@@ -77,3 +77,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI Agent
+.agent
+.docs
+huong_dan_tao_skills.md
