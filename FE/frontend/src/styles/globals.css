@@ -1,0 +1,10 @@
+@config "../../tailwind.config.js";
+@import "tailwindcss";
+
+@layer base {
+  [x-cloak] { display: none !important; }
+}
+
+@layer utilities {
+  .clip-flash { clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); }
+}
