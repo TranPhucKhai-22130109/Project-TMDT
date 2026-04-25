@@ -1,146 +1,94 @@
 ---
-
-# 🗂️ Next.js (FE) + Spring Boot (BE) — Hello World
+# 🗂️ Project-TMDT: E-commerce Admin Dashboard (Next.js) + Backend (Spring Boot)
+---
 
 ## 📁 Cấu trúc tổng quan
 
-```
+```text
 my-project/
-├── FE/frontend/       # Next.js App
-└── BE/ecommerce/      # Spring Boot App
+├── FE/frontend/       # Next.js App (UI/UX + Admin Dashboard)
+└── BE/ecommerce/      # Spring Boot App (REST API)
 ```
 
 ---
 
-## 🖥️ Frontend — Next.js
+## 🖥️ Frontend — Next.js (UI/UX + Admin Dashboard)
 
-```
-FE/frontend/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx
-│   │   ├── page.tsx            # Trang chủ
-│   │   └── globals.css
-│   ├── components/
-│   │   └── HelloMessage.tsx    # Component hiển thị message
-│   ├── constants/
-│   │   └── endpoints.ts        # Khai báo tất cả endpoint API
-│   ├── services/
-│   │   └── helloService.ts     # Gọi API qua service layer
-│   └── lib/
-│       └── api.ts              # HTTP client base (fetch wrapper)
-├── .env.local
-├── next.config.ts
-└── package.json
-```
+### 🛠️ Tech Stack (Frontend)
 
----
+- **Framework**: Next.js 14+ (App Router)
+- **Ngôn ngữ**: JavaScript (JSX)
+- **Styling**: Tailwind CSS
+- **Icons**: `lucide-react`
+- **Charts**: `recharts`
+- **State Management**: React Hooks (`useState`, `useEffect`, `useMemo`)
 
-### `src/constants/endpoints.ts`
+### 📂 Cấu trúc thư mục Frontend
 
-Khai báo toàn bộ endpoint tại một chỗ — không hardcode URL rải rác khắp code.
-
-```ts
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
-export const ENDPOINTS = {
-  hello: {
-    getMessage: `${BASE_URL}/api/hello`,
-  },
-  // Thêm các nhóm endpoint khác ở đây
-  // user: {
-  //   getAll:  `${BASE_URL}/api/users`,
-  //   getById: (id: number) => `${BASE_URL}/api/users/${id}`,
-  // },
-} as const;
-```
-
----
-
-### `src/lib/api.ts`
-
-HTTP client base — wrapper cho `fetch`, xử lý lỗi tập trung.
-
-```ts
-async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, options);
-  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-  return res.json();
-}
-
-export const apiClient = {
-  get: <T>(url: string) => request<T>(url),
-  post: <T>(url: string, body: unknown) =>
-    request<T>(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }),
-  put: <T>(url: string, body: unknown) =>
-    request<T>(url, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    }),
-  del: <T>(url: string) => request<T>(url, { method: "DELETE" }),
-};
+```text
+FE/frontend/src/
+├── app/
+│   ├── dashboard/                  # Các trang Admin Dashboard
+│   │   ├── page.jsx                # Trang Analytics/Tổng quan
+│   │   ├── products/page.jsx       # Trang quản lý Sản phẩm
+│   │   ├── orders/page.jsx         # Trang quản lý Đơn hàng
+│   │   └── users/page.jsx          # Trang quản lý Người dùng
+│   ├── layout.jsx
+│   └── globals.css                 # File CSS chứa Tailwind & global styles
+├── components/
+│   └── dashboard/                  # Các UI components cho Admin
+│       ├── layout/                 # Layout (Sidebar, Topbar)
+│       ├── products/               # Components cho Products (Table, Form, Detail Modal)
+│       ├── orders/                 # Components cho Orders (Table, Detail Modal, Status Badge)
+│       ├── users/                  # Components cho Users (Table, Form, Detail Modal)
+│       ├── ActivityFeed.jsx        # Component: Hoạt động gần đây
+│       ├── OrderStatusChart.jsx    # Component: Biểu đồ trạng thái đơn hàng (Pie Chart)
+│       ├── RecentOrdersTable.jsx   # Component: Bảng đơn hàng gần đây
+│       ├── RevenueChart.jsx        # Component: Biểu đồ doanh thu (Composed Chart)
+│       ├── StatCards.jsx           # Component: Thẻ thống kê KPI
+│       └── TopProductsChart.jsx    # Component: Biểu đồ top sản phẩm (Bar Chart)
+└── data/                           # Mock data (dữ liệu mẫu) cho UI
+    ├── mockAnalytics.js
+    ├── mockOrders.js
+    ├── mockProducts.js
+    └── mockUsers.js
 ```
 
----
+### ✨ Các module chính đã hoàn thiện
 
-### `src/services/helloService.ts`
+1. **Layout & Navigation**
+   - Sidebar với navigation links và notification badges.
+   - Topbar với thanh tìm kiếm và menu người dùng.
 
-Service layer — dùng `ENDPOINTS` + `apiClient`, không viết URL trực tiếp.
+2. **Dashboard / Analytics (`/dashboard`)**
+   - **Thống kê tổng quan (KPIs)**: Doanh thu, số lượng đơn hàng, số lượng sản phẩm, người dùng đang hoạt động (kèm tỷ lệ tăng trưởng).
+   - **Biểu đồ doanh thu (Revenue Chart)**: Line/Area chart hỗ trợ lọc theo thời gian.
+   - **Top Sản phẩm (Top Products)**: Bar chart thống kê sản phẩm bán chạy theo số lượng/doanh thu.
+   - **Trạng thái đơn hàng (Order Status)**: Donut chart hiển thị tỷ lệ trạng thái đơn hàng.
+   - **Hoạt động gần đây (Activity Feed)**: Danh sách cuộn chứa thông báo hệ thống.
 
-```ts
-import { apiClient } from "@/lib/api";
-import { ENDPOINTS } from "@/constants/endpoints";
+3. **Quản lý Sản phẩm (`/dashboard/products`)**
+   - Danh sách sản phẩm với chức năng tìm kiếm, lọc theo danh mục.
+   - Modal thêm/sửa sản phẩm.
+   - Modal hiển thị chi tiết sản phẩm (hiệu ứng scale/fade) kèm biểu đồ sparkline.
+   - Xóa sản phẩm (kèm dialog xác nhận).
 
-interface HelloResponse {
-  message: string;
-}
+4. **Quản lý Đơn hàng (`/dashboard/orders`)**
+   - Danh sách đơn hàng với status badges sinh động.
+   - Modal chi tiết đơn hàng cho phép xem thông tin khách hàng, chi tiết sản phẩm và cập nhật trạng thái giao hàng.
 
-export const helloService = {
-  getMessage: () => apiClient.get<HelloResponse>(ENDPOINTS.hello.getMessage),
-};
-```
-
----
-
-### `src/components/HelloMessage.tsx`
-
-Component chỉ cần gọi service — không cần phải biết về URL hay HTTP.
-
-```tsx
-"use client";
-
-import { useEffect, useState } from "react";
-import { helloService } from "@/services/helloService";
-
-export default function HelloMessage() {
-  const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    helloService.getMessage().then((data) => setMessage(data.message));
-  }, []);
-
-  return <h1>{message || "Loading..."}</h1>;
-}
-```
-
----
-
-### `.env.local`
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
-```
+5. **Quản lý Người dùng (`/dashboard/users`)**
+   - Bảng danh sách người dùng, lọc theo role (Admin/Manager/Customer) và status.
+   - Modal thêm/sửa thông tin người dùng.
+   - Modal chi tiết người dùng với biểu đồ hoạt động gần đây.
 
 ---
 
 ## ☕ Backend — Spring Boot
 
-```
+_Backend hiện tại đóng vai trò cung cấp REST API cho toàn bộ hệ thống._
+
+```text
 BE/ecommerce/
 ├── src/main/
 │   ├── java/com/example/ecommerce/
@@ -161,7 +109,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000") // Cho phép FE kết nối
 public class TestController {
 
     @GetMapping("/hello")
@@ -188,60 +136,27 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 
 ---
 
-## 🚀 Chạy dự án
+## 🚀 Cách chạy dự án
+
+### Chạy Backend (Spring Boot)
 
 ```bash
-# Backend
 cd BE/ecommerce
 ./mvnw spring-boot:run
-# → http://localhost:8080/api/hello
+# API chạy tại: http://localhost:8080
+```
 
-# Frontend
+### Chạy Frontend (Next.js)
+
+```bash
 cd FE/frontend
-npm install && npm run dev
-# → http://localhost:3000
+npm install
+npm run dev
+# Dashboard chạy tại: http://localhost:3000/dashboard
 ```
 
 ---
 
-## 🔄 Luồng hoạt động
+## 🛠️ Điểm quan trọng cần nhớ
 
-```
-Browser (localhost:3000)
-        │  useEffect → helloService.getMessage()
-        ▼
-   helloService          (services/)
-        │  apiClient.get(ENDPOINTS.hello.getMessage)
-        ▼
-   apiClient             (lib/api.ts)
-        │  GET http://localhost:8080/api/hello
-        ▼
-  Spring Boot API
-        │  { "message": "Hello Nextjs + SpringBoot" }
-        ▼
-  Render lên màn hình
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Layer    | Tech        | Version |
-| -------- | ----------- | ------- |
-| Frontend | Next.js     | 14+     |
-| Language | TypeScript  | 5+      |
-| Backend  | Spring Boot | 3+      |
-| Language | Java        | 17+     |
-| Database | MySQL       | 8+      |
-| Build    | Maven       | 3.9+    |
-
----
-
-**Điểm quan trọng cần nhớ:**
-
-- Annotation `@CrossOrigin(origins = "http://localhost:3000")` trong Controller là bắt buộc để FE gọi được BE khi chạy dev (khác port).
-- `NEXT_PUBLIC_` prefix bắt buộc để Next.js expose biến ra client-side.
-- `"use client"` directive cần thiết khi dùng `useEffect`/`useState` trong Next.js App Router.
-- `constants/endpoints.ts` là nơi duy nhất chứa URL — khi BE đổi path, chỉ cần sửa ở đây.
-- `services/` đóng vai trò trung gian giữa component và HTTP client — component không bao giờ gọi `fetch` trực tiếp.
-- `lib/api.ts` xử lý lỗi HTTP tập trung — không cần `if (!res.ok)` lặp lại ở từng service.
+- **Mock Data**: Giao diện hiện tại đang sử dụng dữ liệu tĩnh từ thư mục `src/data/` để thiết kế UI. Bước tiếp theo sẽ là kết nối với các Spring Boot REST APIs thông qua `fetch` hoặc Axios.
