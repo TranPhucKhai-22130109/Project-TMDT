@@ -1,0 +1,721 @@
+[ {
+  "name" : "BMW Z8 \"The World Is Not Enough\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/21329442d2f71af8529d7698201535bd20251217181745102.JPG", "https://minigt.tsm-models.com/upload/picfile_list/42bbd7c41b89b53ed494d42295cacf2420251217181745104.JPG", "https://minigt.tsm-models.com/upload/picfile_list/46ae0b2ea51765ab0039fc91ab5b3a2620251217181745106.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d9aab4898a4abf4b250b7d540a65413320251217181745107.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ec6e89f6f2d9014441f9ff784cb895b420251217181745110.JPG", "https://minigt.tsm-models.com/upload/picfile_list/72814e01bb2b8ccc14412284240edae120251217181745112.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b97d6f118bb40345be63831d08229c1f20251217181745114.JPG", "https://minigt.tsm-models.com/upload/picfile_list/393e9fbf724ca3c7626a61df9986897c20251217181745116.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6b22c1d03f0e12395b1fc84903a831da20251217181745119.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00906",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 M-Performance Daytona Violet",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/1963e52e0586a0af2259ce731b7b50c620251214010933996.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ddb68380dd4c83a52874c67b38147a2620251214010933999.JPG", "https://minigt.tsm-models.com/upload/picfile_list/fc35a440643caceaf86675483dbdea7520251214010934000.JPG", "https://minigt.tsm-models.com/upload/picfile_list/0f11456a39d64ca36bc9d7875c117e3520251214010934001.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01112",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW i7 xDrive60 Tanzanite Blue Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/77d4de6e8917e52d3e256bd18fd5639f20251203080645209.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b94c230ccf5d5937a8ca057a946ec4c520251203080645254.JPG", "https://minigt.tsm-models.com/upload/picfile_list/0439cb936a7469244adf4c9da602df0720251203080645256.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3007d82495e29a9ccaf826bff19efda020251203080645257.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01111",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW Z8 Alpina Alpine Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/3da776e7bb3c88920e14e66005106c1020251207194717398.JPG", "https://minigt.tsm-models.com/upload/picfile_list/19c0537b94ffe5e86c5559d247882ade20251122090720964.JPG", "https://minigt.tsm-models.com/upload/picfile_list/183acff4a3f7b9c7765e9140384514d420251122090720965.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f6ebad9ab6547f2ad638ca74b1f28dad20251122090720967.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01082",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 M Performance Touring Sao Paulo Yellow",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/5f1877b44a4788a09f13772518a9701d20260114053503551.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c5edb565c8152390b7c0c639db4c060e20251118034451266.JPG", "https://minigt.tsm-models.com/upload/picfile_list/aa1120e3e2ce609a75d01aa409581c8d20251118034451273.JPG", "https://minigt.tsm-models.com/upload/picfile_list/20a1bfd505c06aa2d5c608514ef2c5a320251118034451277.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01102",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M5 Touring Brooklyn Grey Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/b41b6bd0c4589d949bd3f19d8108166520251118022917223.JPG", "https://minigt.tsm-models.com/upload/picfile_list/4c42a28f5389d2f531f3d516940a3e1820251118022917228.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e879e84baca3c9cf6000bb40b0e6180220251118022917232.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01096",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M5 Alpine White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c725bdf1df50598904e08b2c15d1856920251118015104234.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3beb231d25e68988c592e6d101b854d720251118015104240.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f5bd4a45c6ad988a0331b93ec1ce57d920251118015104245.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01092",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #91 FIST Team AAI 2025 China GT",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/bb281af4fa090762821ce1464de0e77620251016174848809.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b59c947c7b5b532b4afe894a74e3a20c20251016174848810.JPG", "https://minigt.tsm-models.com/upload/picfile_list/deb99f2c2aa406926e843e3e8c06f45220251016174848804.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d2ee74bf25228b11b51e795a3ca582af20251016174848806.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c3e6ee7c968e6058b85dab343ecfc89420251016174848807.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01108",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 Competition Touring Portimao Blue Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/ec220e8b124c495d81ba677dcf0759ae20260114052418659.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1da8473679578197873c0cecd34d64e120251014071448921.JPG", "https://minigt.tsm-models.com/upload/picfile_list/90afbc1e8ae4cc2d1732c5c0d214b11e20251014071448923.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e92c3cee0f287d88220dd69a1e07598320251014071448925.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01090",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M5 Isle of Man Green Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/9dcbf742cd98289ba5f1efd0d0795acc20250729213552191.JPG", "https://minigt.tsm-models.com/upload/picfile_list/852a4e2bdd3f64042d09f3afbaf4dbba20250729213552193.JPG", "https://minigt.tsm-models.com/upload/picfile_list/bb6b181ebae861307ae6437a4385e64720250729213552194.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01086",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 #44 JPS Team BMW 1987 Bathurst 1000 Class 2 Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/3a10b858e6885ffa2ceb782ab5548c7f20250513172435842.JPG", "https://minigt.tsm-models.com/upload/picfile_list/62b630f13c01c9a3c2eb48fc5209673d20250513172435841.JPG", "https://minigt.tsm-models.com/upload/picfile_list/198662d58e94258259c371f25059fc2720250513172435839.JPG", "https://minigt.tsm-models.com/upload/picfile_list/11e4636c8052eab36b56666211905ca920250513172435837.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00609",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW Z8 Silver",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/2287ded6ce52bce9635a5d4affea7ddb20250616153219132.JPG", "https://minigt.tsm-models.com/upload/picfile_list/691edff6b99d6f2c06fb5ab0d94fbdaf20250511195649623.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d5f65511633b2c6f4187ef41747dda4620250511195649625.JPG", "https://minigt.tsm-models.com/upload/picfile_list/37e305f8a98ce3ad34734f28b9edf85220250511195649627.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00998",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW i7 xDrive60 Alpine White / Black Sapphire",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/21209de9b56c4ef96cee551dd59d61e620250409214117492.jpg", "https://minigt.tsm-models.com/upload/picfile_list/43c7b939402de77c26bb2200b019a50a20250409210647917.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1715444f9d1718a26640b4a3aa3db99520250409210647921.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c259f9d8f895c3d385cc618fc1aaf79520250409210647923.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00959",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW 750IL Sorrento Blue Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/6513d28222464ebcaecb196ba90895ec20251212044043196.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e5b9f38a6c37f718c9d2389879ce139f20250409210503627.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6fc88d54b441be400dd1e3d56ecee16b20250409210503632.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e11450622eb386b8cc5464ca7357f91920250409210503635.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00894",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 M Performance Touring Mint Green",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/1e1462cc67689add5d1ae52e7aa3cf4a20250810210000988.jpg", "https://minigt.tsm-models.com/upload/picfile_list/d57c5f22cb214c2fc8cbf73a6cd6fa3f20250219022438706.JPG", "https://minigt.tsm-models.com/upload/picfile_list/dfd7b39feee4034bf4c8b96b380dc11820250219022438707.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d85a5478a8214bce1bf48948bdf9ba9220250219022438709.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00897",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 Competition (G82) Portimao Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/f2379fcde31b2655a259803562cc7f8920250511011251822.JPG", "https://minigt.tsm-models.com/upload/picfile_list/19443a7e53e7f6968e38562b3da1ba0020250130185048698.JPG", "https://minigt.tsm-models.com/upload/picfile_list/84f99f513112ee4b318f29a522e760dd20250130185048699.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3d3e8a2067bf585e438ec8555a72afca20250130185048700.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00845",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW i7 xDrive60 Mineral White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/5ad7ed574daa25d35ad0a063289cadd620250510053653348.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c3a1ab2c4dc0905db1dc5a662c15105120250126222658250.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1879cecdbf619fcdc77dd68864209bfd20250126222658251.JPG", "https://minigt.tsm-models.com/upload/picfile_list/12cb2d6e02c30a72d918919d30677ddd20250126222658252.JPG" ],
+  "item_info" : {
+    "Item No." : "mgt00819",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW i7 xDrive60 Aventurin",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/fb7ea01164de1c1c89b2c2992bd44a6020250130211747417.jpg", "https://minigt.tsm-models.com/upload/picfile_list/b56ca3d4983858e597ea5f8a41b088e620241209181741009.JPG", "https://minigt.tsm-models.com/upload/picfile_list/90e2505d2672bd94248558900118288420241209181741012.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f2508cc0857c8d398c32bee4d59c51e120241209181741014.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00952",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 M Performance Touring Daytona Violet",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/527a14de7eb30aa002d78dc564f629d520250616150905037.jpg", "https://minigt.tsm-models.com/upload/picfile_list/dfedaf8e38bc4817188bc11bf2339eff20241202222455634.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3090e9784845c4c3f95c38a1563222bd20241202222455635.JPG", "https://minigt.tsm-models.com/upload/picfile_list/604ee8ddb6bde84b8ea94b47e0342b6320241202222455636.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00896",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW 750IL \"Tomorrow Never Dies\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/9d90110eb7292e4531dda784dd69f9c920241122183525488.JPG", "https://minigt.tsm-models.com/upload/picfile_list/10e91ff661e77735bd95c2ad0ccd4d5820241122183525489.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d9daa831d624cff52eb7c30f35084fc920241122183525491.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3c4b26b2a133e6d740a6d7c4d031dbb320251212044305475.JPG", "https://minigt.tsm-models.com/upload/picfile_list/290a26c654c237d5933d8f798a9b796820251212044305483.JPG", "https://minigt.tsm-models.com/upload/picfile_list/8f599eca0020f8cec36a7f37b332977d20251212044305487.JPG", "https://minigt.tsm-models.com/upload/picfile_list/780fb39aa4b7a63efd117641f8d5f60020251212044305479.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00902",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW 3.0 CSL White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/f9a2ff0efd6e757cbb64b2ae946445f020250616041615063.jpg", "https://minigt.tsm-models.com/upload/picfile_list/86e7b0ffab2efa2dbbd4fa718d9b600620241016034701249.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9e4ca3ab6c282e8c989cffbfcdfd706820241016034701251.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a94d4c69a2412b39d914a59ce78b060d20241016034701257.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00863",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 Competition Touring Brooklyn Grey",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/f19c0c2e0f9afb24521ff347ef6dfafb20250130215624097.jpg", "https://minigt.tsm-models.com/upload/picfile_list/14f41c5f1a73f85596a2e4599e34521820240930082838232.JPG", "https://minigt.tsm-models.com/upload/picfile_list/97cf10ee64e37b3db7ba4bd517e0485c20240930082838233.JPG", "https://minigt.tsm-models.com/upload/picfile_list/93b1f3d2bd1033abec2fa8103cbbd13820240930082838234.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00864",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW i7 xDrive60 Dravit Grey",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/ee2f61f6a7ce2f99a9378bf6e49f022820250510053349815.jpg", "https://minigt.tsm-models.com/upload/picfile_list/5e086e66d1ed7d46bf015e2dccb078f720240806002842312.JPG", "https://minigt.tsm-models.com/upload/picfile_list/4c54e75b4f545d1ad1f5a077707c138620240806002842313.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ffb482cc1530177879d458038326bc1020240806002842314.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00818",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 Competition (G82) Sakhir Orange",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/913fd7070541979e50d6246920c92c3820250510052637050.jpg", "https://minigt.tsm-models.com/upload/picfile_list/8858fddac14368f777c60cefd9fb823a20240724025807236.JPG", "https://minigt.tsm-models.com/upload/picfile_list/27d78f4e239c075ffe072d9739de554e20240724025807237.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6ac4c83fca63ba2bf235b38aa171067620240724025807238.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00811",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW i7 xDrive60 Black Sapphire",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/943a5a6f79a26e95629d7f3fd0b619f020241123012017455.jpg", "https://minigt.tsm-models.com/upload/picfile_list/6836f1d4bde4f13277772dd9274e1a1420240711081406425.JPG", "https://minigt.tsm-models.com/upload/picfile_list/03ed14394816a9a072e466f64913bb6820240711081406427.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e0f88620236ea75e8c5840178357523520240711081406428.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00802",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW 750IL Aspen Silver Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/4f10d975c9753c9567f104c3c34603c420250510044852462.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b3627bc225a67622e2eb3c4a819bce9220240626051250241.JPG", "https://minigt.tsm-models.com/upload/picfile_list/999e634e0747f12115f002377b1a5ab220240626051250242.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d78b9ea43050a991a9c5083be69d5c0820240626051250244.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00792",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 M Performance Touring Alpine White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c0826e7a000ad337a78ae8ff538c599d20240908041245762.jpg", "https://minigt.tsm-models.com/upload/picfile_list/560452f63f994523568c4187b1e3398220240514003757232.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3b562f185ba4e6e9acd33b94fd5574ed20240514003757233.JPG", "https://minigt.tsm-models.com/upload/picfile_list/82a0c2ac791f9cab763424b46e89601020240514003757234.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00776",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #7 \"Studie BMW M4\" BMW M Team Studie x CRS 2023 SUPER GT SERIES",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/d9d4b283ffdd9a31d6ff5a296169914220240928211507234.JPG", "https://minigt.tsm-models.com/upload/picfile_list/84e209430cb3afd6be87d503416c0d4f20240429194621714.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b57c48c331c9da07927b17c51dc45aff20240429194621715.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a1ecce8895ca0bfbc3c604a98586da9620240429194621809.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00691",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 Competition Touring Isle of Man Green Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/700cad91a6c34b92e0a6ac385636988b20240908003247065.jpg", "https://minigt.tsm-models.com/upload/picfile_list/771f6a2596a8742643e74a7317d8096720240419031508482.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a36af0537b43e41d35ea3f03c05b1dec20240419031508483.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c338bf0cd40f9b70895314c3cce9b74f20240419031508484.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00764",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 CSL Black Sapphire",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/347096664ef2a7adcfe5ad0c08525a4320240907233132202.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ffe49a6e811470d46c93eb9fb4b4b24c20240127003434205.JPG", "https://minigt.tsm-models.com/upload/picfile_list/72b35a74d66b2ab55e34337cbe3bf5bc20240127003434206.JPG", "https://minigt.tsm-models.com/upload/picfile_list/323367d39844cb0a146b27bf011b4bfe20240127003434206.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00703",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 Competition Touring Toronto Red Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/ca8db139470dc12203b36bb48c6c5d6420240907232946914.jpg", "https://minigt.tsm-models.com/upload/picfile_list/f1e2e417a97db6fd9932db6f6439614420231219184504871.JPG", "https://minigt.tsm-models.com/upload/picfile_list/418bc511b469ef9e7e4422ac12460c8520231219184504872.JPG", "https://minigt.tsm-models.com/upload/picfile_list/5acda430022ed9baf69c43aaea81ad1320231219184504872.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00700",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW Alpina B7 xDrive Aventurin",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/e3aa03723a47bcda7030059032e228b920240908072938243.JPG", "https://minigt.tsm-models.com/upload/picfile_list/2754c842e65b69fa33240cdf3a7bc09120231219180830861.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d960207ee78df752eb27a3972cfdbc7b20231219180830862.JPG", "https://minigt.tsm-models.com/upload/picfile_list/07926dc2a0fd237665100587ed87559120231219180830863.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00693",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M Hybrid V8 #25 BMW M Team RLL 2023 IMSA Sebring 12 Hrs 2nd Place",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/ae8e4c24cb1eb4026ea506667e28658220240908071613317.JPG", "https://minigt.tsm-models.com/upload/picfile_list/00403997a099048f1c1e66c9a39af84a20231219180204333.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d95308bfcadf5e09ea895d563466dd8220231219180204334.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c72117193966066d07b9d017cda7f73420231219180204334.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00709",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 CSL Alpine White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/f5c1518767e0448c03a450fcb8c2be7c20240908151037358.JPG", "https://minigt.tsm-models.com/upload/picfile_list/cf1aced24b11bb45f0e37b7b3849a43520231110081533542.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6bd457b7cb971509279ce12eca5df73f20231110081533543.JPG", "https://minigt.tsm-models.com/upload/picfile_list/071ccfaad95edb9981bd8e5de246b86d20231110081533544.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00683",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M Hybrid V8 GTP #24 2023 IMSA Daytona 24 Hrs",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/fc89aa1fc8464bd52c9457348eaf5d6720240908151926027.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d2261ea1ecbeacd20771dff244bef32b20231016064447335.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9d8948a281e626e5ba92f8555eb7948e20231016064447335.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d672500d088dd56b26a4a347b882843520231016064447336.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00670",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #97 Turner Motorsport IMSA 2023 Laguna Seca GTD 2nd Place",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/600939b62b05df523925f58929179c7520240908161245419.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e822b15a36b84b586eb409fe1590074520240908161245417.JPG", "https://minigt.tsm-models.com/upload/picfile_list/0eec8136d4548df995f9ac2f29760eb420240908161245416.JPG", "https://minigt.tsm-models.com/upload/picfile_list/8b2903870a597318563b9cc4ebb3513120240908161245414.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00647",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 CSL Frozen Brooklyn Grey Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/171ea29f063e80c40331e27c78604e7e20240908193632612.JPG", "https://minigt.tsm-models.com/upload/picfile_list/37e455bff74f82feddcf7de5b9ef70f520240908193703315.JPG", "https://minigt.tsm-models.com/upload/picfile_list/d91d844028ff4e39c86ddb2567de0c6c20240908193703314.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e4bebacb33056f411963aea84119048120240908193703311.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00641",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #1 IMSA 2023 Sebring 12 Hrs GTD Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/a613dadc6f89bfc9b0914ea9fe5de9ed20240908161552606.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a210fadee54d4132b2eb08c102a521f620230908115020351.JPG", "https://minigt.tsm-models.com/upload/picfile_list/04efe323c0dbdb0c33dd82fe2e48d2d620230908115020544.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6c818f2117a971614fa6331e332a206920230908115020856.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00640",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW Alpina B7 xDrive Dravit Grey Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/44b70eb967dfc6f0f2759c2bf549fae520240930212700142.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b590f6852a79b19e2b428b3d38ca081820230908052039575.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ea27d239550f9160eee9af596e07a19020230908052039729.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6d8b9f08ef592d0dc21da647f9008b5420230908052040026.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00619",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 #3 JPS Team BMW 1987 ATCC Championship Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c99b22f11b8a0f2c9586cb0da40563b020231122041652542.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7f1268d957a315ab47ff17d2278bb3d920231122041652539.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7f14306c3ae4ec3ad494210b615bfbc320231122041652540.JPG", "https://minigt.tsm-models.com/upload/picfile_list/5bff21837ab921c7bfa45ffbf325b7a420231122041652541.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00608",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #31 Schubert Motorsport 2022 DTM Champion",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/d7e516aaec59c836c9fbf23ae104c9c220230911175537394.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1681493559_619912.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1681493587_619142.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1681493623_619344.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00553",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 M-Performance (G82) Fire Orange",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678740946_591661.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678740953_591240.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678740958_591245.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00526",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW 750Li xDrive Bernina Grey Amber Effect",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1680629145_581370.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1676054571_581829.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1676054593_581178.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1676054632_581639.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00515",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW Alpina B7 xDrive Alpina Green Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1677014472_554909.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1670195574_554925.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1670195669_554219.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1670195679_554971.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00498",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #7 BMW Team Studie x CSL 2022 Super GT Series",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1684561682_538414.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1667423288_53818.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1667423313_538472.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1667423401_538260.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00484",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW Alpina B7 xDrive Alpina Blue Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1672906036_525834.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664899689_525258.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664899694_525354.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664899699_525212.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00471",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 Competition (G82) San Paulo Yellow",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1684561936_516544.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1663273338_516289.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1663273355_516313.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1663273398_516977.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00468",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #96 2022 IMSA Daytona 24 Hrs",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/5a89032de9c17620d51b6bd92998615120241102204429476.jpg", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1661796735_510115.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1661796740_510911.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1661796745_510910.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00462",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #1 2022 12H Mugello Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/06a6272609a36884a650b963aa54a76420241001064157340.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1659422595_496582.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1659422610_496699.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1659422635_49646.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00439",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW 750Li xDrive Black Sapphire",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1658103536_484435.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1658103558_484763.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1658103566_484459.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00436",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #25 BMW Team RLL 2022 IMSA Daytona 24 Hrs",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/b48d54d6afbd4d3fd30206259de6adb920241102204229733.jpg", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1655137711_469686.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1655137731_469934.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1655137736_469843.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00416",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 #24 2022 IMSA Daytona 24 Hrs",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1660152822_448278.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651008058_448244.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651008062_448826.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651008067_448575.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00394",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 E30 Gulf",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1660152782_431470.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1648883615_431176.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1648883665_431410.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1648883677_431122.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00314",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 GT3 2021 Presentation",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1655139636_394241.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1641236529_394251.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1641236534_394925.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1641236538_394487.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00347",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 M-Performance (G82) Alpine White",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1677014030_393788.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1641236049_3934.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1641236054_393226.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1641236059_393195.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00346",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 #16 Shell 1989 Italian Supertouring Championship",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1636494220_378492.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1636494246_378593.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1636494266_378547.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1636494280_378835.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00261",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB★WORKS BMW M4 IMSA",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651170653_355139.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1632712087_355107.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1632712093_355463.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1632712098_355182.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00319",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB★WORKS BMW M4 Black W/ M Stripe",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630133484_332266.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630133489_332118.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630133495_332360.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00306",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 E30 #42 1991 Deutsche Tourenwagen Meisterschaft",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624472186_305144.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624472199_305264.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624472205_305692.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624472212_30535.JPG" ],
+  "item_info" : {
+    "Item No." : "mgt00056",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 (E30) #1 1992 Guia Race of Macau Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624471930_304191.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624471939_304811.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624471945_304313.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1624471952_304773.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00089",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 AC Schnitzer S3 Sport Black",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1617050554_248221.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1606329788_248169.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1606329789_248436.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1606329790_248679.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00119",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 (E30) ALPINA B6 3.5S Alpina Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1616003114_238652.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1604367712_238598.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1604367713_238672.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1604367713_238493.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00120",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB★WORKS BMW M4 Purple-Green Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1620840535_265943.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1614579075_265658.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1614579082_265429.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1614579089_265454.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00228",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 (F82) Austin Yellow Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1605140838_22469.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1600364037_224469.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1600364038_224979.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1600364039_224909.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00143",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB★WORKS BMW M4 Baby Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1605140583_221793.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1599597978_221938.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1599597979_221411.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1599597979_22148.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00192",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB★WORKS BMW M4 White W/ M Stripe",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1604706310_19121.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1592610353_191403.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1592610354_191786.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1592610354_191181.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00161",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB★WORKS BMW M4 Red w/ Copper Wheel",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1605140936_190152.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1592610230_190358.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1592610231_190328.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1592610235_190930.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00154",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 (F82) Sakhir Orange",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1604452294_186903.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1591403606_186229.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1591403607_186541.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1591403608_186993.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00121",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M4 (F82) Yas Marina Blue Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1604452211_158239.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1584814503_158202.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1584814504_158888.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1584814504_15844.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00122",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 (E30) #6 1991 Guia Race of Macau Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1588269318_140507.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1588269317_140724.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1588269314_1402.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1588269313_140368.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00055-L",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 Henna Red",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1566839224_11235.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1563209522_112940.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1563209528_112589.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1563209528_112968.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00043",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "BMW M3 (E30) Alpine White",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1567016001_94807.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1556649900_94917.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1556649901_94129.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1566839368_94638.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00041",
+    "Scale" : "1:64",
+    "Marque" : "BMW",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]

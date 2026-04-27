@@ -1,0 +1,61 @@
+[ {
+  "name" : "Abarth 595 LB-WORKS x Abas Works Fighters",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/6e5aeb6a161e702976719e8067d0b41b20251122093027335.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ed4d4cfec5a6f93d6eaa990bb0a02a1f20250703173740657.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1b524dcf462e2dd28b6557d1850ff83c20250703173740660.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6ca664115e46b6a8f938340865c21f0d20250703173740664.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01064",
+    "Scale" : "1:64",
+    "Marque" : "Abarth",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Abarth 595 LB-WORKS x Abas Works Grey",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/bc8270553899b6b33aba671e7c0221b120250718185727794.jpg", "https://minigt.tsm-models.com/upload/picfile_list/0d79a1afa2ef98e88cbd4a6afcedfdc620250513021726386.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7c182a5343a44b2a815ab12c05e3b39820250513021726387.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1a34c95654b739316f0b0f77d43cf91520250513021726389.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00995",
+    "Scale" : "1:64",
+    "Marque" : "Abarth",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Abarth 595 LB-WORKS x Abas Works IZTK",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/e2d939e08cf85bd5afc7f54327d72f4520250823033008459.jpg", "https://minigt.tsm-models.com/upload/picfile_list/625b02a61ad7478ea69b36331fe4bd8e20250511171927405.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6892a8a96677ca6118cd0a2590d3e11020250511171927408.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3a71d3fa2b19e11f9b3b87d28079fcf020250511171927409.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01051",
+    "Scale" : "1:64",
+    "Marque" : "Abarth",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB-WORKS x Abas Works ABARTH 595 Red",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/d979c4b0c66db71565cf5302302b2ddf20250616152508956.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f0b7e0025bcce618b229cf7aada521a220250109204134813.JPG", "https://minigt.tsm-models.com/upload/picfile_list/80d060222333c43b663fa9e23dce193620250109204134814.JPG", "https://minigt.tsm-models.com/upload/picfile_list/666255510466d29891b49839cf0dd7aa20250109204134815.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00963",
+    "Scale" : "1:64",
+    "Marque" : "Abarth",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "ABARTH 595 LB-WORKS x Abas Works Pink",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/995c55524f986b317617d6de3fb33a0220250130220849607.jpg", "https://minigt.tsm-models.com/upload/picfile_list/234c43625d8f35b4997b861ee29f48f420240918211542705.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ac5ab72943611772499379a286643c7f20240918211542706.JPG", "https://minigt.tsm-models.com/upload/picfile_list/cabd47c5e35c23c49293e765df473cff20240918211542707.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00851",
+    "Scale" : "1:64",
+    "Marque" : "Abarth",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB-WORKS x Abas Works ABARTH 595 Gara White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/22a78512e280c7afc3ee690eb95916cd20250427221206806.jpg", "https://minigt.tsm-models.com/upload/picfile_list/188befa05e7c456c44d746d78ae7ceae20240724024814825.JPG", "https://minigt.tsm-models.com/upload/picfile_list/8a758c80a14ebcc6b60ae5810cd862b220240724024814826.JPG", "https://minigt.tsm-models.com/upload/picfile_list/18d3a4541c370f57fad75e8defd6040620240724024814827.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00809",
+    "Scale" : "1:64",
+    "Marque" : "Abarth",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]

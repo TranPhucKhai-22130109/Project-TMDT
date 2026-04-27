@@ -1,0 +1,31 @@
+[ {
+  "name" : "Nissan Skyline GT-R (R34) Tommykaira R-z Millenium Jade",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/6dfc24a3a0c752e12442ed2fb5707e8420240908072723947.JPG", "https://minigt.tsm-models.com/upload/picfile_list/46265ec4f96c5c8d558c9625a22039eb20231219183936743.JPG", "https://minigt.tsm-models.com/upload/picfile_list/17180bb6afe320a11cd511d3c68f43ed20231219183936743.JPG", "https://minigt.tsm-models.com/upload/picfile_list/486026f4756dca19d2f5aa8c603188ea20231219183936744.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00697",
+    "Scale" : "1:64",
+    "Marque" : "Tommykaira",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Nissan Skyline GT-R (R34) Tommykaira R-z Midnight Purple",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c8f9066e554fb6c7da927c8663d1ac5b20250509000830808.JPG", "https://minigt.tsm-models.com/upload/picfile_list/dd1be936ad1f446d88ab09a54053820f20230908050702098.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a63a81679e1026381d309de6c65124c420230908050702259.JPG", "https://minigt.tsm-models.com/upload/picfile_list/99da17616a84d24913eeeb742de06cea20230908050702566.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00616",
+    "Scale" : "1:64",
+    "Marque" : "Tommykaira",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Nissan GT-R (R34) Tommykaira R-z Red",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/9637edee66c463ee2b0d47fe40f8efbc20250508202438012.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1680059235_603803.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1680059310_603871.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1680059375_603124.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00543",
+    "Scale" : "1:64",
+    "Marque" : "Tommykaira",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]

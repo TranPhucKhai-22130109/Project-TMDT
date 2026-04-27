@@ -1,0 +1,21 @@
+[ {
+  "name" : "Western Star 49X Blue w/ 40' Reefer Container \"EVERGREEN\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/b7a26daae1d0595f5c015ab85f5e278420240909080027774.jpg", "https://minigt.tsm-models.com/upload/picfile_list/f16ecee388b400a5ed2a9c1de14dd10520230908003021809.JPG", "https://minigt.tsm-models.com/upload/picfile_list/8c8fdd1a0718348122f77745bfb482af20230908003022064.JPG", "https://minigt.tsm-models.com/upload/picfile_list/85f558f8b166bee1b0cb151e3883dc7e20230908003022357.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7464df6f522db014b48477c090f95f2220230908003022657.JPG", "https://minigt.tsm-models.com/upload/picfile_list/928b9e92d08ced2d1cc8391e5173781c20230908003022946.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00597",
+    "Scale" : "1:64",
+    "Marque" : "Western Star",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Western Star 49X w/ 40 Ft Container",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1658176251_442484.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1650917645_442732.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1650917650_442473.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1650917655_442311.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00400-L",
+    "Scale" : "1:64",
+    "Marque" : "Western Star",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]
