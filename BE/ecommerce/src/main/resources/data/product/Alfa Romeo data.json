@@ -1,0 +1,21 @@
+[ {
+  "name" : "Alfa Romeo C43 #77 Valtteri Bottas 2023 F1 2023 Australian GP",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/d49927207a6122750fb421603664388520240930072008962.jpg", "https://minigt.tsm-models.com/upload/picfile_list/77a02e9d43cf68e285824ee17cca3ba520240127012741654.jpg", "https://minigt.tsm-models.com/upload/picfile_list/df93256bc9cd65408ed8f5e84bd269d620240127012741655.jpg", "https://minigt.tsm-models.com/upload/picfile_list/4a8395f6213cefb0f4b40f1d119ed3d520240127012741655.jpg" ],
+  "item_info" : {
+    "Item No." : "MGT00729",
+    "Scale" : "1:64",
+    "Marque" : "Alfa Romeo",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Alfa Romeo C43 #24 Zhou Guanyu 2023 F1 2023 Australian GP",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/5cdfde58d969f5d0f9ed4002a0d4850120240930072210949.jpg", "https://minigt.tsm-models.com/upload/picfile_list/7fe753c02f08ddc228078623e75afc5e20240127012600850.jpg", "https://minigt.tsm-models.com/upload/picfile_list/eb219c6c8d67a497c86bba5d084d2af320240127012600851.jpg", "https://minigt.tsm-models.com/upload/picfile_list/e1a3fd1e9f4d9685c38cde744a4a759b20240127012600851.jpg" ],
+  "item_info" : {
+    "Item No." : "MGT00728",
+    "Scale" : "1:64",
+    "Marque" : "Alfa Romeo",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]

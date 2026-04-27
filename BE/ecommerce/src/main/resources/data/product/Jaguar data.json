@@ -1,0 +1,51 @@
+[ {
+  "name" : "Jaguar C-X75 Black",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/554978bc27519d7fd78b459ad7893e2020251123200551243.JPG", "https://minigt.tsm-models.com/upload/picfile_list/2578ee5de8f95dc93d0a3e86efba938b20250705224728698.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7e5a338282446d10a3894d4351be01c620250705224728700.JPG", "https://minigt.tsm-models.com/upload/picfile_list/dc467c69da746bb90720f781aea39c0920250705224728701.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01070",
+    "Scale" : "1:64",
+    "Marque" : "Jaguar",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Jaguar C-X75 Test Car",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c6ec19695074a81b98d215486a133f5b20250513022112428.jpg", "https://minigt.tsm-models.com/upload/picfile_list/c632e4df012ba86d8bd23e521002d9e920250513022112429.JPG", "https://minigt.tsm-models.com/upload/picfile_list/71862e4cc06a8e4457f989f74ee2663720250513022112430.JPG", "https://minigt.tsm-models.com/upload/picfile_list/4c6eea78b35bf41d5b656322368141b120250513022112431.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00997",
+    "Scale" : "1:64",
+    "Marque" : "Jaguar",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Jaguar C-X75 Silver",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/cddfeb028b9f888ffe6d8d3b3abb211620250409214226636.jpg", "https://minigt.tsm-models.com/upload/picfile_list/4847bb7fef767071dc3fba20985629f420250109194344072.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6026dbc4c393a12f0d08dbdb1aafcea720250109194344073.JPG", "https://minigt.tsm-models.com/upload/picfile_list/63fe25ae2afa61b74e99effaaf8f3e3b20250109194344074.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00960",
+    "Scale" : "1:64",
+    "Marque" : "Jaguar",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Jaguar C-X75 \"Spectre\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/85a9bfb586ace51f8cdda7cf252b6b4020241122184424283.JPG", "https://minigt.tsm-models.com/upload/picfile_list/013224ba1a1ce24482480aaed749fe8d20241122184424284.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3dcc3e7086642e534a76aa7a3b0f5b3820241122184424286.JPG", "https://minigt.tsm-models.com/upload/picfile_list/37aec5f9647561c0848416f67cdee95720250427210229420.jpg", "https://minigt.tsm-models.com/upload/picfile_list/ae4c70443c14b63e2ab0f055dc6c5d8320250427210229419.jpg", "https://minigt.tsm-models.com/upload/picfile_list/46dc8d53d98cfddab61416105afc460e20250427210229421.jpg", "https://minigt.tsm-models.com/upload/picfile_list/c958b1d089d94a9afc669d4c2eb6631620250427210229423.jpg" ],
+  "item_info" : {
+    "Item No." : "MGT00903",
+    "Scale" : "1:64",
+    "Marque" : "Jaguar",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Jaguar C-X75 Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/11efd1dfa7c8a1d7b202a5a247956f2720250419231214846.jpg", "https://minigt.tsm-models.com/upload/picfile_list/df0f3de5538391e55a78656d0ca62c3020241030181327163.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9bc5461138e0decd62932b0f4c1c42c620241030181327164.JPG", "https://minigt.tsm-models.com/upload/picfile_list/dc47de9ce94e0f0b46622abcc84fbe5420241030181327166.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00884",
+    "Scale" : "1:64",
+    "Marque" : "Jaguar",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]
