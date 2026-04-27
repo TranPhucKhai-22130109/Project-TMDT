@@ -1,0 +1,71 @@
+[ {
+  "name" : "Lotus Esprit Turbo Copper Fire Metallic \"For Your Eyes Only\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c342ceb7ce19f3ad907bc79867ce56b620260211175235589.JPG", "https://minigt.tsm-models.com/upload/picfile_list/12142605d2fb2c7ce20fd179eeeea88220260211175235594.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f6a2d790207a599282f556c2e27344b520260211175235598.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00912",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Lotus Esprit Turbo White \"For Your Eyes Only\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/4dda5798814ee3852958f2b9cf8361d420251217184024975.JPG", "https://minigt.tsm-models.com/upload/picfile_list/2bc6fb96a580461b95eaaafea7c1c9b220251217184024973.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f1d3125555e42afda425116f1e3ffb9d20251217184024976.JPG", "https://minigt.tsm-models.com/upload/picfile_list/62ac399cfe40ee8a84a29879e362919620251218043216553.JPG", "https://minigt.tsm-models.com/upload/picfile_list/900ed3abbab6817f57d566db0c114f3520251218043216558.JPG", "https://minigt.tsm-models.com/upload/picfile_list/8cce84e178092384cf27f75475cc5b2220251218043216560.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e3dde20a725c4da516c592277f40981c20251218043216556.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00907",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Lotus Esprit Turbo Metallic Silver",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/cffe8556a19a207e7c7e37e55a3900f820251207192213525.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a8e307821d4b36a736c48423f00089ee20251207192213528.JPG", "https://minigt.tsm-models.com/upload/picfile_list/161f0d0543b47e9ca2b7d823f04d395620251207192213530.JPG", "https://minigt.tsm-models.com/upload/picfile_list/676461bbf4270db6ffb58ac3fbbc369720251207192213531.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01109",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Lotus 99T #11 Satoru Nakajima 1987 Monaco Grand Prix",
+  "img" : [ ],
+  "item_info" : {
+    "Item No." : "MGT01148",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Lotus 99T #12 Ayrton Senna 1987 Monaco Grand Prix Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/84970d6995b84c82f375d23c9f82c80620250828203229012.JPG", "https://minigt.tsm-models.com/upload/picfile_list/4d81c46e0fb3a8b93128b5048a1f89a520250828203229014.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3b605e867a54b64dbe545d5aea37c23c20250828203229015.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01088",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Lotus 78 #6 Gunnar Nilsson 1977 Japanese GP",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/cf8ad5ef4752998e444ad84b926d601720250419193228523.jpg", "https://minigt.tsm-models.com/upload/picfile_list/8ac9fb66329d6708464f4bc5b86fe13420240724024407100.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e112a6735f55e54a77c4bfc0076edd9620240724024407101.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f09a42b70096abdee88b9148c2bca4a620240724024407102.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00808",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Lotus 78 #5 1977 Presentation",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1672906208_519158.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1663607379_519789.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1663607393_519434.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1663607397_519430.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00489",
+    "Scale" : "1:64",
+    "Marque" : "Lotus",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]

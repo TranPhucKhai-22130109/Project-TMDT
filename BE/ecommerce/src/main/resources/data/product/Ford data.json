@@ -1,0 +1,461 @@
+[ {
+  "name" : "Ford Mustang GT3 #26 DAYTONA® EDITION",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/07c55a185cdd46c9061ef5c44a195e9920260123222026314.JPG", "https://minigt.tsm-models.com/upload/picfile_list/908ee46fd6b495b55cb1f5d3bdb39fff20260123222026317.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b836932398b93955ed661fffec6e3e7220260123222026321.JPG", "https://minigt.tsm-models.com/upload/picfile_list/20a90b81132de232033abf379993ddfa20260123222026324.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01091",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Puma Rally1 #55 M-Sport Ford WRT 2025 Rally Monte-Carlo",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/172d406918e17ee1817930dbf36fcb0720251214234445559.JPG", "https://minigt.tsm-models.com/upload/picfile_list/0b90fb1bef0eeeeb6a1b48566440313520251214234445562.JPG", "https://minigt.tsm-models.com/upload/picfile_list/34bf2f25bb44f74633394f55a51f89a320251214234445567.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01176",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Mach 1 Grabber Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/904e9ff737cc09894b56438a79c8b2ef20251214234107068.JPG", "https://minigt.tsm-models.com/upload/picfile_list/20b1f8e829493f860365b2ab804dd55420251214234107071.JPG", "https://minigt.tsm-models.com/upload/picfile_list/117f6407632c642169a67f6da548bb6a20251214234107074.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01138",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Mach 1 \"Diamonds Are Forever\"",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/af457ee155622428b4e8c70aad1ce3a220251207184809824.JPG", "https://minigt.tsm-models.com/upload/picfile_list/27e2bb8ae402d09900e0f71839419ddc20251207184809828.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7a5b0b01cf2309b6d636912f7761829520251207184809830.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e6f36d0bd5aa398312a606ef8d59480f20251218045740583.JPG", "https://minigt.tsm-models.com/upload/picfile_list/406d8b1e132bcf841f745e497483975a20251218045740588.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1986a90f08de3181da3f44ac0479d11820251218045740590.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f109ace750acb79880095f3cb6b73dd520251218045740592.JPG", "https://minigt.tsm-models.com/upload/picfile_list/bbc7109c6bd42db9ad452c8dd9eb209920251218045740586.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00905",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang GTD Spirit of America",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/20fd9c96b649fc1553e683c0520e202520260114053028474.JPG", "https://minigt.tsm-models.com/upload/picfile_list/68f1f39fb1c505432150e63e842ca6dc20251203044019747.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9f79c4ac8f122e63f612fdf02303d9e020251203044019749.JPG", "https://minigt.tsm-models.com/upload/picfile_list/32cc5d14775868caf27a81919487ccde20251203044019752.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01097",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Convertible 1964 Highland Green",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/e9766a2a20a58dfb63002c69ea56daea20251201023958858.JPG", "https://minigt.tsm-models.com/upload/picfile_list/80d421b0fdf61f821a9e41f7bf6b3e3b20251201023958861.JPG", "https://minigt.tsm-models.com/upload/picfile_list/2b435a802e857778e68511caf656c7e620251201023958863.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01166",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Dark Horse 2024 Grabber Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/5d9c1911a5a3f2a683d50d67df2a9cb520260114055058688.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3d93f1158129f40b029de07eee78f7b620251225013144355.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ced7f5514428391214124ee85521afc720251225013144358.JPG", "https://minigt.tsm-models.com/upload/picfile_list/c6a41a9c9a61b8ce0f1957e9c90aecf120251225013144360.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01141",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Mach1 Grabber Yellow",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/16ead7f2d571bf855d84bd5b2cb8385c20251222050052648.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b935915d9cd9e97a13ea644b52ef42e920251222050052651.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9d2fea38c3b46f312702eb30e397c5ee20251222050052655.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01139",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Mach1 1971 Race Red",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/28114ab7655dfc53cac4985222e7866820251102193848859.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1ee7cd8653b3127621fb6a88ea7cb12920250826055054291.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3f50e0abf4ebfe0b7e94d5e16a3dc25b20250826055054293.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f5342dcc5ef1439e7604233b5c792e1320250826055054294.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01122",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB-WORKS FORD MUSTANG Triple Yellow",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/86888b142234513bcb6d26af9fe0136e20251207192740489.JPG", "https://minigt.tsm-models.com/upload/picfile_list/070916a280243a43dbcfe91a1fb2758d20250720223229251.JPG", "https://minigt.tsm-models.com/upload/picfile_list/637a8b40c7c485a85f7c1b4052da6b0320250720223229252.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e6ac5dae1e826cc6a4bfdbc2201a956720250720223229254.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01077",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Puma Rally1 #16 M-Sport Ford WRT 2024 Rally Finland 3rd Place",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/f5a381b5c9922a82bae1a2ccd10a312a20251217180951153.JPG", "https://minigt.tsm-models.com/upload/picfile_list/4d9ff531bcbafea282ac45988498b6e120250703174010292.JPG", "https://minigt.tsm-models.com/upload/picfile_list/92e6d2b4a26885985ab5b86ce84ecd7e20250703174010295.JPG", "https://minigt.tsm-models.com/upload/picfile_list/2d492fd877bd589c50363fb8f1a4b30120250703174010297.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01074",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB-WORKS FORD MUSTANG LB Gold",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/b432e5dabf987d013845eaa3936c1e1320250514005951728.jpg", "https://minigt.tsm-models.com/upload/picfile_list/7ff53cbbe3a28e0ca04b12d12d24c1c020250513174058655.JPG", "https://minigt.tsm-models.com/upload/picfile_list/cf4e2eb87a1aa9b28bd6886fd80dba7620250513174058657.JPG", "https://minigt.tsm-models.com/upload/picfile_list/30af35ffce91845ccc5f042c808ad82520250513174058658.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00847",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Dark Horse 2024 Carbonized Gray",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/b2983a53dc0cd2665afc46bf834e42ed20251212045051567.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b832b1bef7107a6af88137e7f94ecc0920250511011853442.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7a7c5b892d4d2f8d36cf5cf7c91b6a5f20250511011853444.JPG", "https://minigt.tsm-models.com/upload/picfile_list/fc96a4be7205deed846c17d117258f9420250511011853445.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00957",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang GT3 #65 Ford Multimatic Motorsports 2024 IMSA Daytona 24 Hrs",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/50cb17fcc66171549125721f5bbe08a120260114052232586.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e3b3a76d78388dd1d4ebbd4d86ac69d620250427165340097.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b5ee7484a393cabe23e640cc00212ccd20250427165340099.JPG", "https://minigt.tsm-models.com/upload/picfile_list/20fe7c7ae2cc60736a740917492473da20250427165340100.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01012",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Puma Rally1 #13 M-Sport Ford WRT 2024 Rally Monte Carlo",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/ed9c0d378af1d9cda1e223d726060d2f20260211191349183.JPG", "https://minigt.tsm-models.com/upload/picfile_list/480967622df53a3b9389b3f46f8aba9020250409212944701.JPG", "https://minigt.tsm-models.com/upload/picfile_list/bd14657ee647d57189e6ad96852d495620250409212944702.JPG", "https://minigt.tsm-models.com/upload/picfile_list/21df28b820a158d6d5353455f4b0333320250409212944704.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00974",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang GT3 #64 Ford Multimatic Motorsports 2024 IMSA Daytona 24 Hrs",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/d804d5b6416d996101edd1d70695792220260114051836049.JPG", "https://minigt.tsm-models.com/upload/picfile_list/a559ea82cfbe7062e2ccbad2901d3a3620241202223017417.JPG", "https://minigt.tsm-models.com/upload/picfile_list/055df0a4d35162b524b46f4a56672c9720241202223017418.JPG", "https://minigt.tsm-models.com/upload/picfile_list/db43fdfcc9365245ac7459b126ba32e220241202223017420.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00898",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Shelby GT500 Heritage Edition",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/097c7853e0535531184c90fd890a5d5a20240908002631610.jpg", "https://minigt.tsm-models.com/upload/picfile_list/6f65b99cc37519ff5a4a614d47786dfb20240419030955633.JPG", "https://minigt.tsm-models.com/upload/picfile_list/68e3bb635c167cd2053210b8f1868d3f20240419030955634.JPG", "https://minigt.tsm-models.com/upload/picfile_list/548f574b037f1307a03cf6b2757244fa20240419030955634.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00758",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Sunoco Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/71903490a62e120e4d3a174aed26bf3920240606075555819.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b606483f62ff0cdd42d6d61af6bc9a1320240306195622725.JPG", "https://minigt.tsm-models.com/upload/picfile_list/fdb7884eb3b2b85062cb13fb607dbb0920240306195622726.JPG", "https://minigt.tsm-models.com/upload/picfile_list/3c5b93b1e671ec8cbf43236db512f80320240306195622727.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00614",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Shelby GT500 Dragon Snake Concept Fuchsia Metallic",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/f94007009f834b9525c0f803253788b420240908072827913.JPG", "https://minigt.tsm-models.com/upload/picfile_list/6e6aac4aa903dcba7b844a5e1563580120231219180959740.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7df4673a2488b929188d4f966606ba6c20231219180959740.JPG", "https://minigt.tsm-models.com/upload/picfile_list/fe70d8545c330a68821032cdff976ae720231219180959741.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00696",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT ’64 Prototype Heritage Edition",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/19d6589a449b2663b2426a4e6ae760f920241004004115709.jpg", "https://minigt.tsm-models.com/upload/picfile_list/f03b1739fa631ecc60cfb063786765f220231120075321477.JPG", "https://minigt.tsm-models.com/upload/picfile_list/7fb9723d3386140fe6d0a8dbb2d7b9b520231120075321478.JPG", "https://minigt.tsm-models.com/upload/picfile_list/8792e51fbb73f9307423bd425235129320231120075321479.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00622",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT LMGTE PRO 2019 24 Hrs of Le Mans Ford Chip Ganassi Team 4 Cars Set",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/844212ddf4c3f6f646a2be02146fea6620241004004256404.JPG", "https://minigt.tsm-models.com/upload/picfile_list/e419f3d81518f02f61ba59d916ffb65d20231016065119801.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f85ceafadd78da187b46b1daa790298120231016065119775.JPG", "https://minigt.tsm-models.com/upload/picfile_list/45709ad86f6e75848d36737bfbe6232720231016065119775.JPG", "https://minigt.tsm-models.com/upload/picfile_list/667ff356cddcde483e89e59329707c6620231016065119776.JPG", "https://minigt.tsm-models.com/upload/picfile_list/951d0a8e0184c76f1eb1392fdb2a4d2220231016065119777.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ca6538adff6aee74880ddaedf422fa8420231016065119777.JPG", "https://minigt.tsm-models.com/upload/picfile_list/41dffc5f6bdea5c740c3a76d032cd7ba20231016065119778.JPG", "https://minigt.tsm-models.com/upload/picfile_list/23dbd8baf37bf8d47024d5b3d9096eec20231016065119778.JPG", "https://minigt.tsm-models.com/upload/picfile_list/98c13d70b5e0578020d5de37d3f9995620231016065119779.JPG", "https://minigt.tsm-models.com/upload/picfile_list/932aadeda0719f207b1861cac6da4bcc20231016065119780.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9a541a3eb0fb3d89341cadfe9ecac46820231016065119780.JPG", "https://minigt.tsm-models.com/upload/picfile_list/f5730ebc5bf4900b4ee37ee4519d01f220231016065119781.JPG", "https://minigt.tsm-models.com/upload/picfile_list/04d14b481eaff48f8dce0ac87b60d29820231016065119800.JPG" ],
+  "item_info" : {
+    "Item No." : "MGTS0010",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "FORD MUSTANG GT LB-WORKS White",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/34e284a8cdb23796b2d392aa94cc5fbb20240908185510266.JPG", "https://minigt.tsm-models.com/upload/picfile_list/1b86a67cb5d223be8adfc6773ff5ac9920230911235211273.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b7ec4a4a69ba98b77b12b106e76ce65320230911235211274.JPG", "https://minigt.tsm-models.com/upload/picfile_list/afde08543738b3ece158a9ff9d9e215520230911235211274.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00646",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Triple Yellow",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/7f8a9a45713edd450a0583516d5ce2b420241004004632148.JPG", "https://minigt.tsm-models.com/upload/picfile_list/29c228cca873fdbde000bf6e2b9248b320230908053242914.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b8790a7adc962888e937502eb85b84c820230908053242933.JPG", "https://minigt.tsm-models.com/upload/picfile_list/71b60e351a6c8b5922a030502e70750d20230908053243203.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00613",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT MK II #013 Rosso Alpha",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/1faf106bc5383f61a19604c55483786420231114020702818.JPG", "https://minigt.tsm-models.com/upload/picfile_list/454d6319825e5ed56359cffa0d2ab22b20230907202247280.JPG", "https://minigt.tsm-models.com/upload/picfile_list/45a7de7a44864261c774660ae8b1421020230907202247491.JPG", "https://minigt.tsm-models.com/upload/picfile_list/73d22ca4e9fb8512315e92d5af0d459720230907202247811.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00603",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Holman Moody Heritage Edition",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/6d6ca8c4a8a93fd34c419febefd5380920241004004745693.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678745045_601996.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678745051_601800.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678745058_601765.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00536",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Puma Rally1 #19 M-Sport Ford WRT 2022 Rally MonteCarlo Winner LHD",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/e27730e97cbc9d2e94613c32ae78d0ca20241004005015335.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678744188_598568.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678744196_59863.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1678744201_598550.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00533",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Shelby GT500 Twister Orange",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1684561845_564370.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1671767766_564788.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1671767772_56436.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1671767780_564517.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00505",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Alan Mann Heritage Edition",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1672906291_533580.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1666370499_533963.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1666370517_533791.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1666370524_533486.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00476",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang GT LB-Works Grey",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/65be3ba861155dbd2ec674614bbedf7120250307220547128.jpg", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664899598_524518.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664899602_524602.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664899613_524706.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00470",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT #85 2019 24 Hrs of Le Mans LM GTE-Am",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1684214161_495603.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1659422026_49545.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1659422080_49521.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1659422095_495359.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00438",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT MK II Ford Performance",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1684215056_482934.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1657045226_482476.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1657045273_482980.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1657045335_482474.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00429",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "LB-WORKS Ford Mustang Grabber Lime",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1664905456_479929.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1656982842_479242.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1656982911_479170.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1656982922_479637.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00426",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Mk II #002 Blue / Orange",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1655139656_409391.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1644823252_409439.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1644823260_40984.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1644823268_409359.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00359",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Mk II 2019 Pebble Beach Concours d'Elegance",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1643223752_404974.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1643223817_404385.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1643223835_404126.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1643223846_404405.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00293-MJ",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Ingot Silver",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1649481628_385903.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1638814202_385397.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1638814206_38532.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1638814211_385421.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00340",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Shelby GT500 Shadow Black",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651097754_369155.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1635194936_369619.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1635194940_369454.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1635194945_369529.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00334",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Shelby GT500 Grabber Lime",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651443886_449395.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651443963_449579.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651444007_449665.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1651444019_449509.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00271-L",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT 2021 Heritage Edition",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1677013669_34870.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1631557841_348543.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1631557846_348458.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1631557852_348752.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00313",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT GTLM Gulf",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630446094_339419.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630446118_339797.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630446128_339959.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1630446138_339145.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00269",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT MK II #006 Shadow Black",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1639420216_328418.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1629095700_328865.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1629095707_328311.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1629095712_328564.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00297",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford Mustang Shelby GT500 Ford Performance Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1635963369_319392.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1628009549_319584.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1628009555_319111.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1628009560_319587.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00268",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT MK II 2019 Goodwood Festival of Speed",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1677013470_309992.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626710731_309573.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626710819_309970.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626710825_309135.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00280",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT LMGTE PRO 2016 24 Hrs of Le Mans Ford Chip Ganassi Team 4 Cars Set",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1628103278_308352.jpg", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626195565_308173.jpg", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626195749_308224.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626195780_308996.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201210_308179.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201216_308233.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201222_308900.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201232_308221.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201238_308677.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201244_308684.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201249_308309.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201255_308373.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201261_308672.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626201267_308157.JPG" ],
+  "item_info" : {
+    "Item No." : "MGTS0001",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT Liquid Blue",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1631121519_287966.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1619719375_287517.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1619719399_287936.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1619719412_287492.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00249",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT GTLM Test Car",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1631211263_286993.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1619719200_28699.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1619719206_286430.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1619719213_286821.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00246",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Ford GT LMGTE PRO #68 2016 24 Hrs of Le Mans Class Winner",
+  "img" : [ "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1637744462_30722.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626195364_30756.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626195370_307502.JPG", "https://minigt.tsm-models.com/upload/mini_gt/products_gif/product_pic_big/1626195376_30772.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT00278",
+    "Scale" : "1:64",
+    "Marque" : "Ford",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]

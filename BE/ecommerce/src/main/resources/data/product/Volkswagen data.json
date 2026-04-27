@@ -1,0 +1,51 @@
+[ {
+  "name" : "Volkswagen ID.Buzz Candy White/ Pomelo Yellow",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/2672794a8ee5fc89f0924486281aae4c20260211185022952.JPG", "https://minigt.tsm-models.com/upload/picfile_list/0b6a681dfa9eecb9747a5e87a87f6d7f20260211185022954.JPG", "https://minigt.tsm-models.com/upload/picfile_list/21232e4f976266eecc2e4d6da693512e20260211185022956.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01110",
+    "Scale" : "1:64",
+    "Marque" : "Volkswagen",
+    "Status" : "Released"
+  },
+  "description" : null
+}, {
+  "name" : "Volkswagen T1 Microbus Mizu Design",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/c39033aaedd98d4809339c048df1dafb20260119010823783.JPG", "https://minigt.tsm-models.com/upload/picfile_list/b4f58441aec1d370ac312d3fb7ecdad020260119010823787.JPG", "https://minigt.tsm-models.com/upload/picfile_list/04487f4de95dcbcffe934ed0edc2e43720260119010823790.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01191",
+    "Scale" : "1:64",
+    "Marque" : "Volkswagen",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Volkswagen ID.Buzz KW/BBS",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/fd99dd4be487d5fd96526cc20549e55a20251118020426270.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ff82797ef53df665b51cfae32bcaa15020251118020426274.JPG", "https://minigt.tsm-models.com/upload/picfile_list/4bd7a370e887e315fc45cd918e38ae6820251118020426277.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01159",
+    "Scale" : "1:64",
+    "Marque" : "Volkswagen",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Porsche 911 Dakar #718 / Volkswagen ID. Buzz Porsche Centrum Gelderland Roughroads Set",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/0af9a219b48117ec238538325538327020260123214904700.JPG", "https://minigt.tsm-models.com/upload/picfile_list/9b8c14424d01f33a731202158b7619ec20260123214904681.JPG", "https://minigt.tsm-models.com/upload/picfile_list/006cb59110b4fad685be5ca60a897cfd20250826064227701.JPG", "https://minigt.tsm-models.com/upload/picfile_list/ae1224f26f02f6cfb14627031862333d20260123214904677.JPG", "https://minigt.tsm-models.com/upload/picfile_list/374590605a9e84e7a8b70dd147196fe620250826064227705.JPG", "https://minigt.tsm-models.com/upload/picfile_list/09c11798d493fbbcb50d74ce1b180ac720250826064227704.JPG", "https://minigt.tsm-models.com/upload/picfile_list/0d179328214df7755ed46cde4db669b020250826064227703.JPG" ],
+  "item_info" : {
+    "Item No." : "MGTS0019",
+    "Scale" : "1:64",
+    "Marque" : "Volkswagen",
+    "Status" : "Pre-Order"
+  },
+  "description" : null
+}, {
+  "name" : "Volkswagen ID.Buzz Candy White / Energetic Orange",
+  "img" : [ "https://minigt.tsm-models.com/upload/picfile_list/aef6abd4314157266dd0279a685755cf20251207194328639.JPG", "https://minigt.tsm-models.com/upload/picfile_list/be3695c2931d7b749dce62a6b302253f20250605074154966.JPG", "https://minigt.tsm-models.com/upload/picfile_list/177639999ba90f1f8ca3807469afd5c220250605074154967.JPG", "https://minigt.tsm-models.com/upload/picfile_list/00091da7dace47c5aebe08b92c8c955320250605074154969.JPG" ],
+  "item_info" : {
+    "Item No." : "MGT01061",
+    "Scale" : "1:64",
+    "Marque" : "Volkswagen",
+    "Status" : "Released"
+  },
+  "description" : null
+} ]
