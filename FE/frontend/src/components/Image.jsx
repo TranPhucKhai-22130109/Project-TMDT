@@ -1,14 +1,15 @@
-import NextImage from 'next/image';
+import NextImage from "next/image";
 
-export const Image = ({ className, children, variant, contentKey, ... props }) => {
+export const Image = ({ className, children, variant, contentKey, ...props }) => {
   return (
     <NextImage
-          src={props.src || ''}
-          alt={props.alt || ''}
-          width={props.width || 100}
-          height={props.height || 100}
-          className={className}
-          {... props}
-        />
+      src={props.src || "/placeholder.png"}
+      alt={props.alt || "Image"}
+      width={props.width || 50}
+      height={props.height || 50}
+      className={className}
+      unoptimized
+      {...props}
+    />
   );
 };
