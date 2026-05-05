@@ -48,7 +48,8 @@ public class ProductController {
                             product.getScale(),
                             product.getMarque(),
                             product.getStatus(),
-                            product.getDescription()
+                            product.getDescription(),
+                            product.getPrice()
                     );
                 })
                 .toList();
