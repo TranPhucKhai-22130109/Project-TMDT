@@ -38,7 +38,7 @@ public class SecurityConfig {
             // Phân quyền endpoint
             .authorizeHttpRequests(auth -> auth
                 // Public: test endpoints
-                .requestMatchers("/api/hello", "/api/test/**").permitAll()
+                .requestMatchers("/api/hello", "/api/test/**", "/api/products/**").permitAll()
                 // Các request khác cần auth (cấu hình thêm sau)
                 .anyRequest().authenticated()
             );

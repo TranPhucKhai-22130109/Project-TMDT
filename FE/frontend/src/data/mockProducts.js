@@ -1,32 +1,35 @@
 export const mockProducts = [
   {
     id: "PRD-001",
-    name: "iPhone 16 Pro Max 256GB",
-    sku: "APL-IP16PM-256",
-    category: "Electronics",
-    price: 1199,
-    originalPrice: 1299,
+    name: "Toyota Camry 2024 Hybrid",
+    sku: "TOY-CAMRY-24",
+    category: "Vehicles",
+    price: 28500,
+    originalPrice: 31200,
     stock: 8,
     maxStock: 50,
     status: "active",
-    description: "Latest Apple flagship with A18 Pro chip, titanium design, and advanced camera system.",
+    description: "Advanced sedan with hybrid technology, fuel efficiency, and premium comfort features.",
     images: [
-      "https://picsum.photos/seed/iphone1/400/400",
-      "https://picsum.photos/seed/iphone2/400/400",
-      "https://picsum.photos/seed/iphone3/400/400"
+      "https://picsum.photos/seed/car1/400/400",
+      "https://picsum.photos/seed/car2/400/400",
+      "https://picsum.photos/seed/car3/400/400"
     ],
-    tags: ["smartphone", "apple", "flagship", "5g"],
+    tags: ["sedan", "hybrid", "economy", "family"],
     specs: {
-      weight: "227g",
-      dimensions: "163 x 77.6 x 8.25 mm",
-      material: "Titanium / Ceramic Shield",
+      engine: "2.5L Hybrid",
+      transmission: "CVT Automatic",
+      fuelType: "Hybrid (Gasoline + Electric)",
+      mpg: "56 City / 53 Highway",
+      seats: 5,
+      wheelbase: "112.2 inches",
       barcode: "194253123456",
-      supplier: "Apple Inc."
+      supplier: "Toyota Motor Corporation"
     },
-    salesStats: { totalSold: 128, revenue: 153472, returnRate: 1.2, avgRating: 4.8 },
+    salesStats: { totalSold: 128, revenue: 3648000, returnRate: 1.2, avgRating: 4.8 },
     recentOrders: [
       { orderId: "ORD-901", customerName: "John Doe", qty: 1, date: "2024-03-10", status: "Delivered" },
-      { orderId: "ORD-902", customerName: "Alice Smith", qty: 2, date: "2024-03-12", status: "Shipped" },
+      { orderId: "ORD-902", customerName: "Alice Smith", qty: 1, date: "2024-03-12", status: "Shipped" },
       { orderId: "ORD-903", customerName: "Bob Johnson", qty: 1, date: "2024-03-14", status: "Pending" },
       { orderId: "ORD-904", customerName: "Charlie Brown", qty: 1, date: "2024-03-15", status: "Processing" },
       { orderId: "ORD-905", customerName: "David Lee", qty: 1, date: "2024-03-16", status: "Pending" }
