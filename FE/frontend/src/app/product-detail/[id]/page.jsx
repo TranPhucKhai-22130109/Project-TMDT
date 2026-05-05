@@ -23,6 +23,7 @@ import { Text } from "@/components/Text";
 import { useCart } from "@/app/cart/CartContext";
 import { Navbar } from "@/components/Navbar";
 
+
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -179,11 +180,11 @@ export default function ProductDetailPage() {
 
             <div className="flex items-end gap-4">
               <span className="text-5xl font-black text-red-600">
-                ${product.price}
+                {Number(product.price || 0).toLocaleString("vi-VN")} ₫
               </span>
               {product.originalPrice && (
                 <span className="text-2xl line-through text-gray-400">
-                  ${product.originalPrice}
+                  {Number(product.price || 0).toLocaleString("vi-VN")} ₫
                 </span>
               )}
             </div>
@@ -221,21 +222,21 @@ export default function ProductDetailPage() {
               }}
               className="w-full py-8 text-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white rounded-2xl shadow-xl transition-all active:scale-[0.98]"
             >
-              Thêm vào giỏ hàng — ${(product.price * quantity).toFixed(2)}
+              Thêm vào giỏ hàng — {Number(product.price || 0).toLocaleString("vi-VN")} ₫
             </Button>
 
-            <div className="flex gap-4">
+            <div className="flex justify-between gap-4">
               <Button
                 variant="outline"
                 onClick={() => setIsWishlisted(!isWishlisted)}
-                className="flex-1 py-6"
+                className="flex items-center justify-center gap-3"
               >
                 <Heart
                   className={`w-6 h-6 mr-3 ${isWishlisted ? "fill-red-600 text-red-600" : ""}`}
                 />
                 Yêu thích
               </Button>
-              <Button variant="outline" className="flex-1 py-6">
+              <Button variant="outline" className="flex items-center justify-center gap-3 ">
                 <Share2 className="w-6 h-6 mr-3" />
                 Chia sẻ
               </Button>

@@ -14,8 +14,8 @@ public class ProductResponse {
     private Long id;
     private String name;
 
-    private String imageUrl;      // ảnh chính
-    private List<String> images;  // list ảnh
+    private String imageUrl;
+    private List<String> images;
 
     private String itemNo;
     private String scale;
@@ -23,4 +23,5 @@ public class ProductResponse {
     private String status;
 
     private String description;
+    private Double price;
 }

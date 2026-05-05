@@ -75,6 +75,7 @@ public class DataSeeder implements CommandLineRunner {
                     }
 
                     product.setDescription(p.getDescription());
+                    product.setPrice(generatePrice(p));
 
                     return product;
                 }).toList();
@@ -86,5 +87,55 @@ public class DataSeeder implements CommandLineRunner {
         productRepository.saveAll(products);
 
         System.out.println("Seed data thành công! Total products: " + products.size());
+    }
+
+    private Double generatePrice(ProductJson p) {
+        String scale = "";
+        String marque = "";
+
+        if (p.getItemInfo() != null) {
+            scale = p.getItemInfo().getScale();
+            marque = p.getItemInfo().getMarque();
+        }
+
+        int min;
+        int max;
+
+        if ("1:18".equals(scale)) {
+            min = 300;
+            max = 1000000;
+        } else if ("1:24".equals(scale)) {
+            min = 400;
+            max = 1050000;
+        } else if ("1:43".equals(scale)) {
+            min = 450000;
+            max = 1000000;
+        } else if ("1:64".equals(scale)) {
+            min = 500000;
+            max = 2000000;
+        } else {
+            min = 250000;
+            max = 600000;
+        }
+
+        if (marque != null) {
+            String m = marque.toLowerCase();
+
+            if (m.contains("minigt") || m.contains("mini gt")
+                    || m.contains("tarmac")
+                    || m.contains("inno")
+                    || m.contains("pop race")
+                    || m.contains("kyosho")
+                    || m.contains("tomica")) {
+                min += 80000;
+                max += 250000;
+            }
+        }
+
+        int price = min + (int) (Math.random() * (max - min + 1));
+
+        price = Math.round(price / 10000f) * 10000;
+
+        return (double) price;
     }
 }

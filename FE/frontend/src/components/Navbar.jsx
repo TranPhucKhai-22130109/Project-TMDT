@@ -25,7 +25,7 @@ export default function Navbar() {
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-red-600 to-orange-500 text-white text-xs font-bold py-2 text-center">
         <div className="container mx-auto px-4">
-          ⚡ FLASH SALE: Extra 20% OFF Everything! Code: BLITZ20
+          ⚡ FLASH SALE: Giảm giá sốc đến 20% cho hàng ngàn sản phẩm! Mua ngay kẻo lỡ! ⚡
         </div>
       </div>
 
@@ -54,12 +54,12 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <NextLink href="/" className="text-sm font-bold uppercase tracking-wide hover:text-red-600">Home</NextLink>
+            <NextLink href="/" className="text-sm font-bold uppercase tracking-wide hover:text-red-600">Trang chủ</NextLink>
             <NextLink href="/deals" className="text-sm font-bold uppercase tracking-wide text-red-600 flex items-center gap-1">
-              <Flame className="w-4 h-4" /> Deals
+              <Flame className="w-4 h-4" /> Thoả thuậN
             </NextLink>
-            <NextLink href="/products" className="text-sm font-bold uppercase tracking-wide hover:text-red-600">Shop</NextLink>
-            <NextLink href="/contact" className="text-sm font-bold uppercase tracking-wide hover:text-red-600">Support</NextLink>
+            <NextLink href="/products" className="text-sm font-bold uppercase tracking-wide hover:text-red-600">Cửa hàng</NextLink>
+            <NextLink href="/contact" className="text-sm font-bold uppercase tracking-wide hover:text-red-600">Hỗ trợ</NextLink>
           </nav>
 
           {/* Search Bar */}
