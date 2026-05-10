@@ -1,62 +1,94 @@
 package com.example.ecommerce.configuration;
 
+import com.example.ecommerce.service.UserDetailServiceCustomize;
+import jakarta.servlet.http.Cookie;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final UserDetailServiceCustomize userDetailsService;
 
-    /**
-     * Cấu hình bảo mật chính.
-     * - Public endpoints (không cần auth): /api/hello, /api/test
-     * - Các endpoint còn lại: yêu cầu xác thực (sẽ mở rộng sau)
-     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            // Áp dụng CORS theo bean corsConfigurationSource()
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+    public SecurityFilterChain filterChain(HttpSecurity res) throws Exception {
+        res.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/v1/auth/**").permitAll()
+                        .requestMatchers("/v1/products/**").permitAll()
+                        .requestMatchers("/api/products/**").permitAll() // để tạm sửa lại sau
+                        .requestMatchers("/v1/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(
+                        oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
-            // Tắt CSRF (API stateless, dùng JWT sau này)
-            .csrf(AbstractHttpConfigurer::disable)
-
-            // Không tạo session
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-            // Phân quyền endpoint
-            .authorizeHttpRequests(auth -> auth
-                // Public: test endpoints
-                .requestMatchers("/api/hello", "/api/test/**", "/api/products/**").permitAll()
-                // Các request khác cần auth (cấu hình thêm sau)
-                .anyRequest().authenticated()
-            );
-
-        return http.build();
+        return res.build();
     }
 
-    /**
-     * CORS toàn cục – cho phép FE (localhost:3000) gọi BE.
-     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public BearerTokenResolver bearerTokenResolver() {
+        return request -> {
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("accessToken".equals(cookie.getName())) {
+                        return cookie.getValue();
+                    }
+                }
+            }
+            return null;
+        };
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+
+        return new ProviderManager(authenticationProvider);
+    }
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
+    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

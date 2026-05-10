@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Menu, Search, Bell, ChevronDown } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const notifications = [
   { id: 1, text: "New order #ORD-1234 received", time: "2m ago", unread: true },
@@ -13,6 +14,12 @@ export default function Topbar({ title, onMenuClick }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const unreadCount = notifications.filter((n) => n.unread).length;
+  const { logout } = useAuth();
+
+  const handleSignOut = async () => {
+    setShowUserMenu(false);
+    await logout();
+  };
 
   return (
     <header className="h-16 bg-white border-b border-gray-100 flex items-center px-6 gap-4 sticky top-0 z-30 shadow-sm">
@@ -126,9 +133,12 @@ export default function Topbar({ title, onMenuClick }) {
                 Settings
               </a>
               <hr className="my-1 border-gray-100" />
-              <a href="/" className="block px-4 py-2 text-sm text-red-500 hover:bg-red-50">
+              <button
+                onClick={handleSignOut}
+                className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50"
+              >
                 Sign Out
-              </a>
+              </button>
             </div>
           )}
         </div>
@@ -136,3 +146,4 @@ export default function Topbar({ title, onMenuClick }) {
     </header>
   );
 }
+
