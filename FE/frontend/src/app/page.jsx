@@ -31,7 +31,7 @@ import { Twitter } from "lucide-react";
 import { User } from "lucide-react";
 import { X } from "lucide-react";
 import { Zap } from "lucide-react";
-import { getProducts } from "@/services/productService";
+import { getProducts, getSortedProducts } from "@/services/productService";
 import Navbar from "@/components/Navbar";
 
 export default function Page() {
@@ -75,17 +75,31 @@ export default function Page() {
     }
   }, [darkMode]);
 
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const data = await getProducts();
+  //       setProducts(data.slice(0, 8));
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   fetchProducts();
+  // }, []);
+  // useEffect lấy 8 sản phẩm mới nhất
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadLatest = async () => {
       try {
-        const data = await getProducts();
-        setProducts(data.slice(0, 8));
+        // Gọi hàm sort theo ID giảm dần (desc) để lấy xe mới nhất
+        const data = await getSortedProducts('id', 'desc');
+        const list = Array.isArray(data) ? data : (data.content || []);
+        setProducts(list.slice(0, 8));
       } catch (err) {
-        console.error(err);
+        console.error("Lỗi load sản phẩm mới nhất:", err);
       }
     };
-
-    fetchProducts();
+    loadLatest();
   }, []);
 
   return (
@@ -422,8 +436,7 @@ export default function Page() {
         >
           <div className="container mx-auto px-6">
             <h2 className="text-3xl lg:text-4xl font-black text-center text-gray-900 dark:text-white uppercase italic tracking-tighter mb-12">
-              {" "}
-              Trending Right Now{" "}
+              Sản phẩm mới về
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {products.map((product) => (
@@ -433,6 +446,12 @@ export default function Page() {
                 >
                   {/* Image */}
                   <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
+                    
+                    <div className="absolute top-3 left-3 z-20">
+                      <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-tighter">
+                        New
+                      </span>
+                    </div>
                     <Link href={`/product-detail/${product.id}`}>
                       <img
                         src={product.imageUrl}
