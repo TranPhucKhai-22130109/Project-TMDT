@@ -7,3 +7,7 @@ export function getProducts() {
 export function getProductById(id) {
     return apiFetch(`/products/${id}`);
 }
+export function getSortedProducts(sortBy = 'id', direction = 'asc') {
+  // Kết quả sẽ là: /products/sort?sortBy=price&direction=desc
+  return apiFetch(`/products/sort?sortBy=${sortBy}&direction=${direction}`);
+}
