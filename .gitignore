@@ -82,3 +82,8 @@ next-env.d.ts
 .claude/
 AGENTS.md
 GEMINI.md
+
+# Custom
+.guide/
+structure_be.md
+structure_fe.md
