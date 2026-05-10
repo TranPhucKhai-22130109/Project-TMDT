@@ -1,6 +1,5 @@
 package com.example.ecommerce.configuration;
 
-
 import com.example.ecommerce.service.UserDetailServiceCustomize;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +36,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/products/**").permitAll()
+                        .requestMatchers("/api/products/**").permitAll() // để tạm sửa lại sau
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth ->
-                        oauth.jwt(jwt ->
-                                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                );
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(
+                        oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return res.build();
     }
@@ -69,8 +65,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-    ) {
+    public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
 
@@ -86,7 +81,6 @@ public class SecurityConfig {
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {

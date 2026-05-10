@@ -65,7 +65,12 @@ public class AuthService {
         TokenPayload refreshToken = jwtService.generateRefreshToken(user);
         tokenService.storeRefreshToken(refreshToken.getJwtId(), refreshToken.getExpiresAt());
 
-        return LoginResponse.builder().accessToken(accessToken.getToken()).refreshToken(refreshToken.getToken()).userId(user.getId()).build();
+        return LoginResponse.builder()
+            .accessToken(accessToken.getToken())
+            .refreshToken(refreshToken.getToken())
+            .userId(user.getId())
+            .username(user.getUsername())
+            .build();
     }
 
     public String refreshAccessToken(String refreshToken) {
@@ -112,14 +117,25 @@ public class AuthService {
         }
 
         // Clear refresh cookie
-        ResponseCookie clearCookie = ResponseCookie.from("refreshToken", "")
+        ResponseCookie clearRefreshCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
+                .secure(false)
                 .path("/")
                 .maxAge(0)
+                .sameSite("Lax")
                 .build();
 
-        response.addHeader("Set-Cookie", clearCookie.toString());
+        // Clear access cookie
+        ResponseCookie clearAccessCookie = ResponseCookie.from("accessToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+
+        response.addHeader("Set-Cookie", clearRefreshCookie.toString());
+        response.addHeader("Set-Cookie", clearAccessCookie.toString());
     }
 
 }

@@ -103,6 +103,7 @@ public class AuthController {
                                 .data(
                                         LoginResponse.builder()
                                                 .userId(loginResponse.getUserId())
+                                                .username(loginResponse.getUsername())
 //                                                .accessToken(loginResponse.getAccessToken())
                                                 .build()
                                 )

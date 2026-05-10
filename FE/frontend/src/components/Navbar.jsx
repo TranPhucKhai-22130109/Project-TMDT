@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import NextLink from 'next/link';
 import { Menu, Sun, Moon, Search, ShoppingCart, User, Zap, Flame } from 'lucide-react';
 import { useCart } from '@/app/cart/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import { Text } from '@/components/Text';   // Nếu bạn có component này
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const { cartCount } = useCart();
+  const { isAuthenticated, isLoading, username, logout } = useAuth();
 
   // Dark mode
   useEffect(() => {
@@ -84,9 +86,32 @@ export default function Navbar() {
             </button>
 
             {/* Account */}
-            <NextLink href="/login" className="hidden sm:block p-2 text-gray-600 dark:text-gray-300 hover:text-red-600">
-              <User className="w-6 h-6" />
-            </NextLink>
+            <div className="hidden sm:flex items-center gap-4">
+              {!isLoading && (
+                isAuthenticated ? (
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                      Hi, <b>{username || 'User'}</b>
+                    </span>
+                    <button 
+                      onClick={logout}
+                      className="px-4 py-2 text-sm font-bold text-red-600 border border-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded-full transition-colors shadow-sm"
+                    >
+                      Đăng xuất
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <NextLink href="/login" className="text-sm font-bold text-gray-700 dark:text-gray-200 hover:text-red-600 transition-colors">
+                      Đăng nhập
+                    </NextLink>
+                    <NextLink href="/register" className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-full transition-colors shadow-sm shadow-red-500/30">
+                      Đăng ký
+                    </NextLink>
+                  </>
+                )
+              )}
+            </div>
 
             {/* Cart */}
             <NextLink href="/cart" className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-red-600">
