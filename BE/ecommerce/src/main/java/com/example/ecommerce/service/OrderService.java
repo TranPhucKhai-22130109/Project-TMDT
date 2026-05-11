@@ -1,6 +1,6 @@
 package com.example.ecommerce.service;
 
-import com.example.ecommerce.dto.request.CheckoutRequest;
+import com.example.ecommerce.dto.request.auth.CheckoutRequest;
 import com.example.ecommerce.dto.response.OrderResponse;
 import com.example.ecommerce.entity.*;
 import com.example.ecommerce.exception.AppException;
@@ -9,6 +9,7 @@ import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.repository.PaymentRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class OrderService {
     private final UserRepository userRepository;
 
     @Transactional
-    public OrderResponse checkout(String userId, CheckoutRequest request) {
+    public OrderResponse checkout(String userId, com.example.ecommerce.dto.request.auth.@Valid CheckoutRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
