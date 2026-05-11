@@ -52,7 +52,8 @@ public class ProductController {
                             product.getMarque(),
                             product.getStatus(),
                             product.getDescription(),
-                            product.getPrice()
+                            product.getPrice(),
+                            product.getSoldQuantity()
                     );
                 })
                 .toList();
@@ -83,7 +84,7 @@ public class ProductController {
                             product.getId(), product.getName(), product.getImageUrl(),
                             images, product.getItemNo(), product.getScale(),
                             product.getMarque(), product.getStatus(),
-                            product.getDescription(), product.getPrice()
+                            product.getDescription(), product.getPrice(), product.getSoldQuantity()
                     );
                 })
                 .toList();
