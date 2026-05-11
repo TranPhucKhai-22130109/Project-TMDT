@@ -1,6 +1,6 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.request.CheckoutRequest;
+import com.example.ecommerce.dto.request.auth.CheckoutRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.OrderResponse;
 import com.example.ecommerce.service.OrderService;
