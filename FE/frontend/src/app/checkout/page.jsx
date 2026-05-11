@@ -1,189 +1,470 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/Button';
-import { CreditCard } from 'lucide-react';
-import { Flame } from 'lucide-react';
-import { Image } from '@/components/Image';
-import { Input } from '@/components/Input';
-import { Link } from '@/components/Link';
-import { Menu } from 'lucide-react';
-import { Moon } from 'lucide-react';
-import { Search } from 'lucide-react';
-import { ShoppingCart } from 'lucide-react';
-import { Sun } from 'lucide-react';
-import { Text } from '@/components/Text';
-import { User } from 'lucide-react';
-import { X } from 'lucide-react';
-import { Zap } from 'lucide-react';
-import Navbar from '@/components/Navbar';
-export default function Page() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [step, setStep] = useState(1);
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import NextLink from "next/link";
+import { useCart } from "@/app/cart/CartContext";
+import { useAuth } from "@/context/AuthContext";
+import { checkout } from "@/services/orderService";
+import Navbar from "@/components/Navbar";
+import {
+    MapPin, Phone, User, CreditCard, Truck,
+    ChevronRight, Loader2, AlertCircle, CheckCircle2,
+    ShoppingBag, ArrowLeft, Lock, Package,
+} from "lucide-react";
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
+const CITIES = [
+    "TP. Hồ Chí Minh", "Hà Nội", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
+    "An Giang", "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Ninh", "Bến Tre",
+    "Bình Định", "Bình Dương", "Bình Phước", "Bình Thuận", "Cà Mau",
+    "Đắk Lắk", "Đắk Nông", "Điện Biên", "Đồng Nai", "Đồng Tháp",
+    "Gia Lai", "Hà Giang", "Hà Nam", "Hà Tĩnh", "Hải Dương",
+    "Hậu Giang", "Hòa Bình", "Hưng Yên", "Khánh Hòa", "Kiên Giang",
+    "Kon Tum", "Lai Châu", "Lâm Đồng", "Lạng Sơn", "Lào Cai",
+    "Long An", "Nam Định", "Nghệ An", "Ninh Bình", "Ninh Thuận",
+    "Phú Thọ", "Phú Yên", "Quảng Bình", "Quảng Nam", "Quảng Ngãi",
+    "Quảng Ninh", "Quảng Trị", "Sóc Trăng", "Sơn La", "Tây Ninh",
+    "Thái Bình", "Thái Nguyên", "Thanh Hóa", "Thừa Thiên Huế",
+    "Tiền Giang", "Trà Vinh", "Tuyên Quang", "Vĩnh Long", "Vĩnh Phúc", "Yên Bái",
+];
 
-  return (
-    <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
-      <>
-        <Navbar />
-        <div className="container mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            {/* Checkout Steps */}
-            <div className="lg:col-span-2 space-y-8">
-              {/* Progress */}
-              <div className="flex items-center mb-8">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-bold"> 1 </div>
-                  <Text variant="bold" className="font-bold text-gray-900 dark:text-white"> Shipping </Text>
-                </div>
-                <div className={`h-1 w-16 mx-4 rounded-full transition-colors ${`${step > 1 ? 'bg-red-600' : ''} ${step <= 1 ? 'bg-gray-200 dark:bg-gray-700' : ''}`}`}></div>
-                <div className={`flex items-center gap-2 opacity-50 ${`${step >= 2 ? 'opacity-100' : ''}`}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold transition-colors ${`${step >= 2 ? 'bg-red-600 text-white' : ''} ${step < 2 ? 'bg-gray-200 dark:bg-gray-700' : ''}`}`}> 2 </div>
-                  <Text variant="bold" className="font-bold"> Payment </Text>
-                </div>
-              </div>
-              {/* Step 1: Shipping */}
-              {step === 1 && (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6"> Contact Information </h2>
-                  <form onSubmit={(e) => { e.preventDefault(); setStep(2) }} className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> First Name </label>
-                        <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> Last Name </label>
-                        <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" />
-                      </div>
+function formatPrice(price) {
+    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
+}
+
+function StepIndicator({ step }) {
+    const steps = ["Thông tin giao hàng", "Thanh toán"];
+    return (
+        <div className="flex items-center mb-8">
+            {steps.map((label, i) => {
+                const idx = i + 1;
+                const done = idx < step;
+                const active = idx === step;
+                return (
+                    <div key={idx} className="flex items-center">
+                        <div className="flex items-center gap-2">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                                done ? "bg-green-500 text-white" :
+                                    active ? "bg-red-600 text-white ring-4 ring-red-100 dark:ring-red-900" :
+                                        "bg-gray-200 dark:bg-gray-700 text-gray-400"
+                            }`}>
+                                {done ? <CheckCircle2 className="w-4 h-4" /> : idx}
+                            </div>
+                            <span className={`text-sm font-semibold hidden sm:block ${
+                                active ? "text-gray-900 dark:text-white" : "text-gray-400"
+                            }`}>{label}</span>
+                        </div>
+                        {i < steps.length - 1 && (
+                            <div className={`h-0.5 w-12 sm:w-20 mx-3 rounded-full transition-colors ${
+                                step > idx ? "bg-green-500" : "bg-gray-200 dark:bg-gray-700"
+                            }`} />
+                        )}
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> Address </label>
-                      <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-6">
-                      <div className="space-y-2 col-span-1">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> City </label>
-                        <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" />
-                      </div>
-                      <div className="space-y-2 col-span-1">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> State </label>
-                        <select className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
-                          <option> CA </option>
-                          <option> NY </option>
-                          <option> TX </option>
-                        </select>
-                      </div>
-                      <div className="space-y-2 col-span-1">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> ZIP </label>
-                        <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" />
-                      </div>
-                    </div>
-                    <Button contentKey="cta_8" className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl mt-4 hover:opacity-90 transition-opacity" type="submit"> Continue to Payment </Button>
-                  </form>
-                </div>
-              )}
-              {/* Step 2: Payment */}
-              {step === 2 && (
-                <div style={{ display: "none" }} className="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-sm border border-gray-200 dark:border-gray-700">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6"> Payment Method </h2>
-                  <div className="space-y-4 mb-6">
-                    <label className="flex items-center gap-4 p-4 border border-red-500 rounded-xl bg-red-50 dark:bg-red-900/10 cursor-pointer">
-                      <Input variant="text" className="text-red-600 focus:ring-red-500" type="radio" name="payment" />
-                      <Text variant="bold" className="font-bold flex-1 text-gray-900 dark:text-white"> Credit Card </Text>
-                      <div className="flex gap-2 text-gray-500"><CreditCard className="w-5 h-5" /></div>
-                    </label>
-                    <label className="flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer">
-                      <Input variant="text" className="text-red-600 focus:ring-red-500" type="radio" name="payment" />
-                      <Text variant="bold" className="font-bold flex-1 text-gray-900 dark:text-white"> PayPal </Text>
-                    </label>
-                  </div>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> Card Number </label>
-                      <div className="relative">
-                        <Input className="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" placeholder="0000 0000 0000 0000" />
-                        <CreditCard className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> Expiry </label>
-                        <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" placeholder="MM/YY" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700 dark:text-gray-300"> CVC </label>
-                        <Input className="w-full px-4 py-3 rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700" type="text" placeholder="123" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex gap-4 mt-8">
-                    <button onClick={() => { setStep(1) }} className="flex-1 py-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-bold rounded-xl hover:opacity-90"> Back </button>
-                    <button className="flex-[2] py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold rounded-xl shadow-lg shadow-red-500/30 hover:scale-[1.02] transform transition-all"> Pay $288.80 </button>
-                  </div>
-                </div>
-              )}
-            </div>
-            {/* Summary Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 sticky top-8">
-                <h3 className="font-bold text-gray-900 dark:text-white mb-4"> In Your Bag </h3>
-                <div className="space-y-4 mb-6">
-                  <div className="flex gap-4">
-                    <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-lg overflow-hidden relative">
-                      <Text className="absolute -top-1 -right-1 bg-gray-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"> 1 </Text>
-                      <Image variant="cover" className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-sm text-gray-900 dark:text-white"> Nike Air Max </h4>
-                      <p className="text-xs text-gray-500"> Size: 10 </p>
-                    </div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white"> $139.30 </div>
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-lg overflow-hidden relative">
-                      <Text className="absolute -top-1 -right-1 bg-gray-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full"> 1 </Text>
-                      <Image variant="cover" className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-sm text-gray-900 dark:text-white"> Sony Headphones </h4>
-                      <p className="text-xs text-gray-500"> Silver </p>
-                    </div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white"> $149.50 </div>
-                  </div>
-                </div>
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <Text className="text-gray-500"> Subtotal </Text>
-                    <Text className="text-gray-900 dark:text-white"> $498.00 </Text>
-                  </div>
-                  <div className="flex justify-between text-sm text-red-600 font-bold">
-                    <Text> Discount </Text>
-                    <Text> -$209.20 </Text>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <Text className="text-gray-500"> Shipping </Text>
-                    <Text className="text-gray-900 dark:text-white"> Free </Text>
-                  </div>
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <Text variant="bold" className="font-bold text-lg text-gray-900 dark:text-white"> Total </Text>
-                    <Text className="font-black text-2xl text-gray-900 dark:text-white"> $288.80 </Text>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                );
+            })}
         </div>
-        {/* Script Init */}
-      </>
-    </div>
-  );
+    );
+}
+
+export default function Page() {
+    const router = useRouter();
+    const { user } = useAuth();
+    const { cart, cartTotal, clearCart } = useCart();
+
+    const [step, setStep] = useState(1);
+    const [form, setForm] = useState({
+        receiverName: user?.username || "",
+        receiverPhone: "",
+        shippingAddress: "",
+        city: "TP. Hồ Chí Minh",
+        note: "",
+    });
+    const [paymentMethod, setPaymentMethod] = useState("COD");
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [orderError, setOrderError] = useState(null);
+
+    const shippingFee = cartTotal >= 5_000_000 ? 0 : 50_000;
+    const grandTotal = cartTotal + shippingFee;
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+    };
+
+    const validateStep1 = () => {
+        const errs = {};
+        if (!form.receiverName.trim()) errs.receiverName = "Vui lòng nhập tên người nhận";
+        if (!form.receiverPhone.trim()) errs.receiverPhone = "Vui lòng nhập số điện thoại";
+        else if (!/^(0|\+84)[0-9]{9,10}$/.test(form.receiverPhone)) errs.receiverPhone = "Số điện thoại không hợp lệ";
+        if (!form.shippingAddress.trim()) errs.shippingAddress = "Vui lòng nhập địa chỉ";
+        return errs;
+    };
+
+    const handleNextStep = (e) => {
+        e.preventDefault();
+        const errs = validateStep1();
+        if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+        setStep(2);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handlePlaceOrder = async () => {
+        if (!user) { router.push("/login"); return; }
+        if (cart.length === 0) return;
+
+        setLoading(true);
+        setOrderError(null);
+        try {
+            const order = await checkout({
+                ...form,
+                paymentMethod,
+                items: cart.map((item) => ({
+                    productId: item.id,
+                    quantity: item.quantity,
+                })),
+            });
+            clearCart();
+            if (paymentMethod === "ONLINE" && order.paymentUrl) {
+                router.push(order.paymentUrl);
+            } else {
+                router.push(`/orders/${order.id}?success=true`);
+            }
+        } catch (err) {
+            setOrderError(err.message || "Có lỗi xảy ra. Vui lòng thử lại.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Guard: chưa đăng nhập
+    if (!user) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <Navbar />
+                <div className="flex flex-col items-center justify-center py-32 text-center px-4">
+                    <AlertCircle className="w-16 h-16 text-orange-400 mb-5" />
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Bạn chưa đăng nhập</h2>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">Vui lòng đăng nhập để tiến hành thanh toán.</p>
+                    <NextLink
+                        href="/login"
+                        className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors"
+                    >
+                        Đăng nhập ngay
+                    </NextLink>
+                </div>
+            </div>
+        );
+    }
+
+    // Guard: giỏ trống
+    if (cart.length === 0) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <Navbar />
+                <div className="flex flex-col items-center justify-center py-32 text-center px-4">
+                    <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-5" />
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Giỏ hàng trống</h2>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">Thêm sản phẩm vào giỏ trước khi thanh toán.</p>
+                    <NextLink
+                        href="/products"
+                        className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors"
+                    >
+                        Tiếp tục mua sắm
+                    </NextLink>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+            <Navbar />
+
+            <div className="max-w-6xl mx-auto px-4 py-10">
+                {/* Back */}
+                <NextLink
+                    href="/cart"
+                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6"
+                >
+                    <ArrowLeft className="w-4 h-4" /> Quay lại giỏ hàng
+                </NextLink>
+
+                <h1 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-6">
+                    Thanh toán
+                </h1>
+
+                {/* Step indicator */}
+                <StepIndicator step={step} />
+
+                {/* Error */}
+                {orderError && (
+                    <div className="mb-6 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                        <p className="text-sm">{orderError}</p>
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    {/* ── LEFT ── */}
+                    <div className="lg:col-span-2">
+
+                        {/* STEP 1: Shipping form */}
+                        {step === 1 && (
+                            <form onSubmit={handleNextStep} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
+                                <h2 className="text-lg font-bold flex items-center gap-2">
+                                    <MapPin className="w-5 h-5 text-red-500" /> Thông tin giao hàng
+                                </h2>
+
+                                {/* Tên người nhận */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                        Tên người nhận <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            name="receiverName"
+                                            value={form.receiverName}
+                                            onChange={handleChange}
+                                            placeholder="Nguyễn Văn A"
+                                            className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-900 dark:text-white transition ${
+                                                errors.receiverName ? "border-red-400" : "border-gray-200 dark:border-gray-700"
+                                            }`}
+                                        />
+                                    </div>
+                                    {errors.receiverName && <p className="text-xs text-red-500 mt-1">{errors.receiverName}</p>}
+                                </div>
+
+                                {/* Số điện thoại */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                        Số điện thoại <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <input
+                                            type="tel"
+                                            name="receiverPhone"
+                                            value={form.receiverPhone}
+                                            onChange={handleChange}
+                                            placeholder="0901234567"
+                                            className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-900 dark:text-white transition ${
+                                                errors.receiverPhone ? "border-red-400" : "border-gray-200 dark:border-gray-700"
+                                            }`}
+                                        />
+                                    </div>
+                                    {errors.receiverPhone && <p className="text-xs text-red-500 mt-1">{errors.receiverPhone}</p>}
+                                </div>
+
+                                {/* Tỉnh/Thành */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                        Tỉnh / Thành phố <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        name="city"
+                                        value={form.city}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-900 dark:text-white"
+                                    >
+                                        {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                                    </select>
+                                </div>
+
+                                {/* Địa chỉ */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                        Địa chỉ cụ thể <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="shippingAddress"
+                                        value={form.shippingAddress}
+                                        onChange={handleChange}
+                                        placeholder="Số nhà, tên đường, phường/xã, quận/huyện"
+                                        className={`w-full px-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-900 dark:text-white transition ${
+                                            errors.shippingAddress ? "border-red-400" : "border-gray-200 dark:border-gray-700"
+                                        }`}
+                                    />
+                                    {errors.shippingAddress && <p className="text-xs text-red-500 mt-1">{errors.shippingAddress}</p>}
+                                </div>
+
+                                {/* Ghi chú */}
+                                <div>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                        Ghi chú (tuỳ chọn)
+                                    </label>
+                                    <textarea
+                                        name="note"
+                                        value={form.note}
+                                        onChange={handleChange}
+                                        rows={2}
+                                        placeholder="Ghi chú thêm cho đơn hàng..."
+                                        className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-900 dark:text-white resize-none"
+                                    />
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+                                >
+                                    Tiếp tục <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </form>
+                        )}
+
+                        {/* STEP 2: Payment method */}
+                        {step === 2 && (
+                            <div className="space-y-4">
+                                {/* Recap thông tin giao hàng */}
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Thông tin giao hàng</h3>
+                                        <button onClick={() => setStep(1)} className="text-xs text-red-600 hover:underline">Sửa</button>
+                                    </div>
+                                    <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+                                        <p><span className="font-semibold text-gray-900 dark:text-white">{form.receiverName}</span> — {form.receiverPhone}</p>
+                                        <p>{form.shippingAddress}, {form.city}</p>
+                                        {form.note && <p className="text-gray-400 italic">"{form.note}"</p>}
+                                    </div>
+                                </div>
+
+                                {/* Phương thức thanh toán */}
+                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm space-y-3">
+                                    <h2 className="text-lg font-bold flex items-center gap-2">
+                                        <CreditCard className="w-5 h-5 text-red-500" /> Phương thức thanh toán
+                                    </h2>
+
+                                    {/* COD */}
+                                    <label className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
+                                        paymentMethod === "COD"
+                                            ? "border-red-500 bg-red-50 dark:bg-red-900/10"
+                                            : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
+                                    }`}>
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="COD"
+                                            checked={paymentMethod === "COD"}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className="accent-red-600"
+                                        />
+                                        <Truck className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                        <div>
+                                            <p className="font-bold text-gray-900 dark:text-white">Thanh toán khi nhận hàng (COD)</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Trả tiền mặt khi shipper giao hàng tận nơi</p>
+                                        </div>
+                                    </label>
+
+                                    {/* Online */}
+                                    <label className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
+                                        paymentMethod === "ONLINE"
+                                            ? "border-red-500 bg-red-50 dark:bg-red-900/10"
+                                            : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
+                                    }`}>
+                                        <input
+                                            type="radio"
+                                            name="paymentMethod"
+                                            value="ONLINE"
+                                            checked={paymentMethod === "ONLINE"}
+                                            onChange={(e) => setPaymentMethod(e.target.value)}
+                                            className="accent-red-600"
+                                        />
+                                        <CreditCard className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                        <div>
+                                            <p className="font-bold text-gray-900 dark:text-white">Thanh toán trực tuyến</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Thanh toán qua cổng điện tử an toàn (VNPay, MoMo...)</p>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                {/* Buttons */}
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setStep(1)}
+                                        className="flex-1 py-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        ← Quay lại
+                                    </button>
+
+                                    <button
+                                        onClick={handlePlaceOrder}
+                                        disabled={loading}
+                                        className="flex-[2] py-4 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                                    >
+                                        {loading ? (
+                                            <><Loader2 className="w-5 h-5 animate-spin" /> Đang xử lý...</>
+                                        ) : paymentMethod === "ONLINE" ? (
+                                            <><CreditCard className="w-5 h-5" /> Tiến hành thanh toán — {formatPrice(grandTotal)}</>
+                                        ) : (
+                                            <><CheckCircle2 className="w-5 h-5" /> Đặt hàng ngay — {formatPrice(grandTotal)}</>
+                                        )}
+                                    </button>
+                                </div>
+
+                                <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
+                                    <Lock className="w-3 h-3" /> Thông tin của bạn được mã hóa và bảo mật tuyệt đối
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* ── RIGHT: Order summary ── */}
+                    <div className="lg:col-span-1">
+                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                                <Package className="w-4 h-4 text-red-500" />
+                                Đơn hàng ({cart.length} sản phẩm)
+                            </h3>
+
+                            {/* Items */}
+                            <div className="space-y-3 max-h-64 overflow-y-auto pr-1 mb-4">
+                                {cart.map((item) => (
+                                    <div key={item.id} className="flex gap-3">
+                                        <div className="relative flex-shrink-0">
+                                            <img
+                                                src={item.imageUrl || item.image || "/placeholder.png"}
+                                                alt={item.name}
+                                                className="w-14 h-14 object-contain rounded-xl bg-gray-100 dark:bg-gray-700 p-1"
+                                                onError={(e) => { e.target.src = "/placeholder.png"; }}
+                                            />
+                                            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {item.quantity}
+                      </span>
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-xs font-medium text-gray-900 dark:text-white line-clamp-2">{item.name}</p>
+                                            <p className="text-xs text-red-600 font-bold mt-0.5">{formatPrice(item.price * item.quantity)}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Totals */}
+                            <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-2 text-sm">
+                                <div className="flex justify-between text-gray-500 dark:text-gray-400">
+                                    <span>Tạm tính</span>
+                                    <span>{formatPrice(cartTotal)}</span>
+                                </div>
+                                <div className="flex justify-between text-gray-500 dark:text-gray-400">
+                                    <span>Phí vận chuyển</span>
+                                    <span className={shippingFee === 0 ? "text-green-600 font-semibold" : ""}>
+                    {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
+                  </span>
+                                </div>
+                                <div className="flex justify-between font-black text-gray-900 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-700 text-base">
+                                    <span>Tổng cộng</span>
+                                    <span className="text-red-600 text-lg">{formatPrice(grandTotal)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
