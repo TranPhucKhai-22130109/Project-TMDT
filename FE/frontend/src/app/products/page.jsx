@@ -21,7 +21,7 @@ import { Twitter } from "lucide-react";
 import { User } from "lucide-react";
 import { X } from "lucide-react";
 import { Zap } from "lucide-react";
-import { getProducts } from "@/services/productService";
+import { getProducts, getSortedProducts } from "@/services/productService";
 import Navbar from "@/components/Navbar";
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
@@ -29,6 +29,35 @@ export default function Page() {
   const [filterOpen, setFilterOpen] = useState(false);
 
   const [products, setProducts] = useState([]);
+  // Hàm xử lý khi người dùng chọn bộ lọc
+  // Hàm xử lý khi người dùng chọn bộ lọc
+  const handleSort = async (e) => {
+    const value = e.target.value;
+    if (!value) return;
+
+    setLoading(true);
+    const [field, dir] = value.split(',');
+    
+    try {
+      const data = await getSortedProducts(field, dir);
+      
+      // Kiểm tra xem data trả về là mảng trực tiếp hay nằm trong .content
+      const finalData = Array.isArray(data) ? data : (data.content || []);
+      
+      // Dùng spread operator [...] để React nhận diện state mới và render lại
+      setProducts([...finalData]); 
+      
+      // Quan trọng: Đưa về trang 1 để thấy kết quả từ đầu
+      setCurrentPage(1); 
+      
+      console.log("Đã cập nhật danh sách mới:", finalData.length, "sản phẩm");
+    } catch (err) {
+      console.error("Lỗi khi sắp xếp:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const [loading, setLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -184,15 +213,39 @@ export default function Page() {
               {/* Product Section */}
               <div className="flex-1 min-w-0">
                 {/* Mobile Filter Toggle */}
-                <div className="lg:hidden mb-6">
-                  <button
-                    onClick={() => setFilterOpen(!filterOpen)}
-                    className="w-full py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm"
-                  >
-                    <SlidersHorizontal className="w-5 h-5" />
-                    Filters & Sort
-                  </button>
-                </div>
+             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
+              {/* Tiêu đề trang bên trái */}
+              <div>
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase italic tracking-tight">
+                  Danh sách sản phẩm
+                </h2>
+                <p className="text-xs text-gray-500 font-medium">Tìm thấy {products.length} mô hình xe</p>
+              </div>
+
+              {/* Bộ lọc góc bên phải */}
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <span className="text-sm font-bold text-gray-500 uppercase tracking-widest bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-lg">
+                  Bộ lọc
+                </span>
+                <select 
+                  onChange={handleSort}
+                  className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 font-bold text-sm outline-none focus:ring-2 focus:ring-red-500 shadow-sm cursor-pointer text-gray-900 dark:text-white transition-all hover:border-red-500"
+                >
+                  <option value="id,desc">Mới nhất</option>
+                  <option value="price,asc">Giá: Thấp đến Cao ↑</option>
+                  <option value="price,desc">Giá: Cao đến Thấp ↓</option>
+                  <option value="name,asc">Tên xe: A - Z</option>
+                </select>
+
+                {/* Nút lọc cho điện thoại */}
+                <button
+                  onClick={() => setFilterOpen(!filterOpen)}
+                  className="lg:hidden p-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm"
+                >
+                  <SlidersHorizontal className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
 
                 {/* Product Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
@@ -236,10 +289,12 @@ export default function Page() {
                           </div>
 
                           <div className="mt-auto pt-4 flex items-center justify-between">
-                            <span className="text-lg font-black text-red-600">
+                            {/* <span className="text-lg font-black text-red-600">
                               {product.status}
+                            </span> */}
+                            <span className="text-lg font-black text-red-600">
+                              {Number(product.price || 0).toLocaleString("vi-VN")} ₫
                             </span>
-
                             <Button
                               className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors"
                               onClick={(e) => e.preventDefault()} // Ngăn chuyển trang khi click nút +
