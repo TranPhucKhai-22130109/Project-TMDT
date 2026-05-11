@@ -26,7 +26,11 @@ public enum ErrorCode {
     // ==== PRODUCT ====
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "Product not found"),
 
+    // ==== ORDER ====
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "Order not found"),
+    PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "Payment processing failed"),
     ;
+
 
     private final HttpStatus status;
     private final String message;
