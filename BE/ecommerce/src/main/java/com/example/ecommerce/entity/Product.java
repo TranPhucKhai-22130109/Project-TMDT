@@ -16,6 +16,7 @@ public class Product {
 
     private String name;
     private Double price;
+    private Integer soldQuantity;
 
     private String imageUrl; // ảnh chính
 
