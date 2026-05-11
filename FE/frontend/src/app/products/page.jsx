@@ -23,10 +23,29 @@ import { X } from "lucide-react";
 import { Zap } from "lucide-react";
 import { getProducts, getSortedProducts } from "@/services/productService";
 import Navbar from "@/components/Navbar";
+import { addToCart } from "@/services/cartService";
+import { useCart } from "@/app/cart/CartContext";
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const { reloadCartCount } = useCart();
+
+ const handleAddToCart = async (e, productId) => {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  try {
+    await addToCart(productId, 1);
+    await reloadCartCount();
+    alert("Đã thêm vào giỏ hàng!");
+  } catch (error) {
+    console.error(error);
+    alert("Thêm vào giỏ hàng thất bại!");
+  }
+};
 
   const [products, setProducts] = useState([]);
   // Hàm xử lý khi người dùng chọn bộ lọc
@@ -297,7 +316,7 @@ export default function Page() {
                             </span>
                             <Button
                               className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors"
-                              onClick={(e) => e.preventDefault()} // Ngăn chuyển trang khi click nút +
+                              onClick={(e) => handleAddToCart(e, product.id)}
                             >
                               <Plus className="w-5 h-5" />
                             </Button>

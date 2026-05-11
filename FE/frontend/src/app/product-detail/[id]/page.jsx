@@ -20,9 +20,9 @@ import {
 import NextLink from "next/link";
 import { getProducts } from "@/services/productService";
 import { Text } from "@/components/Text";
-import { useCart } from "@/app/cart/CartContext";
 import { Navbar } from "@/components/Navbar";
-
+import { addToCart } from "@/services/cartService";
+import { useCart } from "@/app/cart/CartContext";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -38,8 +38,23 @@ export default function ProductDetailPage() {
   // States cho Navbar (mobile menu & dark mode)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const { reloadCartCount } = useCart();
 
-  const { addToCart } = useCart();
+  const handleAddToCart = async (productId) => {
+    try {
+      const result = await addToCart(productId, 1);
+      console.log("ADD CART RESULT:", result);
+
+      alert("Đã thêm vào giỏ hàng!");
+
+      reloadCartCount().catch((err) => {
+        console.error("Reload cart count error:", err);
+      });
+    } catch (error) {
+      console.error("ADD CART ERROR:", error);
+      alert("Thêm vào giỏ hàng thất bại!");
+    }
+  };
   // Lấy dữ liệu sản phẩm
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -217,12 +232,12 @@ export default function ProductDetailPage() {
 
             <Button
               onClick={() => {
-                addToCart(product, quantity);
-                alert(` Đã thêm ${quantity} ${product.name} vào giỏ hàng!`);
+                handleAddToCart(product.id);
               }}
               className="w-full py-8 text-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white rounded-2xl shadow-xl transition-all active:scale-[0.98]"
             >
-              Thêm vào giỏ hàng — {Number(product.price || 0).toLocaleString("vi-VN")} ₫
+              Thêm vào giỏ hàng —{" "}
+              {Number(product.price || 0).toLocaleString("vi-VN")} ₫
             </Button>
 
             <div className="flex justify-between gap-4">
@@ -236,7 +251,10 @@ export default function ProductDetailPage() {
                 />
                 Yêu thích
               </Button>
-              <Button variant="outline" className="flex items-center justify-center gap-3 ">
+              <Button
+                variant="outline"
+                className="flex items-center justify-center gap-3 "
+              >
                 <Share2 className="w-6 h-6 mr-3" />
                 Chia sẻ
               </Button>
