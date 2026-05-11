@@ -77,6 +77,8 @@ public class DataSeeder implements CommandLineRunner {
                     product.setDescription(p.getDescription());
                     product.setPrice(generatePrice(p));
 
+                    product.setSoldQuantity(generateSoldQuantity());
+
                     return product;
                 }).toList();
 
@@ -87,6 +89,10 @@ public class DataSeeder implements CommandLineRunner {
         productRepository.saveAll(products);
 
         System.out.println("Seed data thành công! Total products: " + products.size());
+    }
+
+    private Integer generateSoldQuantity() {
+        return 500 + (int) (Math.random() * (1500 - 500 + 1));
     }
 
     private Double generatePrice(ProductJson p) {

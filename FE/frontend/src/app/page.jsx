@@ -33,6 +33,8 @@ import { X } from "lucide-react";
 import { Zap } from "lucide-react";
 import { getProducts, getSortedProducts } from "@/services/productService";
 import Navbar from "@/components/Navbar";
+import { addToCart } from "@/services/cartService";
+import { useCart } from "@/app/cart/CartContext";
 
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
@@ -44,6 +46,7 @@ export default function Page() {
   const [products, setProducts] = useState([]);
   const [heroProduct, setHeroProduct] = useState(null);
   const [dealProduct, setDealProduct] = useState(null);
+  const { reloadCartCount } = useCart();
 
   useEffect(() => {
     const loadTopProducts = async () => {
@@ -88,12 +91,28 @@ export default function Page() {
   //   fetchProducts();
   // }, []);
   // useEffect lấy 8 sản phẩm mới nhất
+
+  const handleAddToCart = async (productId) => {
+    try {
+      console.log("CLICK ADD CART:", productId);
+
+      const result = await addToCart(productId, 1);
+
+      await reloadCartCount();
+      console.log("ADD CART RESULT:", result);
+      alert("Đã thêm vào giỏ hàng!");
+    } catch (error) {
+      console.error("ADD CART ERROR:", error);
+      alert("Thêm vào giỏ hàng thất bại!");
+    }
+  };
+
   useEffect(() => {
     const loadLatest = async () => {
       try {
         // Gọi hàm sort theo ID giảm dần (desc) để lấy xe mới nhất
-        const data = await getSortedProducts('id', 'desc');
-        const list = Array.isArray(data) ? data : (data.content || []);
+        const data = await getSortedProducts("id", "desc");
+        const list = Array.isArray(data) ? data : data.content || [];
         setProducts(list.slice(0, 8));
       } catch (err) {
         console.error("Lỗi load sản phẩm mới nhất:", err);
@@ -106,7 +125,6 @@ export default function Page() {
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       <>
         <Navbar />
-
 
         {/* Hero Section */}
         <section id="hero" className="relative py-20 overflow-hidden">
@@ -303,15 +321,16 @@ export default function Page() {
                     </div>
                   </div>
                   <div className="pt-4">
-                    <Link
-                      variant="inline"
-                      contentKey="cta_30"
-                      className="inline-flex w-full sm:w-auto px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:opacity-90 transition-opacity justify-center gap-2"
-                      href="product-detail.html"
+                    <button
+                      disabled={!dealProduct}
+                      onClick={() =>
+                        dealProduct && handleAddToCart(dealProduct.id)
+                      }
+                      className="inline-flex w-full sm:w-auto px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:opacity-90 transition-opacity justify-center gap-2 disabled:opacity-50"
                     >
                       <ShoppingCart className="w-5 h-5" />
-                      Thêm vào giỏ hàng{" "}
-                    </Link>
+                      Thêm vào giỏ hàng
+                    </button>
                   </div>
                 </div>
                 <div className="relative bg-gray-100 dark:bg-gray-700/50 min-h-[400px]">
@@ -446,7 +465,6 @@ export default function Page() {
                 >
                   {/* Image */}
                   <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
-                    
                     <div className="absolute top-3 left-3 z-20">
                       <span className="bg-blue-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg uppercase tracking-tighter">
                         New
@@ -488,7 +506,10 @@ export default function Page() {
                         {Number(product.price || 0).toLocaleString("vi-VN")} ₫
                       </div>
 
-                      <Button className="w-10 h-10 rounded-full flex items-center justify-center">
+                      <Button
+                        onClick={() => handleAddToCart(product.id)}
+                        className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
+                      >
                         <Plus className="w-5 h-5" />
                       </Button>
                     </div>
