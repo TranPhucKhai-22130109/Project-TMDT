@@ -35,6 +35,7 @@ import { getProducts, getSortedProducts } from "@/services/productService";
 import Navbar from "@/components/Navbar";
 import { addToCart } from "@/services/cartService";
 import { useCart } from "@/app/cart/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
@@ -46,7 +47,9 @@ export default function Page() {
   const [products, setProducts] = useState([]);
   const [heroProduct, setHeroProduct] = useState(null);
   const [dealProduct, setDealProduct] = useState(null);
-  const { reloadCartCount } = useCart();
+
+  const { isAuthenticated } = useAuth();
+  const { addGuestCart, reloadCartCount } = useCart();
 
   useEffect(() => {
     const loadTopProducts = async () => {
@@ -92,14 +95,15 @@ export default function Page() {
   // }, []);
   // useEffect lấy 8 sản phẩm mới nhất
 
-  const handleAddToCart = async (productId) => {
+  const handleAddToCart = async (product, quantity = 1) => {
     try {
-      console.log("CLICK ADD CART:", productId);
+      if (isAuthenticated) {
+        await addToCart(product.id, quantity);
+        await reloadCartCount();
+      } else {
+        addGuestCart(product, quantity);
+      }
 
-      const result = await addToCart(productId, 1);
-
-      await reloadCartCount();
-      console.log("ADD CART RESULT:", result);
       alert("Đã thêm vào giỏ hàng!");
     } catch (error) {
       console.error("ADD CART ERROR:", error);
@@ -323,9 +327,11 @@ export default function Page() {
                   <div className="pt-4">
                     <button
                       disabled={!dealProduct}
-                      onClick={() =>
-                        dealProduct && handleAddToCart(dealProduct.id)
-                      }
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dealProduct && handleAddToCart(dealProduct, 1);
+                      }}
                       className="inline-flex w-full sm:w-auto px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-xl hover:opacity-90 transition-opacity justify-center gap-2 disabled:opacity-50"
                     >
                       <ShoppingCart className="w-5 h-5" />
@@ -507,7 +513,11 @@ export default function Page() {
                       </div>
 
                       <Button
-                        onClick={() => handleAddToCart(product.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleAddToCart(product, 1);
+                        }}
                         className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center hover:bg-red-600 hover:text-white transition-colors cursor-pointer"
                       >
                         <Plus className="w-5 h-5" />

@@ -50,4 +50,44 @@ public class CartController {
                 Map.of("count", count)
         );
     }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<?> getCartItems(Authentication authentication) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+
+        String userId = String.valueOf(jwt.getSubject());
+
+        return ResponseEntity.ok(cartService.getCartItems(userId));
+    }
+
+    @PutMapping("/update/{cartItemId}")
+    public ResponseEntity<?> updateCartItem(
+            @PathVariable Long cartItemId,
+            @RequestParam Integer quantity,
+            Authentication authentication
+    ) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = String.valueOf(jwt.getSubject());
+
+        cartService.updateQuantity(userId, cartItemId, quantity);
+
+        return ResponseEntity.ok(
+                Map.of("message", "Cart item updated successfully")
+        );
+    }
+
+    @DeleteMapping("/remove/{cartItemId}")
+    public ResponseEntity<?> removeCartItem(
+            @PathVariable Long cartItemId,
+            Authentication authentication
+    ) {
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String userId = String.valueOf(jwt.getSubject());
+
+        cartService.removeCartItem(userId, cartItemId);
+
+        return ResponseEntity.ok(
+                Map.of("message", "Cart item removed successfully")
+        );
+    }
 }
