@@ -1,11 +1,11 @@
 package com.example.ecommerce.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
+@Getter
+@Setter
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,4 +25,6 @@ public class ProductResponse {
     private String description;
     private Double price;
     private Integer soldQuantity;
+    private Integer stockQuantity;
+    private Boolean isAuction;
 }

@@ -11,10 +11,17 @@ import {
   User,
   Zap,
   Flame,
+  X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { Text } from "@/components/Text";
+import {
+  getCartItems,
+  updateCartItem,
+  removeCartItem,
+} from "@/services/cartService";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -22,11 +29,121 @@ export default function Navbar() {
   const { isAuthenticated, isLoading, username, logout } = useAuth();
   const { cartCount, reloadCartCount } = useCart();
 
+  const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
+  const [drawerItems, setDrawerItems] = useState([]);
+  const [drawerLoading, setDrawerLoading] = useState(false);
+
+  const router = useRouter();
+  const [searchKeyword, setSearchKeyword] = useState("");
+
   useEffect(() => {
     if (isAuthenticated) {
       reloadCartCount();
     }
   }, [isAuthenticated]);
+
+  const openCartDrawer = async () => {
+    setCartDrawerOpen(true);
+
+    if (isAuthenticated) {
+      try {
+        setDrawerLoading(true);
+        const data = await getCartItems();
+        const list = Array.isArray(data) ? data : data.content || [];
+        setDrawerItems(list);
+      } catch (error) {
+        console.error("Load cart drawer error:", error);
+        setDrawerItems([]);
+      } finally {
+        setDrawerLoading(false);
+      }
+    } else {
+      const savedCart = localStorage.getItem("blitz-cart");
+      setDrawerItems(savedCart ? JSON.parse(savedCart) : []);
+    }
+  };
+
+  const handleIncrease = async (item) => {
+    try {
+      if (isAuthenticated) {
+        await updateCartItem(item.id, item.quantity + 1);
+
+        setDrawerItems((prev) =>
+          prev.map((i) =>
+            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+          ),
+        );
+      } else {
+        const updated = drawerItems.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+        );
+
+        setDrawerItems(updated);
+        localStorage.setItem("blitz-cart", JSON.stringify(updated));
+      }
+
+      reloadCartCount();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleDecrease = async (item) => {
+    if (item.quantity <= 1) return;
+
+    try {
+      if (isAuthenticated) {
+        await updateCartItem(item.id, item.quantity - 1);
+
+        setDrawerItems((prev) =>
+          prev.map((i) =>
+            i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i,
+          ),
+        );
+      } else {
+        const updated = drawerItems.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i,
+        );
+
+        setDrawerItems(updated);
+        localStorage.setItem("blitz-cart", JSON.stringify(updated));
+      }
+
+      reloadCartCount();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRemove = async (item) => {
+    try {
+      if (isAuthenticated) {
+        await removeCartItem(item.id);
+      }
+
+      const updated = drawerItems.filter((i) => i.id !== item.id);
+
+      setDrawerItems(updated);
+
+      if (!isAuthenticated) {
+        localStorage.setItem("blitz-cart", JSON.stringify(updated));
+      }
+
+      reloadCartCount();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const keyword = searchKeyword.trim();
+
+    if (!keyword) return;
+
+    router.push(`/products?search=${encodeURIComponent(keyword)}`);
+  };
 
   // Dark mode
   useEffect(() => {
@@ -102,12 +219,22 @@ export default function Navbar() {
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md relative mx-4">
-            <input
-              type="text"
-              placeholder="Search for deals..."
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <form
+              onSubmit={handleSearch}
+              className="hidden md:flex flex-1 max-w-md relative mx-4"
+            >
+              <input
+                type="text"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                placeholder="Tìm kiếm mô hình xe..."
+                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+
+              <button type="submit">
+                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              </button>
+            </form>
           </div>
 
           {/* Right Icons */}
@@ -155,8 +282,8 @@ export default function Navbar() {
             </div>
 
             {/* Cart */}
-            <NextLink
-              href="/cart"
+            <button
+              onClick={openCartDrawer}
               className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-red-600"
             >
               <ShoppingCart className="w-6 h-6" />
@@ -165,7 +292,7 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
-            </NextLink>
+            </button>
           </div>
         </div>
       </div>
@@ -200,6 +327,103 @@ export default function Navbar() {
           {/* Thêm các link mobile menu nếu cần */}
         </div>
       )}
+
+      {cartDrawerOpen && (
+        <div
+          onClick={() => setCartDrawerOpen(false)}
+          className="fixed inset-0 z-[80] bg-black/40"
+        />
+      )}
+
+      <div
+        className={`fixed top-0 right-0 z-[90] h-full w-[380px] max-w-[90%] bg-white dark:bg-gray-900 shadow-2xl transition-transform duration-300 ${
+          cartDrawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-xl font-black">Giỏ hàng</h2>
+          <button onClick={() => setCartDrawerOpen(false)}>
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="p-5 space-y-4 overflow-y-auto h-[calc(100%-150px)]">
+          {drawerLoading ? (
+            <p className="text-gray-500">Đang tải giỏ hàng...</p>
+          ) : drawerItems.length === 0 ? (
+            <p className="text-gray-500">Giỏ hàng đang trống</p>
+          ) : (
+            drawerItems.map((item) => {
+              const product = item.product || item;
+              const price = Number(product.price || 0);
+              const quantity = Number(item.quantity || 1);
+
+              return (
+                <div className="flex gap-3 border-b pb-4">
+                  <img
+                    src={
+                      product.imageUrl || product.image || "/placeholder.png"
+                    }
+                    alt={product.name}
+                    className="w-16 h-16 object-contain rounded-lg bg-gray-100"
+                  />
+
+                  <div className="flex-1">
+                    <p className="font-bold text-sm line-clamp-2">
+                      {product.name}
+                    </p>
+
+                    <p className="text-red-600 font-bold mt-1">
+                      {(price * quantity).toLocaleString("vi-VN")} ₫
+                    </p>
+
+                    <div className="flex items-center justify-between mt-3">
+                      {/* quantity */}
+                      <div className="flex items-center border rounded-lg overflow-hidden">
+                        <button
+                          onClick={() => handleDecrease(item)}
+                          className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          -
+                        </button>
+
+                        <span className="px-3 text-sm font-bold">
+                          {quantity}
+                        </span>
+
+                        <button
+                          onClick={() => handleIncrease(item)}
+                          className="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* remove */}
+                      <button
+                        onClick={() => handleRemove(item)}
+                        className="text-red-500 text-sm hover:underline"
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        <div className="p-5 border-t border-gray-200 dark:border-gray-800">
+          <NextLink
+            href="/cart"
+            onClick={() => setCartDrawerOpen(false)}
+            className="block w-full text-center py-3 rounded-xl bg-red-600 text-white font-bold"
+          >
+            Xem giỏ hàng
+          </NextLink>
+        </div>
+      </div>
     </header>
   );
 }

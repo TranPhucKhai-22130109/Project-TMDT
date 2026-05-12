@@ -7,6 +7,9 @@ import com.example.ecommerce.repository.CartRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +40,31 @@ public class CartService {
 
     public int getCartCount(String userId) {
         return cartItemRepository.findByUserId(userId).size();
+    }
+
+    public List<CartItem> getCartItems(String userId) {
+        return cartItemRepository.findByUserId(userId);
+    }
+
+    @Transactional
+    public void updateQuantity(String userId, Long cartItemId, Integer quantity) {
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(cartItemId, userId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        if (quantity == null || quantity <= 0) {
+            cartItemRepository.delete(cartItem);
+            return;
+        }
+
+        cartItem.setQuantity(quantity);
+        cartItemRepository.save(cartItem);
+    }
+
+    @Transactional
+    public void removeCartItem(String userId, Long cartItemId) {
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(cartItemId, userId)
+                .orElseThrow(() -> new RuntimeException("Cart item not found"));
+
+        cartItemRepository.delete(cartItem);
     }
 }

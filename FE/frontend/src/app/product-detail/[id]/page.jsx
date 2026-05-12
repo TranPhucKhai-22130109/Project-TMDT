@@ -23,6 +23,7 @@ import { Text } from "@/components/Text";
 import { Navbar } from "@/components/Navbar";
 import { addToCart } from "@/services/cartService";
 import { useCart } from "@/app/cart/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -38,20 +39,22 @@ export default function ProductDetailPage() {
   // States cho Navbar (mobile menu & dark mode)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const { reloadCartCount } = useCart();
 
-  const handleAddToCart = async (productId) => {
+  const { isAuthenticated } = useAuth();
+  const { addGuestCart, reloadCartCount } = useCart();
+
+  const handleAddToCart = async (product, quantity = 1) => {
     try {
-      const result = await addToCart(productId, 1);
-      console.log("ADD CART RESULT:", result);
+      if (isAuthenticated) {
+        await addToCart(product.id, quantity);
+        await reloadCartCount();
+      } else {
+        addGuestCart(product, quantity);
+      }
 
       alert("Đã thêm vào giỏ hàng!");
-
-      reloadCartCount().catch((err) => {
-        console.error("Reload cart count error:", err);
-      });
     } catch (error) {
-      console.error("ADD CART ERROR:", error);
+      console.error(error);
       alert("Thêm vào giỏ hàng thất bại!");
     }
   };
@@ -232,7 +235,7 @@ export default function ProductDetailPage() {
 
             <Button
               onClick={() => {
-                handleAddToCart(product.id);
+                handleAddToCart(product, quantity);
               }}
               className="w-full py-8 text-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white rounded-2xl shadow-xl transition-all active:scale-[0.98]"
             >

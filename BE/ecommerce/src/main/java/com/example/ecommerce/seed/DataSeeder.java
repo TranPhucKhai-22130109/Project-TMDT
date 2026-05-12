@@ -79,6 +79,16 @@ public class DataSeeder implements CommandLineRunner {
 
                     product.setSoldQuantity(generateSoldQuantity());
 
+                    Boolean isAuction = generateIsAuction();
+
+                    product.setIsAuction(isAuction);
+
+                    if (isAuction) {
+                        product.setStockQuantity(1);
+                    } else {
+                        product.setStockQuantity(generateStockQuantity());
+                    }
+
                     return product;
                 }).toList();
 
@@ -143,5 +153,13 @@ public class DataSeeder implements CommandLineRunner {
         price = Math.round(price / 10000f) * 10000;
 
         return (double) price;
+    }
+
+    private Integer generateStockQuantity() {
+        return 5 + (int) (Math.random() * (120 - 5 + 1));
+    }
+
+    private Boolean generateIsAuction() {
+        return Math.random() < 0.2;
     }
 }
