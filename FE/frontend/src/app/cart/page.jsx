@@ -43,7 +43,13 @@ export default function Page() {
         const data = await getCartItems();
         const list = Array.isArray(data) ? data : data.content || [];
 
-        setCart(list);
+        const filtered = list.filter((item) => {
+          const product = item.product || item;
+
+          return !product.isDeleted;
+        });
+
+        setCart(filtered);
         reloadCartCount();
       } catch (error) {
         console.error("Load cart items error:", error);
