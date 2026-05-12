@@ -1,5 +1,6 @@
 package com.example.ecommerce.controller;
 
+import com.cloudinary.Cloudinary;
 import org.springframework.data.domain.Sort;
 
 import com.example.ecommerce.dto.response.ProductResponse;
@@ -12,6 +13,10 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
@@ -21,11 +26,12 @@ public class ProductController {
 
     private final ProductRepository productRepository;
     private final ObjectMapper objectMapper;
+    private final Cloudinary cloudinary;
 
     @GetMapping
     public List<ProductResponse> getAllProducts() {
 
-        return productRepository.findAll()
+        return productRepository.findByIsDeletedFalse()
                 .stream()
                 .map(product -> {
 
@@ -53,11 +59,29 @@ public class ProductController {
                             product.getStatus(),
                             product.getDescription(),
                             product.getPrice(),
-                            product.getSoldQuantity()
+                            product.getSoldQuantity(),
+                            product.getStockQuantity(),
+                            product.getIsAuction()
                     );
                 })
                 .toList();
     }
+    @GetMapping("/normal")
+    public List<ProductResponse> getAllNormalProducts() {
+        return productRepository.findByIsAuctionAndIsDeletedFalse(false)
+                .stream()
+                .map(this::toProductResponse)
+                .toList();
+    }
+
+    @GetMapping("/auction")
+    public List<ProductResponse> getAllAuctionProducts() {
+        return productRepository.findByIsAuctionAndIsDeletedFalse(true)
+                .stream()
+                .map(this::toProductResponse)
+                .toList();
+    }
+
     @GetMapping("/sort")
     public List<ProductResponse> getSortedProducts(
             @RequestParam(defaultValue = "id") String sortBy,
@@ -67,7 +91,7 @@ public class ProductController {
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
 
-        return productRepository.findAll(sort)
+        return productRepository.findByIsDeletedFalse(sort)
                 .stream()
                 .map(product -> {
                     List<String> images = new ArrayList<>();
@@ -84,9 +108,122 @@ public class ProductController {
                             product.getId(), product.getName(), product.getImageUrl(),
                             images, product.getItemNo(), product.getScale(),
                             product.getMarque(), product.getStatus(),
-                            product.getDescription(), product.getPrice(), product.getSoldQuantity()
+                            product.getDescription(), product.getPrice(), product.getSoldQuantity(),  product.getStockQuantity(), product.getIsAuction()
                     );
                 })
                 .toList();
+    }
+
+    private ProductResponse toProductResponse(Product product) {
+        List<String> images = new ArrayList<>();
+
+        try {
+            if (product.getImages() != null) {
+                images = objectMapper.readValue(
+                        product.getImages(),
+                        new TypeReference<List<String>>() {}
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getImageUrl(),
+                images,
+                product.getItemNo(),
+                product.getScale(),
+                product.getMarque(),
+                product.getStatus(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getSoldQuantity(),
+                product.getStockQuantity(),
+                product.getIsAuction()
+        );
+    }
+    @PostMapping("/upload")
+    public String uploadImage(@RequestParam("file") MultipartFile file) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    Map.of("folder", "ecommerce/products")
+            );
+
+            return uploadResult.get("secure_url").toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Upload Cloudinary failed: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-product/{id}")
+    public ProductResponse updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductResponse request
+    ) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setName(request.getName());
+        product.setImageUrl(request.getImageUrl());
+        product.setItemNo(request.getItemNo());
+        product.setScale(request.getScale());
+        product.setMarque(request.getMarque());
+        product.setStatus(request.getStatus());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setSoldQuantity(request.getSoldQuantity());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setIsAuction(request.getIsAuction());
+
+        try {
+            product.setImages(objectMapper.writeValueAsString(request.getImages()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Product saved = productRepository.save(product);
+
+        return toProductResponse(saved);
+    }
+    @PostMapping("/create")
+    public ProductResponse createProduct(@RequestBody ProductResponse request) {
+        Product product = new Product();
+
+        product.setName(request.getName());
+        product.setImageUrl(request.getImageUrl());
+        product.setItemNo(request.getItemNo());
+        product.setScale(request.getScale());
+        product.setMarque(request.getMarque());
+        product.setStatus(request.getStatus());
+        product.setDescription(request.getDescription());
+        product.setPrice(request.getPrice());
+        product.setSoldQuantity(request.getSoldQuantity());
+        product.setStockQuantity(request.getStockQuantity());
+        product.setIsAuction(request.getIsAuction());
+        product.setIsDeleted(false);
+
+        try {
+            product.setImages(objectMapper.writeValueAsString(request.getImages()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Product saved = productRepository.save(product);
+
+        return toProductResponse(saved);
+    }
+    @DeleteMapping("/delete-product/{id}")
+    public Map<String, String> deleteProduct(@PathVariable Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setIsDeleted(true);
+        productRepository.save(product);
+
+        return Map.of("message", "Delete product successfully");
     }
 }

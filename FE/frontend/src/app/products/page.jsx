@@ -26,6 +26,7 @@ import Navbar from "@/components/Navbar";
 import { addToCart } from "@/services/cartService";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useSearchParams } from "next/navigation";
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -100,10 +101,38 @@ export default function Page() {
       });
   }, []);
 
-  const totalPages = Math.ceil(products.length / productsPerPage);
+  const searchParams = useSearchParams();
+  const searchKeyword = searchParams.get("search") || "";
+
+  const normalizeText = (text) => {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]/g, " ");
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const keyword = normalizeText(searchKeyword).trim();
+
+    if (!keyword) return true;
+
+    const searchableText = normalizeText(`
+    ${product.name}
+    ${product.itemNo}
+    ${product.marque}
+    ${product.scale}
+    ${product.status}
+  `);
+
+    return searchableText.includes(keyword);
+  });
+
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
   const startIndex = (currentPage - 1) * productsPerPage;
-  const currentProducts = products.slice(
+
+  const currentProducts = filteredProducts.slice(
     startIndex,
     startIndex + productsPerPage,
   );
@@ -236,7 +265,7 @@ export default function Page() {
                       Danh sách sản phẩm
                     </h2>
                     <p className="text-xs text-gray-500 font-medium">
-                      Tìm thấy {products.length} mô hình xe
+                      Tìm thấy {filteredProducts.length} mô hình xe
                     </p>
                   </div>
 

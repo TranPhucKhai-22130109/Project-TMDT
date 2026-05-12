@@ -17,6 +17,7 @@ public class Product {
     private String name;
     private Double price;
     private Integer soldQuantity;
+    private Integer stockQuantity;
 
     private String imageUrl; // ảnh chính
 
@@ -28,4 +29,8 @@ public class Product {
     private String scale;
     private String marque;
     private String status;
+    private Boolean isAuction;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted = false;
 }

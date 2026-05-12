@@ -13,6 +13,7 @@ import {
   Flame,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { Text } from "@/components/Text";
@@ -31,6 +32,9 @@ export default function Navbar() {
   const [cartDrawerOpen, setCartDrawerOpen] = useState(false);
   const [drawerItems, setDrawerItems] = useState([]);
   const [drawerLoading, setDrawerLoading] = useState(false);
+
+  const router = useRouter();
+  const [searchKeyword, setSearchKeyword] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -131,6 +135,16 @@ export default function Navbar() {
     }
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const keyword = searchKeyword.trim();
+
+    if (!keyword) return;
+
+    router.push(`/products?search=${encodeURIComponent(keyword)}`);
+  };
+
   // Dark mode
   useEffect(() => {
     if (darkMode) {
@@ -205,12 +219,22 @@ export default function Navbar() {
 
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-md relative mx-4">
-            <input
-              type="text"
-              placeholder="Search for deals..."
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
-            />
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <form
+              onSubmit={handleSearch}
+              className="hidden md:flex flex-1 max-w-md relative mx-4"
+            >
+              <input
+                type="text"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                placeholder="Tìm kiếm mô hình xe..."
+                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+              />
+
+              <button type="submit">
+                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              </button>
+            </form>
           </div>
 
           {/* Right Icons */}
