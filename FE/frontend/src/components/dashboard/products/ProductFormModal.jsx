@@ -2,47 +2,52 @@
 
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { uploadProductImage } from "@/services/productService";
 
-export default function ProductFormModal({ isOpen, onClose, onSave, initialData }) {
-  const [form, setForm] = useState({
-    name: "",
-    sku: "",
-    category: "Electronics",
-    price: "",
-    originalPrice: "",
-    stock: "",
-    maxStock: "",
-    status: "active",
-    description: "",
-    tags: "",
-  });
+const emptyForm = {
+  name: "",
+  itemNo: "",
+  price: "",
+  stockQuantity: "",
+  soldQuantity: "",
+  scale: "",
+  marque: "",
+  status: "Released",
+  isAuction: false,
+  description: "",
+};
 
+export default function ProductFormModal({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+}) {
+  const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
+  const [existingImages, setExistingImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        ...initialData,
-        price: initialData.price.toString(),
-        originalPrice: initialData.originalPrice ? initialData.originalPrice.toString() : "",
-        stock: initialData.stock.toString(),
-        maxStock: initialData.maxStock.toString(),
-        tags: initialData.tags ? initialData.tags.join(", ") : "",
+        name: initialData.name || "",
+        itemNo: initialData.itemNo || "",
+        price: initialData.price?.toString() || "",
+        stockQuantity: initialData.stockQuantity?.toString() || "",
+        soldQuantity: initialData.soldQuantity?.toString() || "0",
+        scale: initialData.scale || "",
+        marque: initialData.marque || "",
+        status: initialData.status || "Released",
+        isAuction: Boolean(initialData.isAuction),
+        description: initialData.description || "",
       });
     } else {
-      setForm({
-        name: "",
-        sku: "",
-        category: "Electronics",
-        price: "",
-        originalPrice: "",
-        stock: "",
-        maxStock: "",
-        status: "active",
-        description: "",
-        tags: "",
-      });
+      setForm(emptyForm);
     }
+
+    setExistingImages(initialData?.images || []);
+    setNewImages([]);
     setErrors({});
   }, [initialData, isOpen]);
 
@@ -50,231 +55,423 @@ export default function ProductFormModal({ isOpen, onClose, onSave, initialData 
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    if (type === "checkbox") {
-      setForm((prev) => ({ ...prev, [name]: checked ? "active" : "inactive" }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newErrors = {};
-    if (!form.name.trim()) newErrors.name = "Name is required.";
-    if (!form.sku.trim()) newErrors.sku = "SKU is required.";
-    if (!form.category) newErrors.category = "Category is required.";
-    if (!form.price || isNaN(form.price) || Number(form.price) < 0) newErrors.price = "Valid price is required.";
-    if (!form.stock || isNaN(form.stock) || Number(form.stock) < 0) newErrors.stock = "Valid stock is required.";
-    
+
+    if (!form.name.trim()) newErrors.name = "Tên sản phẩm không được bỏ trống.";
+
+    if (!form.itemNo.trim()) newErrors.itemNo = "Item No không được bỏ trống.";
+
+    if (!form.price || isNaN(form.price) || Number(form.price) < 0) {
+      newErrors.price = "Giá không hợp lệ.";
+    }
+
+    if (
+      form.stockQuantity === "" ||
+      isNaN(form.stockQuantity) ||
+      Number(form.stockQuantity) < 0
+    ) {
+      newErrors.stockQuantity = "Số lượng tồn không hợp lệ.";
+    }
+
+    if (
+      form.soldQuantity !== "" &&
+      (isNaN(form.soldQuantity) || Number(form.soldQuantity) < 0)
+    ) {
+      newErrors.soldQuantity = "Số lượng đã bán không hợp lệ.";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    const tagsArray = form.tags.split(",").map(t => t.trim()).filter(Boolean);
+    try {
+      let uploadedNewImages = [];
 
-    onSave({
-      ...form,
-      id: initialData?.id || `PRD-NEW-${Date.now().toString().slice(-4)}`,
-      price: Number(form.price),
-      originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
-      stock: Number(form.stock),
-      maxStock: form.maxStock ? Number(form.maxStock) : Number(form.stock) * 2,
-      tags: tagsArray,
-      images: initialData?.images || [
-        "https://picsum.photos/seed/new1/400/400",
-        "https://picsum.photos/seed/new2/400/400",
-        "https://picsum.photos/seed/new3/400/400",
-      ],
-      specs: initialData?.specs || { weight: "-", dimensions: "-", material: "-", barcode: "-", supplier: "-" },
-      salesStats: initialData?.salesStats || { totalSold: 0, revenue: 0, returnRate: 0, avgRating: 0 },
-      recentOrders: initialData?.recentOrders || [],
-    });
-  };
+      if (newImages.length > 0) {
+        uploadedNewImages = await Promise.all(
+          newImages.map((file) => uploadProductImage(file)),
+        );
+      }
 
-  const renderTags = () => {
-    if (!form.tags) return null;
-    const tagsArray = form.tags.split(",").map(t => t.trim()).filter(Boolean);
-    if (tagsArray.length === 0) return null;
-    return (
-      <div className="flex flex-wrap gap-2 mt-2">
-        {tagsArray.map((tag, idx) => (
-          <span key={idx} className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-full border border-indigo-100">
-            {tag}
-          </span>
-        ))}
-      </div>
-    );
+      const images = [...existingImages, ...uploadedNewImages];
+
+      const imageUrl = images[0] || "";
+
+      const payload = {
+        name: form.name.trim(),
+        itemNo: form.itemNo.trim(),
+        price: Number(form.price),
+        stockQuantity: Number(form.stockQuantity),
+        soldQuantity: Number(form.soldQuantity || 0),
+        scale: form.scale.trim(),
+        marque: form.marque.trim(),
+        status: form.status,
+        isAuction: Boolean(form.isAuction),
+        description: form.description.trim(),
+        imageUrl,
+        images,
+        isDeleted: false,
+      };
+
+      await onSave(payload, initialData?.id);
+    } catch (error) {
+      console.error("Update product error:", error);
+      alert("Update product failed!");
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose}></div>
-      <div className="relative bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <h2 className="text-xl font-semibold text-gray-900">
-            {initialData ? "Edit Product" : "Add Product"}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+          <h2 className="text-2xl font-bold text-gray-900">
+            {initialData ? "Thay đổi sản phẩm" : "Thêm sản phẩm"}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-500 transition-colors">
-            <X className="w-5 h-5" />
+
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition"
+          >
+            <X className="w-6 h-6" />
           </button>
         </div>
 
+        {/* Content */}
         <div className="overflow-y-auto p-6 flex-1">
-          <form id="product-form" onSubmit={handleSubmit} className="space-y-6">
-            
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  value={form.name} 
-                  onChange={handleChange}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-                />
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
-                <input 
-                  type="text" 
-                  name="sku" 
-                  value={form.sku} 
-                  onChange={handleChange}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none ${errors.sku ? 'border-red-500' : 'border-gray-300'}`}
-                />
-                {errors.sku && <p className="text-red-500 text-xs mt-1">{errors.sku}</p>}
-              </div>
-            </div>
+          <form id="product-form" onSubmit={handleSubmit} className="space-y-8">
+            {/* IMAGE SECTION */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-3">
+                Hình ảnh sản phẩm
+              </label>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
-                <select 
-                  name="category" 
-                  value={form.category} 
-                  onChange={handleChange}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none bg-white ${errors.category ? 'border-red-500' : 'border-gray-300'}`}
-                >
-                  <option value="">Select Category</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Clothing">Clothing</option>
-                  <option value="Food">Food</option>
-                </select>
-                {errors.category && <p className="text-red-500 text-xs mt-1">{errors.category}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <div className="flex items-center h-10">
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input 
-                      type="checkbox" 
-                      name="status" 
-                      checked={form.status === "active"} 
-                      onChange={handleChange}
-                      className="sr-only peer" 
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                {/* Existing images */}
+                {existingImages.map((src, index) => (
+                  <div
+                    key={`existing-${index}`}
+                    className="relative aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-50 group"
+                  >
+                    <img
+                      src={src}
+                      alt=""
+                      className="w-full h-full object-cover"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-                    <span className="ml-3 text-sm font-medium text-gray-700">
-                      {form.status === "active" ? "Active" : "Inactive"}
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($) *</label>
-                <input 
-                  type="number" 
-                  name="price" 
-                  step="0.01"
-                  value={form.price} 
-                  onChange={handleChange}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
-                />
-                {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Original Price ($)</label>
-                <input 
-                  type="number" 
-                  name="originalPrice" 
-                  step="0.01"
-                  value={form.originalPrice} 
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-              </div>
-            </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setExistingImages((prev) =>
+                          prev.filter((_, i) => i !== index),
+                        )
+                      }
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 text-white text-sm opacity-0 group-hover:opacity-100 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stock *</label>
-                <input 
-                  type="number" 
-                  name="stock" 
-                  value={form.stock} 
-                  onChange={handleChange}
-                  className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none ${errors.stock ? 'border-red-500' : 'border-gray-300'}`}
-                />
-                {errors.stock && <p className="text-red-500 text-xs mt-1">{errors.stock}</p>}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Max Stock</label>
-                <input 
-                  type="number" 
-                  name="maxStock" 
-                  value={form.maxStock} 
-                  onChange={handleChange}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-              </div>
-            </div>
+                {/* New images */}
+                {newImages.map((file, index) => (
+                  <div
+                    key={`new-${index}`}
+                    className="relative aspect-square rounded-xl overflow-hidden border border-indigo-200 bg-indigo-50 group"
+                  >
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea 
-                name="description" 
-                rows="3" 
-                value={form.description} 
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
-              ></textarea>
-            </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setNewImages((prev) =>
+                          prev.filter((_, i) => i !== index),
+                        )
+                      }
+                      className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 text-white text-sm opacity-0 group-hover:opacity-100 transition"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
-              <input 
-                type="text" 
-                name="tags" 
-                value={form.tags} 
-                onChange={handleChange}
-                placeholder="e.g. electronics, apple, smartphone"
-                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
+                {existingImages.length === 0 && newImages.length === 0 && (
+                  <div className="aspect-square rounded-xl border border-dashed border-gray-300 flex items-center justify-center text-sm text-gray-400 bg-gray-50">
+                    Không hình ảnh
+                  </div>
+                )}
+              </div>
+
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(e) =>
+                  setNewImages((prev) => [
+                    ...prev,
+                    ...Array.from(e.target.files),
+                  ])
+                }
+                className="block w-full text-sm text-gray-600
+      file:mr-4
+      file:py-2
+      file:px-4
+      file:rounded-lg
+      file:border-0
+      file:bg-indigo-50
+      file:text-indigo-700
+      hover:file:bg-indigo-100
+      cursor-pointer"
               />
-              {renderTags()}
+
+              <p className="text-xs text-gray-500 mt-2">
+                Có thể thêm hoặc xoá ảnh trước khi cập nhật sản phẩm.
+              </p>
             </div>
 
+            {/* BASIC INFO */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tên *
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-xl border outline-none transition ${
+                    errors.name
+                      ? "border-red-500"
+                      : "border-gray-200 focus:border-indigo-500"
+                  }`}
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mã sản phẩm *
+                </label>
+                <input
+                  type="text"
+                  name="itemNo"
+                  value={form.itemNo}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-xl border outline-none transition ${
+                    errors.itemNo
+                      ? "border-red-500"
+                      : "border-gray-200 focus:border-indigo-500"
+                  }`}
+                />
+                {errors.itemNo && (
+                  <p className="text-red-500 text-xs mt-1">{errors.itemNo}</p>
+                )}
+              </div>
+            </div>
+
+            {/* PRICE + STOCK */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Giá *
+                </label>
+
+                <input
+                  type="number"
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-xl border outline-none transition ${
+                    errors.price
+                      ? "border-red-500"
+                      : "border-gray-200 focus:border-indigo-500"
+                  }`}
+                />
+
+                {errors.price && (
+                  <p className="text-red-500 text-xs mt-1">{errors.price}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Số lượng tồn kho *
+                </label>
+
+                <input
+                  type="number"
+                  name="stockQuantity"
+                  value={form.stockQuantity}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-xl border outline-none transition ${
+                    errors.stockQuantity
+                      ? "border-red-500"
+                      : "border-gray-200 focus:border-indigo-500"
+                  }`}
+                />
+
+                {errors.stockQuantity && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.stockQuantity}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* SOLD + STATUS */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Số lượng đã bán
+                </label>
+
+                <input
+                  type="number"
+                  name="soldQuantity"
+                  value={form.soldQuantity}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 rounded-xl border outline-none transition ${
+                    errors.soldQuantity
+                      ? "border-red-500"
+                      : "border-gray-200 focus:border-indigo-500"
+                  }`}
+                />
+
+                {errors.soldQuantity && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.soldQuantity}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Status
+                </label>
+
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white outline-none focus:border-indigo-500"
+                >
+                  <option value="Released">Released</option>
+                  <option value="Draft">Draft</option>
+                  <option value="SoldOut">Sold Out</option>
+                  <option value="Hidden">Hidden</option>
+                </select>
+              </div>
+            </div>
+
+            {/* SCALE + MARQUE */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Scale
+                </label>
+
+                <input
+                  type="text"
+                  name="scale"
+                  value={form.scale}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Thương hiệu
+                </label>
+
+                <input
+                  type="text"
+                  name="marque"
+                  value={form.marque}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-indigo-500"
+                />
+              </div>
+            </div>
+
+            {/* AUCTION */}
+            <div className="flex items-center gap-3">
+              <input
+                id="isAuction"
+                type="checkbox"
+                name="isAuction"
+                checked={form.isAuction}
+                onChange={handleChange}
+                className="w-5 h-5"
+              />
+
+              <label
+                htmlFor="isAuction"
+                className="text-sm font-medium text-gray-700"
+              >
+                Sản phẩm đấu giá
+              </label>
+            </div>
+
+            {/* DESCRIPTION */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mô tả
+              </label>
+
+              <textarea
+                name="description"
+                rows="4"
+                value={form.description}
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none resize-none focus:border-indigo-500"
+              />
+            </div>
           </form>
         </div>
 
-        <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-          <button 
+        {/* FOOTER */}
+        <div className="px-6 py-5 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+          <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-100 transition"
           >
-            Cancel
+            Hủy
           </button>
-          <button 
+
+          <button
             type="submit"
             form="product-form"
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors"
+            className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition"
           >
-            Save Product
+            {initialData ? "Thay đổi" : "Lưu sản phẩm"}
           </button>
         </div>
       </div>
