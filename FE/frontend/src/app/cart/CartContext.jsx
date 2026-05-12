@@ -1,85 +1,120 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
+import { getCartCount } from "@/services/cartService";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-    const [cart, setCart] = useState([]);
+  const [guestCart, setGuestCart] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
 
-    // Load giỏ hàng từ localStorage
-    useEffect(() => {
-        const savedCart = localStorage.getItem('blitz-cart');
-        if (savedCart) setCart(JSON.parse(savedCart));
-    }, []);
+  // Load guest cart từ localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem("blitz-cart");
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      setGuestCart(parsedCart);
 
-    // Lưu giỏ hàng vào localStorage
-    useEffect(() => {
-        localStorage.setItem('blitz-cart', JSON.stringify(cart));
-    }, [cart]);
+      const count = parsedCart.reduce((sum, item) => sum + item.quantity, 0);
+      setCartCount(count);
+    }
+  }, []);
 
-    const addToCart = (product, quantity = 1) => {
-        setCart(prevCart => {
-            const existing = prevCart.find(item => item.id === product.id);
-            if (existing) {
-                return prevCart.map(item =>
-                    item.id === product.id
-                        ? { ...item, quantity: item.quantity + quantity }
-                        : item
-                );
-            } else {
-                return [...prevCart, { ...product, quantity }];
-            }
-        });
-    };
+  // Lưu guest cart vào localStorage
+  useEffect(() => {
+    localStorage.setItem("blitz-cart", JSON.stringify(guestCart));
+  }, [guestCart]);
 
-    const removeFromCart = (id) => {
-        setCart(prev => prev.filter(item => item.id !== id));
-    };
+  // Dùng cho user đã login: load count thật từ DB
+  const reloadCartCount = async () => {
+    try {
+      const data = await getCartCount();
+      setCartCount(data.count || 0);
+    } catch (error) {
+      console.error("Reload cart count error:", error);
+    }
+  };
 
-    const updateQuantity = (id, newQuantity) => {
-        if (newQuantity < 1) return;
-        setCart(prev => prev.map(item =>
-            item.id === id ? { ...item, quantity: newQuantity } : item
-        ));
-    };
+  const removeGuestCart = (id) => {
+    setGuestCart((prevCart) => {
+      const newCart = prevCart.filter((item) => item.id !== id);
+      const count = newCart.reduce((sum, item) => sum + item.quantity, 0);
+      setCartCount(count);
+      return newCart;
+    });
+  };
 
-    // ── Thêm mới cho chức năng Đặt hàng ──
-    const clearCart = () => setCart([]);
+  const updateGuestQuantity = (id, newQuantity) => {
+    if (newQuantity < 1) return;
 
-    // Các field cũ (giữ nguyên tên để không break code khác)
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    setGuestCart((prevCart) => {
+      const newCart = prevCart.map((item) =>
+        item.id === id ? { ...item, quantity: newQuantity } : item,
+      );
 
-    // Alias dùng trong checkout page mới
-    const totalItems = cartCount;
-    const totalAmount = cartTotal;
+      const count = newCart.reduce((sum, item) => sum + item.quantity, 0);
+      setCartCount(count);
 
-    // items dạng chuẩn cho checkout (map id → productId)
-    const checkoutItems = cart.map(item => ({
-        productId: item.id,
-        name: item.name,
-        price: item.price,
-        imageUrl: item.imageUrl || item.image || '',
-        quantity: item.quantity,
-    }));
+      return newCart;
+    });
+  };
 
-    return (
-        <CartContext.Provider value={{
-            cart,
-            addToCart,
-            removeFromCart,
-            updateQuantity,
-            clearCart,
-            cartCount,
-            cartTotal,
-            totalItems,
-            totalAmount,
-            checkoutItems,
-        }}>
-            {children}
-        </CartContext.Provider>
-    );
+  const clearGuestCart = () => {
+    setGuestCart([]);
+    setCartCount(0);
+    localStorage.removeItem("blitz-cart");
+  };
+
+  const guestCartTotal = guestCart.reduce(
+    (sum, item) => sum + Number(item.price || 0) * item.quantity,
+    0,
+  );
+
+  const addGuestCart = (product, quantity = 1) => {
+    setGuestCart((prevCart) => {
+      const existing = prevCart.find((item) => item.id === product.id);
+
+      let newCart;
+
+      if (existing) {
+        newCart = prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item,
+        );
+      } else {
+        newCart = [...prevCart, { ...product, quantity }];
+      }
+
+      localStorage.setItem("blitz-cart", JSON.stringify(newCart));
+      setCartCount(newCart.length);
+
+      return newCart;
+    });
+  };
+
+  return (
+    <CartContext.Provider
+      value={{
+        cart: guestCart,
+        guestCart,
+        cartCount,
+        cartTotal: guestCartTotal,
+
+        addToCart: addGuestCart,
+        addGuestCart,
+        removeFromCart: removeGuestCart,
+        updateQuantity: updateGuestQuantity,
+        clearCart: clearGuestCart,
+        clearGuestCart,
+
+        reloadCartCount,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 export const useCart = () => useContext(CartContext);
