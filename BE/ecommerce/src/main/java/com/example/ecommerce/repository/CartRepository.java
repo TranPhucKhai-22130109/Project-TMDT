@@ -8,7 +8,12 @@ import java.util.*;
 public interface CartRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByUserIdAndProductId(String userId, Long productId);
 
+    int countByUserId(String userId);
+
     List<CartItem> findByUserId(String userId);
 
-    int countByUserId(String userId);
+    Optional<CartItem> findByIdAndUserId(Long id, String userId);
+
+    void deleteByIdAndUserId(Long id, Long userId);
+
 }

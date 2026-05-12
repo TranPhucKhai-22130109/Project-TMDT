@@ -10,6 +10,8 @@ import { Input } from '@/components/Input';
 import { Lock } from 'lucide-react';
 import { Mail } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { addToCart } from "@/services/cartService";
+import { useCart } from "@/app/cart/CartContext";
 
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
@@ -20,6 +22,8 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  const { reloadCartCount, clearGuestCart } = useCart();
 
   useEffect(() => {
     if (darkMode) {
@@ -36,20 +40,42 @@ export default function Page() {
     }
   }, [isAuthenticated, router]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  const syncGuestCartToDB = async () => {
+  const savedCart = localStorage.getItem("blitz-cart");
+  if (!savedCart) return;
 
-    try {
-      await login({ email, password });
-      router.push('/');
-    } catch (err) {
-      setError(err.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const guestCart = JSON.parse(savedCart);
+
+  for (const item of guestCart) {
+    await addToCart(item.id, item.quantity || 1);
+  }
+
+  localStorage.removeItem("blitz-cart");
+
+  if (clearGuestCart) {
+    clearGuestCart();
+  }
+
+  await reloadCartCount();
+};
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+
+  try {
+    await login({ email, password });
+
+    await syncGuestCartToDB();
+
+    router.push("/");
+  } catch (err) {
+    setError(err.message || "Login failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center p-4">
