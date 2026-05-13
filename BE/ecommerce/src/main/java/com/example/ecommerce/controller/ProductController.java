@@ -31,7 +31,7 @@ public class ProductController {
     @GetMapping
     public List<ProductResponse> getAllProducts() {
 
-        return productRepository.findByIsDeletedFalse()
+        return productRepository.findByIsDeletedFalseAndIsApprovedTrue()
                 .stream()
                 .map(product -> {
 
@@ -61,14 +61,27 @@ public class ProductController {
                             product.getPrice(),
                             product.getSoldQuantity(),
                             product.getStockQuantity(),
-                            product.getIsAuction()
+                            product.getIsAuction(),
+                            product.getSeller() != null
+                                    ? product.getSeller().getId()
+                                    : null,
+
+                            product.getSeller() != null
+                                    ? product.getSeller().getUsername()
+                                    : null,
+
+                            product.getSeller() != null
+                                    ? product.getSeller().getEmail()
+                                    : null,
+                            product.getIsApproved(),
+                            product.getIsDeleted()
                     );
                 })
                 .toList();
     }
     @GetMapping("/normal")
     public List<ProductResponse> getAllNormalProducts() {
-        return productRepository.findByIsAuctionAndIsDeletedFalse(false)
+        return productRepository.findByIsAuctionAndIsDeletedFalseAndIsApprovedTrue(false)
                 .stream()
                 .map(this::toProductResponse)
                 .toList();
@@ -76,7 +89,7 @@ public class ProductController {
 
     @GetMapping("/auction")
     public List<ProductResponse> getAllAuctionProducts() {
-        return productRepository.findByIsAuctionAndIsDeletedFalse(true)
+        return productRepository.findByIsAuctionAndIsDeletedFalseAndIsApprovedTrue(true)
                 .stream()
                 .map(this::toProductResponse)
                 .toList();
@@ -91,7 +104,7 @@ public class ProductController {
                 ? Sort.by(sortBy).descending()
                 : Sort.by(sortBy).ascending();
 
-        return productRepository.findByIsDeletedFalse(sort)
+        return productRepository.findByIsDeletedFalseAndIsApprovedTrue(sort)
                 .stream()
                 .map(product -> {
                     List<String> images = new ArrayList<>();
@@ -108,7 +121,19 @@ public class ProductController {
                             product.getId(), product.getName(), product.getImageUrl(),
                             images, product.getItemNo(), product.getScale(),
                             product.getMarque(), product.getStatus(),
-                            product.getDescription(), product.getPrice(), product.getSoldQuantity(),  product.getStockQuantity(), product.getIsAuction()
+                            product.getDescription(), product.getPrice(), product.getSoldQuantity(),  product.getStockQuantity(), product.getIsAuction(),product.getSeller() != null
+                            ? product.getSeller().getId()
+                            : null,
+
+                            product.getSeller() != null
+                                    ? product.getSeller().getUsername()
+                                    : null,
+
+                            product.getSeller() != null
+                                    ? product.getSeller().getEmail()
+                                    : null,
+                            product.getIsApproved(),
+                            product.getIsDeleted()
                     );
                 })
                 .toList();
@@ -141,7 +166,20 @@ public class ProductController {
                 product.getPrice(),
                 product.getSoldQuantity(),
                 product.getStockQuantity(),
-                product.getIsAuction()
+                product.getIsAuction(),
+                product.getSeller() != null
+                        ? product.getSeller().getId()
+                        : null,
+
+                product.getSeller() != null
+                        ? product.getSeller().getUsername()
+                        : null,
+
+                product.getSeller() != null
+                        ? product.getSeller().getEmail()
+                        : null,
+                product.getIsApproved(),
+                product.getIsDeleted()
         );
     }
     @PostMapping("/upload")
