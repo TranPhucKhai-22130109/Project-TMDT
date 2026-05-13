@@ -2,17 +2,16 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { Search, Plus, Filter } from "lucide-react";
-import DashboardLayout from "@/components/dashboard/layout/DashboardLayout.jsx";
-import ProductTable from "@/components/dashboard/products/ProductTable.jsx";
-import ProductFormModal from "@/components/dashboard/products/ProductFormModal.jsx";
-import ProductDetailPanel from "@/components/dashboard/products/ProductDetailPanel.jsx";
-import DeleteDialog from "@/components/dashboard/products/DeleteDialog.jsx";
+import DashboardLayout from "@/components/admin/layout/DashboardLayout.jsx";
+import ProductTable from "@/components/admin/products/ProductTable.jsx";
+import ProductFormModal from "@/components/admin/products/ProductFormModal.jsx";
+import ProductDetailPanel from "@/components/admin/products/ProductDetailPanel.jsx";
+import DeleteDialog from "@/components/admin/products/DeleteDialog.jsx";
 import {
-  getAllProducts,
-  updateProduct,
-  createProduct,
-  deleteProduct,
-} from "@/services/sellerProductService.js";
+  getAdminProducts,
+  getPendingProducts,
+  approveProduct,
+} from "@/services/adminProductService.js";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
@@ -20,6 +19,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [priceFilter, setPriceFilter] = useState("All");
+  const [activeTab, setActiveTab] = useState("all");
 
   // Modal states
   const [formModal, setFormModal] = useState({ isOpen: false, data: null });
@@ -75,14 +75,27 @@ export default function ProductsPage() {
       });
     }
 
-    return list;
-  }, [products, search, categoryFilter, priceFilter]);
+    if (activeTab === "pending") {
+      list = list.filter((p) => !p.isApproved);
+    }
 
+    return list;
+  }, [products, search, categoryFilter, priceFilter, activeTab]);
+  const pendingProducts = filtered.filter((p) => !p.isApproved);
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const data = await getAllProducts();
+
+      let data;
+
+      if (activeTab === "pending") {
+        data = await getPendingProducts();
+      } else {
+        data = await getAdminProducts();
+      }
+
       const list = Array.isArray(data) ? data : data.content || [];
+
       setProducts(list);
     } catch (error) {
       console.error("Tải sản phẩm admin thất bại:", error);
@@ -156,9 +169,32 @@ export default function ProductsPage() {
     setDetailPanel({ isOpen: false, product: null });
   };
 
+  const handleApprove = async (product) => {
+    if (!product?.id) return;
+
+    try {
+      await approveProduct(product.id);
+
+      setProducts((prev) => prev.filter((p) => p.id !== product.id));
+
+      if (detailPanel.product?.id === product.id) {
+        setDetailPanel((prev) => ({
+          ...prev,
+          product: {
+            ...prev.product,
+            isApproved: true,
+          },
+        }));
+      }
+    } catch (error) {
+      console.error("Approve product failed:", error);
+      alert("Approve product failed!");
+    }
+  };
+
   useEffect(() => {
     loadProducts();
-  }, []);
+  }, [activeTab]);
 
   return (
     <DashboardLayout title="Products">
@@ -210,24 +246,46 @@ export default function ProductsPage() {
               </select>
             </div>
           </div>
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => setActiveTab("all")}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === "all"
+                ? "bg-indigo-600 text-white"
+                : "bg-white border text-gray-600"
+            }`}
+          >
+            Tất cả sản phẩm
+          </button>
 
           <button
-            onClick={() => setFormModal({ isOpen: true, data: null })}
-            className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shrink-0 shadow-sm"
+            onClick={() => setActiveTab("pending")}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === "pending"
+                ? "bg-yellow-500 text-white"
+                : "bg-white border text-gray-600"
+            }`}
           >
-            <Plus className="w-4 h-4" />
-            Thêm sản phẩm
+            Chờ duyệt
           </button>
         </div>
 
         {/* Table wrapper */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <ProductTable
-            products={filtered}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDeleteClick}
-          />
+          {activeTab === "all" && (
+            <ProductTable products={filtered} onView={handleView} />
+          )}
+
+          {activeTab === "pending" && (
+            <ProductTable
+              products={pendingProducts}
+              onView={handleView}
+              onApprove={handleApprove}
+              showApproveButton={true}
+            />
+          )}
         </div>
       </div>
 

@@ -4,10 +4,14 @@ import com.example.ecommerce.dto.TokenPayload;
 import com.example.ecommerce.dto.request.auth.LoginRequest;
 import com.example.ecommerce.dto.request.auth.SignUpRequest;
 import com.example.ecommerce.dto.response.LoginResponse;
+import com.example.ecommerce.entity.Role;
 import com.example.ecommerce.entity.User;
+import com.example.ecommerce.entity.UserRole;
 import com.example.ecommerce.exception.AppException;
 import com.example.ecommerce.exception.ErrorCode;
+import com.example.ecommerce.repository.RoleRepository;
 import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.repository.UserRoleRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
@@ -29,6 +33,8 @@ import java.time.Instant;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -49,7 +55,16 @@ public class AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        Role role = roleRepository.findByRoleName("USER")
+                .orElseThrow(() -> new RuntimeException("Role USER not found"));
+
+        UserRole userRole = new UserRole();
+        userRole.setUser(savedUser);
+        userRole.setRole(role);
+
+        userRoleRepository.save(userRole);
     }
 
     public LoginResponse login(LoginRequest request) {

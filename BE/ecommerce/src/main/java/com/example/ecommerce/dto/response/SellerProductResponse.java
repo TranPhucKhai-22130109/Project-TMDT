@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductResponse {
+public class SellerProductResponse {
 
     private Long id;
     private String name;
@@ -28,9 +28,9 @@ public class ProductResponse {
     private Integer soldQuantity;
     private Integer stockQuantity;
     private Boolean isAuction;
+    private Boolean isDeleted;
     private String sellerId;
     private String sellerName;
     private String sellerEmail;
     private Boolean isApproved;
-    private Boolean isDeleted;
 }
