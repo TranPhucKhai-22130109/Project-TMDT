@@ -68,12 +68,14 @@ function StepIndicator({ step }) {
 
 export default function Page() {
     const router = useRouter();
-    const { user } = useAuth();
+
+    // ✅ Dùng đúng field từ AuthContext: isAuthenticated, userId, username, isLoading
+    const { isAuthenticated, userId, username, isLoading } = useAuth();
     const { cart, cartTotal, clearCart } = useCart();
 
     const [step, setStep] = useState(1);
     const [form, setForm] = useState({
-        receiverName: user?.username || "",
+        receiverName: "",
         receiverPhone: "",
         shippingAddress: "",
         city: "TP. Hồ Chí Minh",
@@ -97,7 +99,8 @@ export default function Page() {
         const errs = {};
         if (!form.receiverName.trim()) errs.receiverName = "Vui lòng nhập tên người nhận";
         if (!form.receiverPhone.trim()) errs.receiverPhone = "Vui lòng nhập số điện thoại";
-        else if (!/^(0|\+84)[0-9]{9,10}$/.test(form.receiverPhone)) errs.receiverPhone = "Số điện thoại không hợp lệ";
+        else if (!/^(0|\+84)[0-9]{9,10}$/.test(form.receiverPhone))
+            errs.receiverPhone = "Số điện thoại không hợp lệ";
         if (!form.shippingAddress.trim()) errs.shippingAddress = "Vui lòng nhập địa chỉ";
         return errs;
     };
@@ -111,7 +114,8 @@ export default function Page() {
     };
 
     const handlePlaceOrder = async () => {
-        if (!user) { router.push("/login"); return; }
+        // ✅ Kiểm tra bằng isAuthenticated thay vì user object
+        if (!isAuthenticated) { router.push("/login"); return; }
         if (cart.length === 0) return;
 
         setLoading(true);
@@ -138,8 +142,20 @@ export default function Page() {
         }
     };
 
-    // Guard: chưa đăng nhập
-    if (!user) {
+    // ✅ Chờ AuthContext load xong từ localStorage trước khi render
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <Navbar />
+                <div className="flex items-center justify-center py-32">
+                    <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                </div>
+            </div>
+        );
+    }
+
+    // ✅ Dùng isAuthenticated thay vì !user
+    if (!isAuthenticated) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 <Navbar />
@@ -158,7 +174,6 @@ export default function Page() {
         );
     }
 
-    // Guard: giỏ trống
     if (cart.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -183,7 +198,6 @@ export default function Page() {
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10">
-                {/* Back */}
                 <NextLink
                     href="/cart"
                     className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6"
@@ -195,10 +209,8 @@ export default function Page() {
                     Thanh toán
                 </h1>
 
-                {/* Step indicator */}
                 <StepIndicator step={step} />
 
-                {/* Error */}
                 {orderError && (
                     <div className="mb-6 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3">
                         <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -211,12 +223,18 @@ export default function Page() {
                     {/* ── LEFT ── */}
                     <div className="lg:col-span-2">
 
-                        {/* STEP 1: Shipping form */}
+                        {/* STEP 1: Shipping */}
                         {step === 1 && (
                             <form onSubmit={handleNextStep} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
                                 <h2 className="text-lg font-bold flex items-center gap-2">
                                     <MapPin className="w-5 h-5 text-red-500" /> Thông tin giao hàng
                                 </h2>
+
+                                {/* ✅ Hiển thị username từ AuthContext */}
+                                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3 text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                    <User className="w-4 h-4 text-gray-400" />
+                                    Đặt hàng với tài khoản: <span className="font-bold text-gray-900 dark:text-white">{username}</span>
+                                </div>
 
                                 {/* Tên người nhận */}
                                 <div>
@@ -230,7 +248,7 @@ export default function Page() {
                                             name="receiverName"
                                             value={form.receiverName}
                                             onChange={handleChange}
-                                            placeholder="Nguyễn Văn A"
+                                            placeholder={username || "Nguyễn Văn A"}
                                             className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50 dark:bg-gray-900 dark:text-white transition ${
                                                 errors.receiverName ? "border-red-400" : "border-gray-200 dark:border-gray-700"
                                             }`}
@@ -317,10 +335,10 @@ export default function Page() {
                             </form>
                         )}
 
-                        {/* STEP 2: Payment method */}
+                        {/* STEP 2: Payment */}
                         {step === 2 && (
                             <div className="space-y-4">
-                                {/* Recap thông tin giao hàng */}
+                                {/* Recap shipping */}
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm">
                                     <div className="flex items-center justify-between mb-3">
                                         <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Thông tin giao hàng</h3>
@@ -333,56 +351,47 @@ export default function Page() {
                                     </div>
                                 </div>
 
-                                {/* Phương thức thanh toán */}
+                                {/* Payment method */}
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm space-y-3">
                                     <h2 className="text-lg font-bold flex items-center gap-2">
                                         <CreditCard className="w-5 h-5 text-red-500" /> Phương thức thanh toán
                                     </h2>
 
-                                    {/* COD */}
                                     <label className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
                                         paymentMethod === "COD"
                                             ? "border-red-500 bg-red-50 dark:bg-red-900/10"
                                             : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
                                     }`}>
-                                        <input
-                                            type="radio"
-                                            name="paymentMethod"
-                                            value="COD"
-                                            checked={paymentMethod === "COD"}
-                                            onChange={(e) => setPaymentMethod(e.target.value)}
-                                            className="accent-red-600"
+                                        <input type="radio" name="paymentMethod" value="COD"
+                                               checked={paymentMethod === "COD"}
+                                               onChange={(e) => setPaymentMethod(e.target.value)}
+                                               className="accent-red-600"
                                         />
                                         <Truck className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                                         <div>
                                             <p className="font-bold text-gray-900 dark:text-white">Thanh toán khi nhận hàng (COD)</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Trả tiền mặt khi shipper giao hàng tận nơi</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Trả tiền mặt khi shipper giao hàng</p>
                                         </div>
                                     </label>
 
-                                    {/* Online */}
                                     <label className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
                                         paymentMethod === "ONLINE"
                                             ? "border-red-500 bg-red-50 dark:bg-red-900/10"
                                             : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
                                     }`}>
-                                        <input
-                                            type="radio"
-                                            name="paymentMethod"
-                                            value="ONLINE"
-                                            checked={paymentMethod === "ONLINE"}
-                                            onChange={(e) => setPaymentMethod(e.target.value)}
-                                            className="accent-red-600"
+                                        <input type="radio" name="paymentMethod" value="ONLINE"
+                                               checked={paymentMethod === "ONLINE"}
+                                               onChange={(e) => setPaymentMethod(e.target.value)}
+                                               className="accent-red-600"
                                         />
                                         <CreditCard className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
                                         <div>
                                             <p className="font-bold text-gray-900 dark:text-white">Thanh toán trực tuyến</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Thanh toán qua cổng điện tử an toàn (VNPay, MoMo...)</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Thanh toán qua cổng điện tử (VNPay, MoMo...)</p>
                                         </div>
                                     </label>
                                 </div>
 
-                                {/* Buttons */}
                                 <div className="flex gap-3">
                                     <button
                                         onClick={() => setStep(1)}
@@ -407,7 +416,7 @@ export default function Page() {
                                 </div>
 
                                 <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-                                    <Lock className="w-3 h-3" /> Thông tin của bạn được mã hóa và bảo mật tuyệt đối
+                                    <Lock className="w-3 h-3" /> Thông tin của bạn được mã hóa và bảo mật
                                 </p>
                             </div>
                         )}
@@ -421,7 +430,6 @@ export default function Page() {
                                 Đơn hàng ({cart.length} sản phẩm)
                             </h3>
 
-                            {/* Items */}
                             <div className="space-y-3 max-h-64 overflow-y-auto pr-1 mb-4">
                                 {cart.map((item) => (
                                     <div key={item.id} className="flex gap-3">
@@ -444,7 +452,6 @@ export default function Page() {
                                 ))}
                             </div>
 
-                            {/* Totals */}
                             <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-2 text-sm">
                                 <div className="flex justify-between text-gray-500 dark:text-gray-400">
                                     <span>Tạm tính</span>
