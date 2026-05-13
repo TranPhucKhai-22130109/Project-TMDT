@@ -1,9 +1,6 @@
 package com.example.ecommerce.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -25,6 +22,8 @@ public class Product {
     private String images; // lưu JSON string list ảnh
 
     private String itemNo;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
     private String scale;
     private String marque;
@@ -33,4 +32,11 @@ public class Product {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private User seller;
+
+    @Column(nullable = false)
+    private Boolean isApproved = false;
 }

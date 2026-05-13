@@ -2,10 +2,17 @@ package com.example.ecommerce.seed;
 
 import com.example.ecommerce.dto.requesy.ProductJson;
 import com.example.ecommerce.entity.Product;
+import com.example.ecommerce.entity.Role;
+import com.example.ecommerce.entity.User;
+import com.example.ecommerce.entity.UserRole;
 import com.example.ecommerce.repository.ProductRepository;
+import com.example.ecommerce.repository.RoleRepository;
+import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.repository.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
@@ -14,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -21,6 +29,10 @@ import java.util.List;
 public class DataSeeder implements CommandLineRunner {
 
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -30,6 +42,8 @@ public class DataSeeder implements CommandLineRunner {
             System.out.println("Data already exists, skip seeding...");
             return;
         }
+
+        List<User> sellers = seedSellers();
 
         File folder = new ClassPathResource("data/product").getFile();
 
@@ -44,6 +58,8 @@ public class DataSeeder implements CommandLineRunner {
 
         List<Product> products = new ArrayList<>();
 
+        int sellerIndex = 0;
+
         for (File file : jsonFiles) {
             try (InputStream inputStream = new FileInputStream(file)) {
 
@@ -52,7 +68,9 @@ public class DataSeeder implements CommandLineRunner {
                         new TypeReference<List<ProductJson>>() {}
                 );
 
-                List<Product> productList = jsonList.stream().map(p -> {
+                Collections.shuffle(jsonList);
+
+                for (ProductJson p : jsonList) {
                     Product product = new Product();
 
                     product.setName(p.getName());
@@ -76,12 +94,13 @@ public class DataSeeder implements CommandLineRunner {
 
                     product.setDescription(p.getDescription());
                     product.setPrice(generatePrice(p));
-
                     product.setSoldQuantity(generateSoldQuantity());
 
                     Boolean isAuction = generateIsAuction();
-
                     product.setIsAuction(isAuction);
+
+                    product.setIsApproved(true);
+                    product.setIsDeleted(false);
 
                     if (isAuction) {
                         product.setStockQuantity(1);
@@ -89,16 +108,54 @@ public class DataSeeder implements CommandLineRunner {
                         product.setStockQuantity(generateStockQuantity());
                     }
 
-                    return product;
-                }).toList();
+                    User seller = sellers.get(sellerIndex % sellers.size());
+                    product.setSeller(seller);
+                    sellerIndex++;
 
-                products.addAll(productList);
+                    products.add(product);
+                }
             }
         }
 
         productRepository.saveAll(products);
 
-        System.out.println("Seed data thành công! Total products: " + products.size());
+        System.out.println("Seed data thành công!");
+        System.out.println("Total sellers: " + sellers.size());
+        System.out.println("Total products: " + products.size());
+    }
+
+    private List<User> seedSellers() {
+        List<User> sellers = new ArrayList<>();
+        Role sellerRole = roleRepository.findByRoleName("SELLER")
+                .orElseThrow(() -> new RuntimeException("SELLER role not found"));
+        for (int i = 1; i <= 50; i++) {
+            String email = "seller" + i + "@gmail.com";
+
+            User seller = userRepository.findByEmail(email).orElse(null);
+
+            if (seller == null) {
+                seller = new User();
+                seller.setUsername("Seller " + i);
+                seller.setEmail(email);
+                seller.setPassword(passwordEncoder.encode("123456"));
+
+                seller = userRepository.save(seller);
+
+                UserRole userRole = new UserRole();
+                userRole.setUser(seller);
+                userRole.setRole(sellerRole);
+
+                userRoleRepository.save(userRole);
+
+                seller = userRepository.save(seller);
+            }
+
+            sellers.add(seller);
+        }
+
+        Collections.shuffle(sellers);
+
+        return sellers;
     }
 
     private Integer generateSoldQuantity() {
@@ -118,10 +175,10 @@ public class DataSeeder implements CommandLineRunner {
         int max;
 
         if ("1:18".equals(scale)) {
-            min = 300;
+            min = 300000;
             max = 1000000;
         } else if ("1:24".equals(scale)) {
-            min = 400;
+            min = 400000;
             max = 1050000;
         } else if ("1:43".equals(scale)) {
             min = 450000;
@@ -149,7 +206,6 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         int price = min + (int) (Math.random() * (max - min + 1));
-
         price = Math.round(price / 10000f) * 10000;
 
         return (double) price;

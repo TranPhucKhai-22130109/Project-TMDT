@@ -9,10 +9,26 @@ import java.util.List;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByIsAuction(Boolean isAuction);
+    List<Product> findByIsDeletedFalseAndIsApprovedTrue();
+
+    List<Product> findByIsAuctionAndIsDeletedFalseAndIsApprovedTrue(Boolean isAuction);
+
+    List<Product> findByIsDeletedFalseAndIsApprovedTrue(Sort sort);
+
+    List<Product> findBySellerIdAndIsDeletedFalse(String sellerId);
+
+    List<Product> findByIsDeletedFalseAndIsApprovedFalse();
+
+    List<Product> findBySellerIdAndIsAuctionAndIsDeletedFalse(
+            String sellerId,
+            Boolean isAuction
+    );
+
+    List<Product> findBySellerIdAndIsDeletedFalse(
+            String sellerId,
+            Sort sort
+    );
+
     List<Product> findByIsDeletedFalse();
 
-    List<Product> findByIsAuctionAndIsDeletedFalse(Boolean isAuction);
-
-    List<Product> findByIsDeletedFalse(Sort sort);
 }

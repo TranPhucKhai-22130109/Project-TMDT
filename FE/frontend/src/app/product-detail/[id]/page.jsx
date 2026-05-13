@@ -16,6 +16,9 @@ import {
   User,
   Zap,
   Flame,
+  Store,
+  ShieldCheck,
+  PackageCheck,
 } from "lucide-react";
 import NextLink from "next/link";
 import { getProducts } from "@/services/productService";
@@ -175,8 +178,12 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
+
+          
+          
           {/* Product Info */}
           <div className="space-y-8">
+            
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-4 py-1.5 rounded-full">
@@ -210,6 +217,8 @@ export default function ProductDetailPage() {
             <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
               {product.description || "Mô hình xe chất lượng cao từ MINI GT."}
             </p>
+
+           
 
             {/* Quantity */}
             <div>
@@ -261,6 +270,54 @@ export default function ProductDetailPage() {
                 <Share2 className="w-6 h-6 mr-3" />
                 Chia sẻ
               </Button>
+            </div>
+             {/* Seller Info */}
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-5 shadow-sm">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                    <Store className="w-7 h-7 text-red-600" />
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-bold uppercase text-gray-400">
+                      Người bán
+                    </p>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white">
+                      {product.sellerName || "Official Seller"}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Seller ID: {product.sellerId || "N/A"}
+                    </p>
+                  </div>
+                </div>
+
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                  <ShieldCheck className="w-4 h-4" />
+                  Đã xác minh
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mt-5">
+                <div className="rounded-2xl bg-gray-50 dark:bg-gray-900 p-3">
+                  <p className="text-xs text-gray-500">Sản phẩm</p>
+                  <p className="font-bold text-gray-900 dark:text-white">
+                    Đang bán
+                  </p>
+                </div>
+
+                <div className="rounded-2xl bg-gray-50 dark:bg-gray-900 p-3">
+                  <p className="text-xs text-gray-500">Trạng thái</p>
+                  <p className="font-bold text-gray-900 dark:text-white flex items-center gap-1">
+                    <PackageCheck className="w-4 h-4" />
+                    Có sẵn
+                  </p>
+                </div>
+              </div>
+
+              <button className="mt-5 w-full py-3 rounded-2xl border border-red-200 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                Xem shop
+              </button>
             </div>
           </div>
         </div>

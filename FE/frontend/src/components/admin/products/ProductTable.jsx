@@ -1,8 +1,12 @@
 "use client";
 
-import { Edit, Trash2, Eye } from "lucide-react";
-
-export default function ProductTable({ products, onView, onEdit, onDelete }) {
+import { Edit, Trash2, Eye, CheckCircle2 } from "lucide-react";
+export default function ProductTable({
+  products,
+  onView,
+  onApprove,
+  showApproveButton = false,
+}) {
   const getStockColor = (stock) => {
     if (stock < 10) return "text-red-600";
     if (stock < 30) return "text-yellow-600";
@@ -14,6 +18,7 @@ export default function ProductTable({ products, onView, onEdit, onDelete }) {
     if (stock < 30) return "bg-yellow-500";
     return "bg-green-500";
   };
+
 
   return (
     <div className="overflow-x-auto">
@@ -144,22 +149,20 @@ export default function ProductTable({ products, onView, onEdit, onDelete }) {
                 <div className="flex justify-end gap-2 text-gray-400">
                   <button
                     onClick={() => onView(product)}
-                    className="p-1 hover:text-indigo-600 transition-colors"
+                    className="p-2 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors"
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => onEdit(product)}
-                    className="p-1 hover:text-indigo-600 transition-colors"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => onDelete(product)}
-                    className="p-1 hover:text-red-600 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+
+                  {showApproveButton && !product.isApproved && (
+                    <button
+                      onClick={() => onApprove(product)}
+                      className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-semibold transition-colors"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      Duyệt
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
