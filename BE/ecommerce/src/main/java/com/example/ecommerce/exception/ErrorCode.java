@@ -15,6 +15,7 @@ public enum ErrorCode {
     USER_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "User already exists"),
     USERNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "Username already exists"),
     BAD_CREDENTIALS(HttpStatus.BAD_REQUEST, "Email or password is incorrect"),
+    ROLE_NOT_FOUND(HttpStatus.BAD_REQUEST, "Role not found"),
 
     // ==== TOKEN ====
     INVALID_TOKEN(HttpStatus.BAD_REQUEST, "Invalid token"),
