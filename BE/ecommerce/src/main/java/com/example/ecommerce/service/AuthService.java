@@ -130,6 +130,13 @@ public class AuthService {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
 
+        // Kiểm tra trạng thái tài khoản
+        switch (user.getStatus()) {
+            case BANNED -> throw new AppException(ErrorCode.ACCOUNT_BANNED);
+            case INACTIVE -> throw new AppException(ErrorCode.ACCOUNT_INACTIVE);
+            default -> {} // ACTIVE → tiếp tục
+        }
+
         TokenPayload accessToken = jwtService.generateAccessToken(user);
         TokenPayload refreshToken = jwtService.generateRefreshToken(user);
         tokenService.storeRefreshToken(refreshToken.getJwtId(), refreshToken.getExpiresAt());
