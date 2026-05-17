@@ -1,8 +1,7 @@
 package com.example.ecommerce.controller;
 
 
-
-
+import com.example.ecommerce.dto.request.auth.GoogleAuthRequest;
 import com.example.ecommerce.dto.request.auth.LoginRequest;
 import com.example.ecommerce.dto.request.auth.SignUpRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
@@ -28,7 +27,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> checkUsername(
             @RequestParam String username
     ) {
-        boolean available  = authService.isUsernameAvailable(username);
+        boolean available = authService.isUsernameAvailable(username);
 
         if (!available) {
             return ResponseEntity.ok(
@@ -63,6 +62,53 @@ public class AuthController {
                         .build()
         );
     }
+
+    // Google
+    @PostMapping("/google")
+    public ResponseEntity<ApiResponse<LoginResponse>> loginWithGoogle(
+            @RequestBody GoogleAuthRequest request) {
+        LoginResponse loginResponse = authService.loginWithGoogle(request);
+
+        ResponseCookie accessCookie = ResponseCookie.from(
+                        "accessToken",
+                        loginResponse.getAccessToken()
+                )
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(15 * 60)
+                .sameSite("Lax")
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from(
+                        "refreshToken",
+                        loginResponse.getRefreshToken()
+                )
+                .httpOnly(true)
+                .secure(false)
+                .path("/v1/auth/refresh")
+                .maxAge(30 * 24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .body(
+                        ApiResponse.<LoginResponse>builder()
+                                .success(true)
+                                .code("GOOGLE_LOGIN_SUCCESS")
+                                .message("Login with Google successfully")
+                                .data(
+                                        LoginResponse.builder()
+                                                .userId(loginResponse.getUserId())
+                                                .username(loginResponse.getUsername())
+                                                .build()
+                                )
+                                .build()
+                );
+    }
+
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
@@ -118,11 +164,11 @@ public class AuthController {
         if (refreshToken == null) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
-        String newAccessToken = authService.refreshAccessToken(refreshToken);
+        LoginResponse loginResponse = authService.refreshAccessToken(refreshToken);
 
         ResponseCookie accessCookie = ResponseCookie.from(
                         "accessToken",
-                        newAccessToken
+                        loginResponse.getAccessToken()
                 )
                 .httpOnly(true)
                 .secure(false)
@@ -131,18 +177,31 @@ public class AuthController {
                 .sameSite("Lax")
                 .build();
 
+        ResponseCookie refreshCookie = ResponseCookie.from(
+                        "refreshToken",
+                        loginResponse.getRefreshToken()
+                )
+                .httpOnly(true)
+                .secure(false)
+                .path("/v1/auth/refresh")
+                .maxAge(30 * 24 * 60 * 60)
+                .sameSite("Lax")
+                .build();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
-                .body(  ApiResponse.<LoginResponse>builder()
-                                .success(true)
-                                .code("REFRESH_SUCCESS")
-                                .message("Token refreshed")
-                                .data(
-                                        LoginResponse.builder()
-//                                        .accessToken(newAccessToken)
-                                                .build()
-                                )
-                                .build()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(ApiResponse.<LoginResponse>builder()
+                        .success(true)
+                        .code("REFRESH_SUCCESS")
+                        .message("Token refreshed")
+                        .data(
+                                LoginResponse.builder()
+                                        .userId(loginResponse.getUserId())
+                                        .username(loginResponse.getUsername())
+                                        .build()
+                        )
+                        .build()
                 );
     }
 
