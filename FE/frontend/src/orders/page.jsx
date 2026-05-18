@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 "use client";
 // src/app/orders/page.jsx — Lịch sử mua hàng
 
@@ -246,7 +246,7 @@ export default function OrderHistoryPage() {
             </div>
         </div>
     );
-=======
+
 "use client";
 // src/app/orders/page.jsx — Lịch sử mua hàng
 
@@ -363,7 +363,7 @@ export default function OrderHistoryPage() {
     const router = useRouter();
 
 
-    const { isAuthenticated, isLoading } = useAuth();
+    const {isAuthenticated, isLoading} = useAuth();
 
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -397,7 +397,7 @@ export default function OrderHistoryPage() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-                <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                <Loader2 className="w-8 h-8 text-orange-500 animate-spin"/>
             </div>
         );
     }
@@ -406,7 +406,7 @@ export default function OrderHistoryPage() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
                 <div className="text-center p-8">
-                    <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
+                    <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-4"/>
                     <h2 className="text-xl font-semibold mb-2">Bạn chưa đăng nhập</h2>
                     <button
                         onClick={() => router.push("/login")}
@@ -426,7 +426,7 @@ export default function OrderHistoryPage() {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
             <div className="max-w-3xl mx-auto px-4">
                 <div className="flex items-center gap-2 mb-6">
-                    <ShoppingBag className="w-6 h-6 text-orange-500" />
+                    <ShoppingBag className="w-6 h-6 text-orange-500"/>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                         Lịch sử mua hàng
                     </h1>
@@ -460,11 +460,11 @@ export default function OrderHistoryPage() {
 
                 {loading ? (
                     <div className="flex justify-center py-16">
-                        <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-orange-500 animate-spin"/>
                     </div>
                 ) : error ? (
                     <div className="text-center py-16">
-                        <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                        <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3"/>
                         <p className="text-gray-500">{error}</p>
                         <button
                             onClick={() => window.location.reload()}
@@ -475,7 +475,7 @@ export default function OrderHistoryPage() {
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="text-center py-16">
-                        <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <Package className="w-12 h-12 text-gray-300 mx-auto mb-3"/>
                         <p className="text-gray-500 font-medium">Không có đơn hàng nào</p>
                         <button
                             onClick={() => router.push("/")}
@@ -487,12 +487,12 @@ export default function OrderHistoryPage() {
                 ) : (
                     <div className="space-y-4">
                         {filtered.map((order) => (
-                            <OrderCard key={order.id} order={order} />
+                            <OrderCard key={order.id} order={order}/>
                         ))}
                     </div>
                 )}
             </div>
         </div>
     );
->>>>>>> b5ba13d (updated payment)
+}
 }
