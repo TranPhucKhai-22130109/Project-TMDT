@@ -313,7 +313,7 @@ export default function Navbar() {
 
       {mobileMenuOpen && (
         <div className="fixed inset-y-0 left-0 z-[70] w-[80%] max-w-sm bg-white dark:bg-gray-900 shadow-2xl lg:hidden border-r border-gray-200 dark:border-gray-800 overflow-y-auto">
-          {/* Mobile Menu Content - bạn có thể copy từ code cũ của mình */}
+          {/* Mobile Menu Content */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
             <NextLink href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-yellow-500 rounded flex items-center justify-center text-white">
@@ -330,7 +330,6 @@ export default function Navbar() {
               <X className="w-6 h-6" />
             </button>
           </div>
-          {/* Thêm các link mobile menu nếu cần */}
         </div>
       )}
 
@@ -359,13 +358,16 @@ export default function Navbar() {
           ) : drawerItems.length === 0 ? (
             <p className="text-gray-500">Giỏ hàng đang trống</p>
           ) : (
-            drawerItems.map((item) => {
+            drawerItems.map((item, index) => {
               const product = item.product || item;
               const price = Number(product.price || 0);
               const quantity = Number(item.quantity || 1);
 
               return (
-                <div className="flex gap-3 border-b pb-4">
+                <div
+                  key={item.id || index}
+                  className="flex gap-3 border-b pb-4"
+                >
                   <img
                     src={
                       product.imageUrl || product.image || "/placeholder.png"
