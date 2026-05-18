@@ -1,8 +1,12 @@
 package com.example.ecommerce.dto.request.auth;
 
-import com.example.ecommerce.entity.Order;
+import com.example.ecommerce.enums.PaymentMethod;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.util.List;
@@ -26,7 +30,7 @@ public class CheckoutRequest {
     private String note;
 
     @NotNull(message = "Payment method is required")
-    private Order.PaymentMethod paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @NotEmpty(message = "Order must have at least one item")
     @Valid

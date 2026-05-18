@@ -23,12 +23,9 @@ public class OrderResponse {
     private String note;
     private Instant createdAt;
     private List<OrderItemResponse> items;
-
-    // Payment link (for online payment)
     private String paymentUrl;
 
-    @Data
-    @Builder
+    @Data @Builder
     public static class OrderItemResponse {
         private Long productId;
         private String productName;
