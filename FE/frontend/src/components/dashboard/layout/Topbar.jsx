@@ -14,7 +14,7 @@ export default function Topbar({ title, onMenuClick }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const unreadCount = notifications.filter((n) => n.unread).length;
-  const { logout } = useAuth();
+  const { logout, username } = useAuth();
 
   const handleSignOut = async () => {
     setShowUserMenu(false);
@@ -118,9 +118,9 @@ export default function Topbar({ title, onMenuClick }) {
             className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
           >
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
-              A
+              {username ? username.charAt(0).toUpperCase() : "A"}
             </div>
-            <span className="hidden sm:block text-sm font-medium text-gray-700">Admin</span>
+            <span className="hidden sm:block text-sm font-medium text-gray-700">{username || "Admin"}</span>
             <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block" />
           </button>
 

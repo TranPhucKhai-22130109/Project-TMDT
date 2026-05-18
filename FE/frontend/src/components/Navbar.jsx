@@ -210,6 +210,12 @@ export default function Navbar() {
               Cửa hàng
             </NextLink>
             <NextLink
+              href="/auctions"
+              className="text-sm font-bold uppercase tracking-wide hover:text-red-600"
+            >
+              Đấu giá
+            </NextLink>
+            <NextLink
               href="/contact"
               className="text-sm font-bold uppercase tracking-wide hover:text-red-600"
             >

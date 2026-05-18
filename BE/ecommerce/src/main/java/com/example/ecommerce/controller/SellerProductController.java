@@ -73,6 +73,10 @@ public class SellerProductController {
         product.setSoldQuantity(0);
         product.setStockQuantity(request.getStockQuantity() != null ? request.getStockQuantity() : 0);
         product.setIsAuction(request.getIsAuction() != null ? request.getIsAuction() : false);
+        product.setAuctionStartPrice(request.getAuctionStartPrice());
+        product.setAuctionStartTime(request.getAuctionStartTime());
+        product.setAuctionEndTime(request.getAuctionEndTime());
+        product.setCurrentPrice(request.getCurrentPrice());
 
         product.setSeller(seller);
         product.setIsApproved(false);
@@ -122,6 +126,10 @@ public class SellerProductController {
         product.setPrice(request.getPrice());
         product.setStockQuantity(request.getStockQuantity());
         product.setIsAuction(request.getIsAuction());
+        product.setAuctionStartPrice(request.getAuctionStartPrice());
+        product.setAuctionStartTime(request.getAuctionStartTime());
+        product.setAuctionEndTime(request.getAuctionEndTime());
+        product.setCurrentPrice(request.getCurrentPrice());
 
 
         try {
@@ -199,7 +207,11 @@ public class SellerProductController {
                 product.getSeller() != null
                         ? product.getSeller().getEmail()
                         : null,
-                product.getIsApproved()
+                product.getIsApproved(),
+                product.getAuctionStartPrice(),
+                product.getAuctionStartTime(),
+                product.getAuctionEndTime(),
+                product.getCurrentPrice()
         );
     }
 
