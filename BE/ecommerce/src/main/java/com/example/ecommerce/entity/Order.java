@@ -1,8 +1,11 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.enums.PaymentMethod;
+import com.example.ecommerce.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.Instant;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +14,7 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class Order {
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -41,33 +44,9 @@ public class Order {
     @Builder.Default
     private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
 
-    // Shipping info
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
     private String city;
     private String note;
-
-    @Column(nullable = false, updatable = false)
-    @Builder.Default
-    private Instant createdAt = Instant.now();
-
-    private Instant updatedAt;
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = Instant.now();
-    }
-
-    public enum OrderStatus {
-        PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
-    }
-
-    public enum PaymentMethod {
-        COD, ONLINE
-    }
-
-    public enum PaymentStatus {
-        UNPAID, PAID, REFUNDED
-    }
 }

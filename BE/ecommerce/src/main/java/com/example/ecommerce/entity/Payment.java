@@ -1,7 +1,10 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.enums.PaymentGateway;
+import com.example.ecommerce.enums.PaymentResult;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.Instant;
 
 @Entity
@@ -9,7 +12,7 @@ import java.time.Instant;
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class Payment {
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,10 +28,13 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private PaymentGateway gateway = PaymentGateway.MOCK;
+    private PaymentGateway gateway = PaymentGateway.VNPAY;
 
-    // Transaction ID from payment gateway
+    // Mã txnRef gửi sang VNPay
     private String transactionId;
+
+    // Mã giao dịch VNPay trả về sau khi thành công
+    private String gatewayTransactionNo;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -38,12 +44,4 @@ public class Payment {
     private Instant createdAt = Instant.now();
 
     private Instant paidAt;
-
-    public enum PaymentGateway {
-        MOCK, VNPAY, MOMO
-    }
-
-    public enum PaymentResult {
-        PENDING, SUCCESS, FAILED, CANCELLED
-    }
 }
