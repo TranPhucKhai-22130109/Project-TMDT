@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -547,7 +547,7 @@ export default function Page() {
             </div>
         </div>
     );
-=======
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -621,8 +621,8 @@ function StepIndicator({ step }) {
 export default function Page() {
     const router = useRouter();
 
-    const { isAuthenticated, username, isLoading } = useAuth();
-    const { reloadCartCount } = useCart();
+    const {isAuthenticated, username, isLoading} = useAuth();
+    const {reloadCartCount} = useCart();
 
     const [cart, setCart] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
@@ -694,9 +694,9 @@ export default function Page() {
     const grandTotal = cartTotal + shippingFee;
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+        const {name, value} = e.target;
+        setForm((prev) => ({...prev, [name]: value}));
+        if (errors[name]) setErrors((prev) => ({...prev, [name]: ""}));
     };
 
     const validateStep1 = () => {
@@ -712,13 +712,17 @@ export default function Page() {
     const handleNextStep = (e) => {
         e.preventDefault();
         const errs = validateStep1();
-        if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+        if (Object.keys(errs).length > 0) {
+            setErrors(errs);
+            return;
+        }
 
         setStep(2);
         try {
             sessionStorage.setItem("checkoutStep", "2");
-        } catch (e) {}
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch (e) {
+        }
+        window.scrollTo({top: 0, behavior: "smooth"});
     };
 
     // ==========================================
@@ -729,7 +733,10 @@ export default function Page() {
             e.preventDefault();
         }
 
-        if (!isAuthenticated) { router.push("/login"); return; }
+        if (!isAuthenticated) {
+            router.push("/login");
+            return;
+        }
         if (cart.length === 0) return;
 
         setLoading(true);
@@ -767,7 +774,8 @@ export default function Page() {
             } else {
                 try {
                     sessionStorage.removeItem("checkoutStep");
-                } catch (e) {}
+                } catch (e) {
+                }
                 router.push(`/orders/${orderResult.id}?success=true`); // Chuyển sang trang xem đơn
             }
 
@@ -782,9 +790,9 @@ export default function Page() {
     if (isLoading || loadingCart) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <Navbar />
+                <Navbar/>
                 <div className="flex items-center justify-center py-32">
-                    <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-red-500 animate-spin"/>
                 </div>
             </div>
         );
@@ -793,12 +801,13 @@ export default function Page() {
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <Navbar />
+                <Navbar/>
                 <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-                    <AlertCircle className="w-16 h-16 text-orange-400 mb-5" />
+                    <AlertCircle className="w-16 h-16 text-orange-400 mb-5"/>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Bạn chưa đăng nhập</h2>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">Vui lòng đăng nhập để tiến hành thanh toán.</p>
-                    <NextLink href="/login" className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
+                    <NextLink href="/login"
+                              className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
                         Đăng nhập ngay
                     </NextLink>
                 </div>
@@ -809,12 +818,13 @@ export default function Page() {
     if (cart.length === 0) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-                <Navbar />
+                <Navbar/>
                 <div className="flex flex-col items-center justify-center py-32 text-center px-4">
-                    <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-5" />
+                    <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-5"/>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Giỏ hàng trống</h2>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">Thêm sản phẩm vào giỏ trước khi thanh toán.</p>
-                    <NextLink href="/products" className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
+                    <NextLink href="/products"
+                              className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
                         Tiếp tục mua sắm
                     </NextLink>
                 </div>
@@ -824,22 +834,24 @@ export default function Page() {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-            <Navbar />
+            <Navbar/>
 
             <div className="max-w-6xl mx-auto px-4 py-10">
-                <NextLink href="/cart" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6">
-                    <ArrowLeft className="w-4 h-4" /> Quay lại giỏ hàng
+                <NextLink href="/cart"
+                          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6">
+                    <ArrowLeft className="w-4 h-4"/> Quay lại giỏ hàng
                 </NextLink>
 
                 <h1 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-6">
                     Thanh toán
                 </h1>
 
-                <StepIndicator step={step} />
+                <StepIndicator step={step}/>
 
                 {orderError && (
-                    <div className="mb-6 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3">
-                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <div
+                        className="mb-6 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-2xl px-4 py-3">
+                        <AlertCircle className="w-5 h-5 flex-shrink-0"/>
                         <p className="text-sm">{orderError}</p>
                     </div>
                 )}
@@ -849,22 +861,27 @@ export default function Page() {
                     <div className="lg:col-span-2">
                         {/* STEP 1: Shipping */}
                         {step === 1 && (
-                            <form onSubmit={handleNextStep} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
+                            <form onSubmit={handleNextStep}
+                                  className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
                                 <h2 className="text-lg font-bold flex items-center gap-2">
-                                    <MapPin className="w-5 h-5 text-red-500" /> Thông tin giao hàng
+                                    <MapPin className="w-5 h-5 text-red-500"/> Thông tin giao hàng
                                 </h2>
 
-                                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3 text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                                    <User className="w-4 h-4 text-gray-400" />
-                                    Đặt hàng với tài khoản: <span className="font-bold text-gray-900 dark:text-white">{username || "Khách hàng"}</span>
+                                <div
+                                    className="bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3 text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                    <User className="w-4 h-4 text-gray-400"/>
+                                    Đặt hàng với tài khoản: <span
+                                    className="font-bold text-gray-900 dark:text-white">{username || "Khách hàng"}</span>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <label
+                                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Tên người nhận <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <User
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
                                         <input
                                             type="text"
                                             name="receiverName"
@@ -876,15 +893,18 @@ export default function Page() {
                                             }`}
                                         />
                                     </div>
-                                    {errors.receiverName && <p className="text-xs text-red-500 mt-1">{errors.receiverName}</p>}
+                                    {errors.receiverName &&
+                                        <p className="text-xs text-red-500 mt-1">{errors.receiverName}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <label
+                                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Số điện thoại <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative">
-                                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <Phone
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
                                         <input
                                             type="tel"
                                             name="receiverPhone"
@@ -896,11 +916,13 @@ export default function Page() {
                                             }`}
                                         />
                                     </div>
-                                    {errors.receiverPhone && <p className="text-xs text-red-500 mt-1">{errors.receiverPhone}</p>}
+                                    {errors.receiverPhone &&
+                                        <p className="text-xs text-red-500 mt-1">{errors.receiverPhone}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <label
+                                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Tỉnh / Thành phố <span className="text-red-500">*</span>
                                     </label>
                                     <select
@@ -914,7 +936,8 @@ export default function Page() {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <label
+                                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Địa chỉ cụ thể <span className="text-red-500">*</span>
                                     </label>
                                     <input
@@ -927,11 +950,13 @@ export default function Page() {
                                             errors.shippingAddress ? "border-red-400" : "border-gray-200 dark:border-gray-700"
                                         }`}
                                     />
-                                    {errors.shippingAddress && <p className="text-xs text-red-500 mt-1">{errors.shippingAddress}</p>}
+                                    {errors.shippingAddress &&
+                                        <p className="text-xs text-red-500 mt-1">{errors.shippingAddress}</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                                    <label
+                                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Ghi chú (tuỳ chọn)
                                     </label>
                                     <textarea
@@ -944,8 +969,9 @@ export default function Page() {
                                     />
                                 </div>
 
-                                <button type="submit" className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                                    Tiếp tục <ChevronRight className="w-4 h-4" />
+                                <button type="submit"
+                                        className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                                    Tiếp tục <ChevronRight className="w-4 h-4"/>
                                 </button>
                             </form>
                         )}
@@ -953,57 +979,69 @@ export default function Page() {
                         {/* STEP 2: Payment */}
                         {step === 2 && (
                             <div className="space-y-4">
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm">
+                                <div
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm">
                                     <div className="flex items-center justify-between mb-3">
-                                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Thông tin giao hàng</h3>
+                                        <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Thông tin
+                                            giao hàng</h3>
                                         <button onClick={() => {
                                             setStep(1);
                                             sessionStorage.setItem("checkoutStep", "1");
-                                        }} className="text-xs text-red-600 hover:underline">Sửa</button>
+                                        }} className="text-xs text-red-600 hover:underline">Sửa
+                                        </button>
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                                        <p><span className="font-semibold text-gray-900 dark:text-white">{form.receiverName}</span> — {form.receiverPhone}</p>
+                                        <p><span
+                                            className="font-semibold text-gray-900 dark:text-white">{form.receiverName}</span> — {form.receiverPhone}
+                                        </p>
                                         <p>{form.shippingAddress}, {form.city}</p>
                                         {form.note && <p className="text-gray-400 italic">"{form.note}"</p>}
                                     </div>
                                 </div>
 
-                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm space-y-3">
+                                <div
+                                    className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm space-y-3">
                                     <h2 className="text-lg font-bold flex items-center gap-2">
-                                        <CreditCard className="w-5 h-5 text-red-500" /> Phương thức thanh toán
+                                        <CreditCard className="w-5 h-5 text-red-500"/> Phương thức thanh toán
                                     </h2>
 
-                                    <label className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
-                                        paymentMethod === "COD"
-                                            ? "border-red-500 bg-red-50 dark:bg-red-900/10"
-                                            : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
-                                    }`}>
+                                    <label
+                                        className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
+                                            paymentMethod === "COD"
+                                                ? "border-red-500 bg-red-50 dark:bg-red-900/10"
+                                                : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
+                                        }`}>
                                         <input type="radio" name="paymentMethod" value="COD"
                                                checked={paymentMethod === "COD"}
                                                onChange={(e) => setPaymentMethod(e.target.value)}
                                                className="accent-red-600"
                                         />
-                                        <Truck className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                        <Truck className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0"/>
                                         <div>
-                                            <p className="font-bold text-gray-900 dark:text-white">Thanh toán khi nhận hàng (COD)</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Trả tiền mặt khi shipper giao hàng</p>
+                                            <p className="font-bold text-gray-900 dark:text-white">Thanh toán khi nhận
+                                                hàng (COD)</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Trả tiền mặt
+                                                khi shipper giao hàng</p>
                                         </div>
                                     </label>
 
-                                    <label className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
-                                        paymentMethod === "ONLINE"
-                                            ? "border-red-500 bg-red-50 dark:bg-red-900/10"
-                                            : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
-                                    }`}>
+                                    <label
+                                        className={`flex items-center gap-4 p-4 border-2 rounded-2xl cursor-pointer transition ${
+                                            paymentMethod === "ONLINE"
+                                                ? "border-red-500 bg-red-50 dark:bg-red-900/10"
+                                                : "border-gray-200 dark:border-gray-700 hover:border-gray-300"
+                                        }`}>
                                         <input type="radio" name="paymentMethod" value="ONLINE"
                                                checked={paymentMethod === "ONLINE"}
                                                onChange={(e) => setPaymentMethod(e.target.value)}
                                                className="accent-red-600"
                                         />
-                                        <CreditCard className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0" />
+                                        <CreditCard className="w-6 h-6 text-gray-500 dark:text-gray-400 flex-shrink-0"/>
                                         <div>
-                                            <p className="font-bold text-gray-900 dark:text-white">Thanh toán trực tuyến</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Thanh toán qua cổng điện tử (VNPay, MoMo...)</p>
+                                            <p className="font-bold text-gray-900 dark:text-white">Thanh toán trực
+                                                tuyến</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Thanh toán
+                                                qua cổng điện tử (VNPay, MoMo...)</p>
                                         </div>
                                     </label>
                                 </div>
@@ -1025,11 +1063,13 @@ export default function Page() {
                                         className="flex-[2] py-4 bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-2xl shadow-lg shadow-red-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                                     >
                                         {loading ? (
-                                            <><Loader2 className="w-5 h-5 animate-spin" /> Đang xử lý...</>
+                                            <><Loader2 className="w-5 h-5 animate-spin"/> Đang xử lý...</>
                                         ) : paymentMethod === "ONLINE" ? (
-                                            <><CreditCard className="w-5 h-5" /> Thanh toán — {formatPrice(grandTotal)}</>
+                                            <><CreditCard className="w-5 h-5"/> Thanh toán
+                                                — {formatPrice(grandTotal)}</>
                                         ) : (
-                                            <><CheckCircle2 className="w-5 h-5" /> Đặt hàng — {formatPrice(grandTotal)}</>
+                                            <><CheckCircle2 className="w-5 h-5"/> Đặt hàng
+                                                — {formatPrice(grandTotal)}</>
                                         )}
                                     </button>
                                 </div>
@@ -1039,9 +1079,10 @@ export default function Page() {
 
                     {/* ── RIGHT: Order summary ── */}
                     <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
+                        <div
+                            className="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
                             <h3 className="font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                <Package className="w-4 h-4 text-red-500" />
+                                <Package className="w-4 h-4 text-red-500"/>
                                 Đơn hàng ({cart.length} sản phẩm)
                             </h3>
 
@@ -1061,7 +1102,8 @@ export default function Page() {
                                                         }
                                                     }}
                                                 />
-                                                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                                <span
+                                                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                                     {item?.quantity || 1}
                                                 </span>
                                             </div>
@@ -1085,7 +1127,8 @@ export default function Page() {
                                         {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
                                     </span>
                                 </div>
-                                <div className="flex justify-between font-black text-gray-900 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-700 text-base">
+                                <div
+                                    className="flex justify-between font-black text-gray-900 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-700 text-base">
                                     <span>Tổng cộng</span>
                                     <span className="text-red-600 text-lg">{formatPrice(grandTotal)}</span>
                                 </div>
@@ -1096,5 +1139,5 @@ export default function Page() {
             </div>
         </div>
     );
->>>>>>> b5ba13d (updated payment)
+}
 }
