@@ -3,10 +3,6 @@
 import { Eye, Edit, Trash2 } from "lucide-react";
 import UserRoleBadge, { STATUS_STYLES } from "./UserRoleBadge.jsx";
 
-// Assume we pass these helpers as props or import them if defined elsewhere
-// Since the prompt says "Helper functions (define outside component)" for UsersPage,
-// we will receive getRelativeTime, getInitials, getAvatarColor as props.
-
 export default function UserTable({ 
   users, 
   selectedIds,
@@ -16,6 +12,7 @@ export default function UserTable({
   onEdit, 
   onDelete, 
   onToggleStatus,
+  onChangeRole,
   getRelativeTime,
   getInitials,
   getAvatarColor
@@ -32,7 +29,7 @@ export default function UserTable({
 
   return (
     <div className="overflow-x-auto w-full">
-      <table className="w-full text-left border-collapse min-w-[900px]">
+      <table className="w-full text-left border-collapse min-w-[700px]">
         <thead>
           <tr className="bg-gray-50 border-y border-gray-200 text-xs font-semibold text-gray-500 uppercase tracking-wider">
             <th className="p-4 w-12">
@@ -46,17 +43,15 @@ export default function UserTable({
             <th className="p-4">User</th>
             <th className="p-4">Role</th>
             <th className="p-4">Status</th>
-            <th className="p-4">Join Date</th>
-            <th className="p-4">Last Active</th>
-            <th className="p-4 text-center">Orders</th>
-            <th className="p-4">Total Spent</th>
+            <th className="p-4">Joined</th>
             <th className="p-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white text-sm">
           {users.map((user) => {
             const isSelected = selectedIds.includes(user.id);
-            const statusStyle = STATUS_STYLES[user.status] || STATUS_STYLES.Inactive;
+            const statusStyle = STATUS_STYLES[user.status] || STATUS_STYLES.INACTIVE;
+            const role = user.roles?.[0] || "USER";
             
             return (
               <tr key={user.id} className={`group hover:bg-gray-50 transition-colors ${isSelected ? 'bg-indigo-50/30' : ''}`}>
@@ -74,25 +69,16 @@ export default function UserTable({
                   <div className="flex items-center gap-3">
                     <div 
                       className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden"
-                      style={{ backgroundColor: getAvatarColor(user.name) }}
+                      style={{ backgroundColor: getAvatarColor(user.username) }}
                     >
-                      {user.avatar ? (
-                        <img 
-                          src={user.avatar} 
-                          alt={user.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => { e.target.style.display = 'none'; }}
-                        />
-                      ) : (
-                        getInitials(user.name)
-                      )}
+                      {getInitials(user.username)}
                     </div>
                     <div>
                       <button 
                         onClick={() => onView(user)}
                         className="font-bold text-gray-900 hover:text-indigo-600 hover:underline text-left block"
                       >
-                        {user.name}
+                        {user.username}
                       </button>
                       <div className="text-gray-500 text-xs mt-0.5">{user.email}</div>
                     </div>
@@ -101,7 +87,25 @@ export default function UserTable({
                 
                 {/* Role */}
                 <td className="p-4">
-                  <UserRoleBadge role={user.role} size="sm" />
+                  <div className="flex items-center gap-2 group/role">
+                    <UserRoleBadge role={role} size="sm" />
+                    <select
+                      value={role}
+                      onChange={(e) => {
+                        const newRole = e.target.value;
+                        if (newRole !== role && window.confirm(`Change role from ${role} to ${newRole}?`)) {
+                          onChangeRole(user.id, newRole);
+                        } else {
+                          e.target.value = role;
+                        }
+                      }}
+                      className="opacity-0 group-hover/role:opacity-100 text-xs text-gray-500 px-1 py-0.5 border border-gray-200 rounded hover:border-indigo-300 bg-white cursor-pointer transition-all focus:opacity-100"
+                    >
+                      <option value="USER">User</option>
+                      <option value="SELLER">Seller</option>
+                      <option value="ADMIN">Admin</option>
+                    </select>
+                  </div>
                 </td>
                 
                 {/* Status */}
@@ -109,35 +113,23 @@ export default function UserTable({
                   <div className="flex items-center gap-2 group/status">
                     <div className="flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
-                      <span className={`font-medium ${statusStyle.color}`}>{user.status}</span>
+                      <span className={`font-medium ${statusStyle.color}`}>{statusStyle.label}</span>
                     </div>
                     <button 
                       onClick={() => onToggleStatus(user.id)}
                       className="opacity-0 group-hover/status:opacity-100 text-xs text-gray-400 hover:text-indigo-600 px-1.5 py-0.5 border border-gray-200 rounded hover:border-indigo-300 hover:bg-indigo-50 transition-all bg-white"
                     >
-                      {user.status === "Banned" ? "Unban" : "Ban"}
+                      {user.status === "BANNED" ? "Unban" : "Ban"}
                     </button>
                   </div>
                 </td>
                 
-                {/* Join Date */}
+                {/* Joined */}
                 <td className="p-4 text-gray-600">
-                  {new Date(user.joinedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                </td>
-                
-                {/* Last Active */}
-                <td className="p-4 text-gray-500 text-xs">
-                  {getRelativeTime(user.lastActive)}
-                </td>
-                
-                {/* Orders */}
-                <td className="p-4 text-center font-medium text-gray-700">
-                  {user.stats.totalOrders}
-                </td>
-                
-                {/* Total Spent */}
-                <td className="p-4 font-bold text-gray-900">
-                  ${user.stats.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {user.createdAt 
+                    ? new Date(user.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+                    : "—"
+                  }
                 </td>
                 
                 {/* Actions */}
@@ -158,9 +150,10 @@ export default function UserTable({
                       <Edit className="w-4 h-4" />
                     </button>
                     <button 
+                      disabled
                       onClick={() => onDelete(user.id)} 
-                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                      title="Delete user"
+                      className="p-1.5 text-gray-300 cursor-not-allowed rounded"
+                      title="Delete is not yet connected to backend"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { Plus, Search, Filter } from "lucide-react";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { Plus, Search, Filter, Loader2 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard/layout/DashboardLayout.jsx";
 import UserTable from "./UserTable.jsx";
 import UserDetailPanel from "./UserDetailPanel.jsx";
 import UserFormModal from "./UserFormModal.jsx";
-import { mockUsers } from "@/data/mockUsers.js";
+import { fetchUsers, createUser, updateUserStatus, updateUserRole } from "@/services/adminUserService";
 
 // Helper Functions
 const getRelativeTime = (dateString) => {
@@ -28,7 +28,7 @@ const getInitials = (name) => {
 };
 
 const getAvatarColor = (name) => {
-  if (!name) return "#6366f1"; // default indigo
+  if (!name) return "#6366f1";
   const colors = ["#6366f1", "#3b82f6", "#10b981", "#f97316", "#ec4899", "#14b8a6"];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -37,13 +37,16 @@ const getAvatarColor = (name) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
-const ROLE_TABS = ["All", "Admin", "Manager", "Customer"];
+const ROLE_TABS = ["All", "ADMIN", "SELLER", "USER"];
 
 export default function UsersPage() {
   // State
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchInput, setSearchInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState(""); // Debounced
+  const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortBy, setSortBy] = useState("Newest");
@@ -52,6 +55,23 @@ export default function UsersPage() {
   
   const [formModal, setFormModal] = useState({ isOpen: false, data: null });
   const [detailPanel, setDetailPanel] = useState({ isOpen: false, user: null });
+
+  // Load users from API
+  const loadUsers = useCallback(async () => {
+    try {
+      setError(null);
+      const data = await fetchUsers();
+      setUsers(data.data || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   // Debounce Search
   useEffect(() => {
@@ -69,14 +89,14 @@ export default function UsersPage() {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(u => 
-        u.name.toLowerCase().includes(q) || 
-        u.email.toLowerCase().includes(q)
+        u.username?.toLowerCase().includes(q) || 
+        u.email?.toLowerCase().includes(q)
       );
     }
 
     // 2. Role Filter
     if (roleFilter !== "All") {
-      result = result.filter(u => u.role === roleFilter);
+      result = result.filter(u => u.roles?.includes(roleFilter));
     }
 
     // 3. Status Filter
@@ -88,16 +108,12 @@ export default function UsersPage() {
     result = [...result].sort((a, b) => {
       switch (sortBy) {
         case "Oldest":
-          return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
         case "Name A-Z":
-          return a.name.localeCompare(b.name);
-        case "Most Orders":
-          return b.stats.totalOrders - a.stats.totalOrders;
-        case "Highest Spent":
-          return b.stats.totalSpent - a.stats.totalSpent;
+          return (a.username || "").localeCompare(b.username || "");
         case "Newest":
         default:
-          return new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       }
     });
 
@@ -105,11 +121,13 @@ export default function UsersPage() {
   }, [users, searchQuery, roleFilter, statusFilter, sortBy]);
 
   const roleCounts = useMemo(() => {
-    const counts = { All: users.length, Admin: 0, Manager: 0, Customer: 0 };
+    const counts = { All: users.length, ADMIN: 0, SELLER: 0, USER: 0 };
     users.forEach(u => {
-      if (counts[u.role] !== undefined) {
-        counts[u.role]++;
-      }
+      (u.roles || []).forEach(role => {
+        if (counts[role] !== undefined) {
+          counts[role]++;
+        }
+      });
     });
     return counts;
   }, [users]);
@@ -120,57 +138,66 @@ export default function UsersPage() {
   };
 
   const handleEdit = (user) => {
-    setDetailPanel(prev => ({ ...prev, isOpen: false })); // Close detail if open
+    setDetailPanel(prev => ({ ...prev, isOpen: false }));
     setFormModal({ isOpen: true, data: user });
   };
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      setUsers(prev => prev.filter(u => u.id !== id));
-      if (detailPanel.isOpen && detailPanel.user?.id === id) {
-        setDetailPanel({ isOpen: false, user: null });
-      }
-      setSelectedIds(prev => prev.filter(selId => selId !== id));
-    }
+    alert("Delete user is not yet connected to the backend.");
   };
 
-  const handleSave = (formData) => {
+  const handleSave = async (formData) => {
     if (formData.id) {
-      // Edit
+      // Edit — client-side only (backend chưa có PUT endpoint tổng hợp)
       setUsers(prev => prev.map(u => u.id === formData.id ? { ...u, ...formData } : u));
       if (detailPanel.isOpen && detailPanel.user?.id === formData.id) {
         setDetailPanel(prev => ({ ...prev, user: { ...prev.user, ...formData } }));
       }
+      setFormModal({ isOpen: false, data: null });
     } else {
-      // Add
-      const newId = `USR-${String(users.length + 1).padStart(3, '0')}`;
-      const newUser = {
-        ...formData,
-        id: newId,
-        joinedAt: new Date().toISOString(),
-        lastActive: new Date().toISOString(),
-        stats: { totalOrders: 0, totalSpent: 0, avgOrderValue: 0, returnRate: 0 },
-        recentOrders: [],
-        activityData: []
-      };
-      setUsers(prev => [newUser, ...prev]);
+      // Add — gọi API thật
+      try {
+        await createUser(formData);
+        setFormModal({ isOpen: false, data: null });
+        await loadUsers(); // reload danh sách
+      } catch (err) {
+        alert(err.message);
+      }
     }
-    setFormModal({ isOpen: false, data: null });
   };
 
-  const handleToggleStatus = (id) => {
-    setUsers(prev => prev.map(u => {
-      if (u.id !== id) return u;
-      let nextStatus = "Active";
-      if (u.status === "Active") nextStatus = "Inactive";
-      else if (u.status === "Inactive") nextStatus = "Banned";
-      
-      const updatedUser = { ...u, status: nextStatus };
+  const handleToggleStatus = async (id) => {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+
+    const nextStatus = user.status === "BANNED" ? "ACTIVE" : "BANNED";
+    
+    try {
+      await updateUserStatus(id, nextStatus);
+      const updatedUser = { ...user, status: nextStatus };
+      setUsers(prev => prev.map(u => u.id === id ? updatedUser : u));
       if (detailPanel.isOpen && detailPanel.user?.id === id) {
         setDetailPanel(prev => ({ ...prev, user: updatedUser }));
       }
-      return updatedUser;
-    }));
+    } catch (err) {
+      alert("Failed to update status: " + err.message);
+    }
+  };
+
+  const handleChangeRole = async (id, newRole) => {
+    const user = users.find(u => u.id === id);
+    if (!user) return;
+
+    try {
+      await updateUserRole(id, newRole);
+      const updatedUser = { ...user, roles: [newRole] };
+      setUsers(prev => prev.map(u => u.id === id ? updatedUser : u));
+      if (detailPanel.isOpen && detailPanel.user?.id === id) {
+        setDetailPanel(prev => ({ ...prev, user: updatedUser }));
+      }
+    } catch (err) {
+      alert("Failed to update role: " + err.message);
+    }
   };
 
   // Bulk Actions
@@ -190,22 +217,52 @@ export default function UsersPage() {
     }
   };
 
-  const handleBulkStatus = (newStatus) => {
-    setUsers(prev => prev.map(u => {
-      if (selectedIds.includes(u.id)) {
-        return { ...u, status: newStatus };
-      }
-      return u;
-    }));
-    setSelectedIds([]);
+  const handleBulkStatus = async (newStatus) => {
+    try {
+      await Promise.all(selectedIds.map(id => updateUserStatus(id, newStatus)));
+      setUsers(prev => prev.map(u => {
+        if (selectedIds.includes(u.id)) {
+          return { ...u, status: newStatus };
+        }
+        return u;
+      }));
+      setSelectedIds([]);
+    } catch (err) {
+      alert("Failed to update some users: " + err.message);
+    }
   };
 
   const handleBulkDelete = () => {
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} users?`)) {
-      setUsers(prev => prev.filter(u => !selectedIds.includes(u.id)));
-      setSelectedIds([]);
-    }
+    alert("Bulk delete users is not yet connected to the backend.");
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <DashboardLayout title="Users">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <DashboardLayout title="Users">
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <p className="text-red-600 text-sm">{error}</p>
+          <button 
+            onClick={() => { setLoading(true); loadUsers(); }}
+            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+          >
+            Retry
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Users">
@@ -249,7 +306,7 @@ export default function UsersPage() {
                         : "bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200/60"
                     }`}
                   >
-                    {tab}
+                    {tab === "All" ? "All" : tab.charAt(0) + tab.slice(1).toLowerCase()}
                     <span className={`px-2 py-0.5 rounded-full text-xs ${
                       isActive ? "bg-indigo-500 text-white" : "bg-gray-200 text-gray-600"
                     }`}>
@@ -283,9 +340,9 @@ export default function UsersPage() {
                   className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white appearance-none cursor-pointer"
                 >
                   <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Banned">Banned</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                  <option value="BANNED">Banned</option>
                 </select>
               </div>
 
@@ -298,8 +355,6 @@ export default function UsersPage() {
                 <option value="Newest">Newest First</option>
                 <option value="Oldest">Oldest First</option>
                 <option value="Name A-Z">Name A-Z</option>
-                <option value="Most Orders">Most Orders</option>
-                <option value="Highest Spent">Highest Spent</option>
               </select>
             </div>
           </div>
@@ -312,26 +367,28 @@ export default function UsersPage() {
               </span>
               <div className="flex items-center gap-2 whitespace-nowrap">
                 <button 
-                  onClick={() => handleBulkStatus("Active")}
+                  onClick={() => handleBulkStatus("ACTIVE")}
                   className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded hover:bg-green-100 transition-colors"
                 >
                   Set Active
                 </button>
                 <button 
-                  onClick={() => handleBulkStatus("Inactive")}
+                  onClick={() => handleBulkStatus("INACTIVE")}
                   className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
                 >
                   Set Inactive
                 </button>
                 <button 
-                  onClick={() => handleBulkStatus("Banned")}
+                  onClick={() => handleBulkStatus("BANNED")}
                   className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 border border-red-200 rounded hover:bg-red-100 transition-colors ml-2"
                 >
                   Ban Users
                 </button>
                 <button 
+                  disabled
                   onClick={handleBulkDelete}
-                  className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-red-400 opacity-70 cursor-not-allowed rounded"
+                  title="Bulk delete is not yet connected to backend"
                 >
                   Delete Selected
                 </button>
@@ -349,31 +406,16 @@ export default function UsersPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleStatus={handleToggleStatus}
+            onChangeRole={handleChangeRole}
             getRelativeTime={getRelativeTime}
             getInitials={getInitials}
             getAvatarColor={getAvatarColor}
           />
 
-          {/* Table Footer / Pagination */}
+          {/* Table Footer */}
           <div className="px-6 py-4 border-t border-gray-100 bg-white flex items-center justify-between mt-auto">
             <div className="text-sm text-gray-500">
-              Showing <span className="font-medium text-gray-900">1</span> to <span className="font-medium text-gray-900">{Math.min(10, filteredUsers.length)}</span> of <span className="font-medium text-gray-900">{filteredUsers.length}</span> users
-            </div>
-            <div className="flex gap-1">
-              <button className="px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50" disabled>
-                Prev
-              </button>
-              <button className="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 border border-indigo-600 rounded hover:bg-indigo-700">
-                1
-              </button>
-              {filteredUsers.length > 10 && (
-                <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50">
-                  2
-                </button>
-              )}
-              <button className="px-3 py-1.5 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50" disabled={filteredUsers.length <= 10}>
-                Next
-              </button>
+              Showing <span className="font-medium text-gray-900">{filteredUsers.length}</span> of <span className="font-medium text-gray-900">{users.length}</span> users
             </div>
           </div>
 
@@ -391,9 +433,9 @@ export default function UsersPage() {
         isOpen={detailPanel.isOpen}
         user={detailPanel.user}
         onClose={() => setDetailPanel({ isOpen: false, user: null })}
-        onEdit={handleEdit}
         onDelete={handleDelete}
         onToggleStatus={handleToggleStatus}
+        onChangeRole={handleChangeRole}
         getRelativeTime={getRelativeTime}
         getInitials={getInitials}
         getAvatarColor={getAvatarColor}
