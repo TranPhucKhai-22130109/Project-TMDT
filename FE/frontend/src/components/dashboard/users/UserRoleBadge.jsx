@@ -1,30 +1,33 @@
-import { Shield, Briefcase, User } from "lucide-react";
+import { Shield, Store, User } from "lucide-react";
 
 export const STATUS_STYLES = {
-  Active: { color: "text-green-700", dot: "bg-green-500" },
-  Inactive: { color: "text-gray-500", dot: "bg-gray-400" },
-  Banned: { color: "text-red-700", dot: "bg-red-500" }
+  ACTIVE: { color: "text-green-700", dot: "bg-green-500", label: "Active" },
+  INACTIVE: { color: "text-gray-500", dot: "bg-gray-400", label: "Inactive" },
+  BANNED: { color: "text-red-700", dot: "bg-red-500", label: "Banned" }
 };
 
 export default function UserRoleBadge({ role, size = "md" }) {
-  let bgClass, textClass, Icon;
+  let bgClass, textClass, Icon, label;
 
   switch (role) {
-    case "Admin":
+    case "ADMIN":
       bgClass = "bg-red-50 border border-red-100";
       textClass = "text-red-700";
       Icon = Shield;
+      label = "Admin";
       break;
-    case "Manager":
+    case "SELLER":
       bgClass = "bg-blue-50 border border-blue-100";
       textClass = "text-blue-700";
-      Icon = Briefcase;
+      Icon = Store;
+      label = "Seller";
       break;
-    case "Customer":
+    case "USER":
     default:
       bgClass = "bg-gray-100 border border-gray-200";
       textClass = "text-gray-700";
       Icon = User;
+      label = "User";
       break;
   }
 
@@ -35,7 +38,7 @@ export default function UserRoleBadge({ role, size = "md" }) {
   return (
     <span className={`inline-flex items-center gap-1.5 rounded-full ${bgClass} ${textClass} ${sizeClass}`}>
       <Icon size={iconSize} className="shrink-0" />
-      {role}
+      {label}
     </span>
   );
 }
