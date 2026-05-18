@@ -40,6 +40,19 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener("auth:logout", handleForceLogout);
   }, []);
 
+  // Login Google
+  const loginWithGoogle = async () => {
+    const data = await authService.loginWithGoogle();
+    const newUserId = data.data?.userId;
+    const newUsername = data.data?.username;
+    if (newUserId) {
+      setUserId(newUserId);
+      setUsername(newUsername || "User");
+      setIsAuthenticated(true);
+    }
+    return data;
+  };
+
   const login = async ({ email, password }) => {
     const data = await authService.login({ email, password });
     const newUserId = data.data?.userId;
@@ -74,6 +87,7 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         isLoading,
         login,
+        loginWithGoogle,
         logout,
         signup,
       }}

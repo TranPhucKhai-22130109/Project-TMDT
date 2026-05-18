@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/products/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll() // để tạm sửa lại sau
+                        .requestMatchers("/api/admin/users/**").permitAll() // để tạm sửa lại sau
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(

@@ -1,20 +1,27 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.TokenPayload;
+import com.example.ecommerce.dto.request.auth.GoogleAuthRequest;
 import com.example.ecommerce.dto.request.auth.LoginRequest;
 import com.example.ecommerce.dto.request.auth.SignUpRequest;
+import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.LoginResponse;
 import com.example.ecommerce.entity.Role;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.entity.UserRole;
+import com.example.ecommerce.enums.RoleName;
 import com.example.ecommerce.exception.AppException;
 import com.example.ecommerce.exception.ErrorCode;
 import com.example.ecommerce.repository.RoleRepository;
 import com.example.ecommerce.repository.UserRepository;
 import com.example.ecommerce.repository.UserRoleRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +48,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
+    private final FirebaseAuth firebaseAuth;
 
     public boolean isUsernameAvailable(String username) {
         return !userRepository.existsByUsername(username);
@@ -67,8 +76,53 @@ public class AuthService {
         userRoleRepository.save(userRole);
     }
 
+    // Login Google
+    public LoginResponse loginWithGoogle(GoogleAuthRequest request) {
+        try {
+            // 1. Verify ID Token với Firebase
+            FirebaseToken decodedToken = firebaseAuth.verifyIdToken(request.getIdToken());
+            String email = decodedToken.getEmail();
+            String name = decodedToken.getName();
+
+            // 2. Tìm hoặc tạo user
+            User user = userRepository.findByEmail(email).orElseGet(() -> {
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setUsername(name);
+                newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                User savedUser = userRepository.save(newUser);
+
+                Role userRole = roleRepository.findByRoleName(String.valueOf(RoleName.USER))
+                        .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_FOUND));
+                UserRole userRoleEntity = new UserRole();
+                userRoleEntity.setUser(savedUser);
+                userRoleEntity.setRole(userRole);
+                userRoleRepository.save(userRoleEntity);
+
+                return savedUser;
+            });
+
+            // 3. Issue JWT
+            TokenPayload accessToken = jwtService.generateAccessToken(user);
+            TokenPayload refreshToken = jwtService.generateRefreshToken(user);
+            tokenService.storeRefreshToken(refreshToken.getJwtId(), refreshToken.getExpiresAt());
+
+            // 4. Trả về LoginResponse — giống login()
+            return LoginResponse.builder()
+                    .accessToken(accessToken.getToken())
+                    .refreshToken(refreshToken.getToken())
+                    .userId(user.getId())
+                    .username(user.getUsername())
+                    .build();
+
+        } catch (FirebaseAuthException e) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
+    }
+
     public LoginResponse login(LoginRequest request) {
-        Authentication authenticationToken = UsernamePasswordAuthenticationToken.unauthenticated(request.getEmail(), request.getPassword());
+        Authentication authenticationToken = UsernamePasswordAuthenticationToken
+                .unauthenticated(request.getEmail(), request.getPassword());
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         User user = (User) authentication.getPrincipal();
@@ -76,19 +130,26 @@ public class AuthService {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
 
+        // Kiểm tra trạng thái tài khoản
+        switch (user.getStatus()) {
+            case BANNED -> throw new AppException(ErrorCode.ACCOUNT_BANNED);
+            case INACTIVE -> throw new AppException(ErrorCode.ACCOUNT_INACTIVE);
+            default -> {} // ACTIVE → tiếp tục
+        }
+
         TokenPayload accessToken = jwtService.generateAccessToken(user);
         TokenPayload refreshToken = jwtService.generateRefreshToken(user);
         tokenService.storeRefreshToken(refreshToken.getJwtId(), refreshToken.getExpiresAt());
 
         return LoginResponse.builder()
-            .accessToken(accessToken.getToken())
-            .refreshToken(refreshToken.getToken())
-            .userId(user.getId())
-            .username(user.getUsername())
-            .build();
+                .accessToken(accessToken.getToken())
+                .refreshToken(refreshToken.getToken())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .build();
     }
 
-    public String refreshAccessToken(String refreshToken) {
+    public LoginResponse refreshAccessToken(String refreshToken) {
         Jwt jwt;
         try {
             jwt = jwtDecoder.decode(refreshToken); // decode refresh token
@@ -109,7 +170,17 @@ public class AuthService {
         User user = userRepository.findById(jwt.getSubject())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        return jwtService.generateAccessToken(user).getToken();
+        // 3. Generate new access + refresh tokens (rotation)
+        TokenPayload newAccessToken = jwtService.generateAccessToken(user);
+        TokenPayload newRefreshToken = jwtService.generateRefreshToken(user);
+        tokenService.storeRefreshToken(newRefreshToken.getJwtId(), newRefreshToken.getExpiresAt());
+
+        return LoginResponse.builder()
+                .accessToken(newAccessToken.getToken())
+                .refreshToken(newRefreshToken.getToken())
+                .userId(user.getId())
+                .username(user.getUsername())
+                .build();
     }
 
 
@@ -127,7 +198,7 @@ public class AuthService {
 
         // Revoke refresh token
         if (refreshToken != null && jwtService.isValidToken(refreshToken)) {
-            Jwt jwt = jwtService.extractToken(accessToken);
+            Jwt jwt = jwtService.extractToken(refreshToken);
             tokenService.revokeRefreshToken(jwt.getClaim("jwtId"));
         }
 

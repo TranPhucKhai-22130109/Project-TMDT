@@ -2,7 +2,45 @@
 // Backend dùng Cookie-based HttpOnly JWT → credentials: 'include' là bắt buộc
 // Token do browser quản lý qua cookie, FE chỉ lưu userId vào localStorage
 
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/config/firebase";
 const AUTH_BASE = process.env.NEXT_PUBLIC_AUTH_URL || "http://localhost:8080";
+
+/**
+ * Login bằng Google
+ * 1. Firebase popup → lấy idToken
+ * 2. Gửi idToken lên BE POST /v1/auth/google
+ * 3. BE verify → trả cookie + userId/username
+ */
+export async function loginWithGoogle() {
+  // 1. Mở popup Google Sign-In qua Firebase
+  const result = await signInWithPopup(auth, googleProvider);
+  const idToken = await result.user.getIdToken();
+
+  // 2. Gửi idToken lên backend
+  const res = await fetch(`${AUTH_BASE}/v1/auth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ idToken }),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Google login failed");
+  }
+
+  // 3. Lưu localStorage (giống login thường)
+  if (data.data?.userId) {
+    localStorage.setItem("localstorage-userId", data.data.userId);
+  }
+  if (data.data?.username) {
+    localStorage.setItem("localstorage-username", data.data.username);
+  }
+
+  return data;
+}
 
 /**
  * Đăng nhập
