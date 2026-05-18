@@ -74,7 +74,11 @@ public class ProductController {
                                     ? product.getSeller().getEmail()
                                     : null,
                             product.getIsApproved(),
-                            product.getIsDeleted()
+                            product.getIsDeleted(),
+                            product.getAuctionStartPrice(),
+                            product.getAuctionStartTime(),
+                            product.getAuctionEndTime(),
+                            product.getCurrentPrice()
                     );
                 })
                 .toList();
@@ -133,7 +137,11 @@ public class ProductController {
                                     ? product.getSeller().getEmail()
                                     : null,
                             product.getIsApproved(),
-                            product.getIsDeleted()
+                            product.getIsDeleted(),
+                            product.getAuctionStartPrice(),
+                            product.getAuctionStartTime(),
+                            product.getAuctionEndTime(),
+                            product.getCurrentPrice()
                     );
                 })
                 .toList();
@@ -179,7 +187,11 @@ public class ProductController {
                         ? product.getSeller().getEmail()
                         : null,
                 product.getIsApproved(),
-                product.getIsDeleted()
+                product.getIsDeleted(),
+                product.getAuctionStartPrice(),
+                product.getAuctionStartTime(),
+                product.getAuctionEndTime(),
+                product.getCurrentPrice()
         );
     }
     @PostMapping("/upload")
@@ -216,6 +228,10 @@ public class ProductController {
         product.setSoldQuantity(request.getSoldQuantity());
         product.setStockQuantity(request.getStockQuantity());
         product.setIsAuction(request.getIsAuction());
+        product.setAuctionStartPrice(request.getAuctionStartPrice());
+        product.setAuctionStartTime(request.getAuctionStartTime());
+        product.setAuctionEndTime(request.getAuctionEndTime());
+        product.setCurrentPrice(request.getCurrentPrice());
 
         try {
             product.setImages(objectMapper.writeValueAsString(request.getImages()));
@@ -243,6 +259,10 @@ public class ProductController {
         product.setStockQuantity(request.getStockQuantity());
         product.setIsAuction(request.getIsAuction());
         product.setIsDeleted(false);
+        product.setAuctionStartPrice(request.getAuctionStartPrice());
+        product.setAuctionStartTime(request.getAuctionStartTime());
+        product.setAuctionEndTime(request.getAuctionEndTime());
+        product.setCurrentPrice(request.getCurrentPrice());
 
         try {
             product.setImages(objectMapper.writeValueAsString(request.getImages()));

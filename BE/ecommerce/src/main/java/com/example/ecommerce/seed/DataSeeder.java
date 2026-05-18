@@ -5,6 +5,7 @@ import com.example.ecommerce.entity.Product;
 import com.example.ecommerce.entity.Role;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.entity.UserRole;
+import com.example.ecommerce.enums.ProductStatus;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.repository.RoleRepository;
 import com.example.ecommerce.repository.UserRepository;
@@ -20,6 +21,8 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,9 +50,7 @@ public class DataSeeder implements CommandLineRunner {
 
         File folder = new ClassPathResource("data/product").getFile();
 
-        File[] jsonFiles = folder.listFiles((dir, name) ->
-                name.toLowerCase().endsWith(".json")
-        );
+        File[] jsonFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
         if (jsonFiles == null || jsonFiles.length == 0) {
             System.out.println("No JSON files found in data/product");
@@ -65,8 +66,8 @@ public class DataSeeder implements CommandLineRunner {
 
                 List<ProductJson> jsonList = objectMapper.readValue(
                         inputStream,
-                        new TypeReference<List<ProductJson>>() {}
-                );
+                        new TypeReference<List<ProductJson>>() {
+                        });
 
                 Collections.shuffle(jsonList);
 
@@ -89,7 +90,6 @@ public class DataSeeder implements CommandLineRunner {
                         product.setItemNo(p.getItemInfo().getItemNo());
                         product.setScale(p.getItemInfo().getScale());
                         product.setMarque(p.getItemInfo().getMarque());
-                        product.setStatus(p.getItemInfo().getStatus());
                     }
 
                     product.setDescription(p.getDescription());
@@ -98,12 +98,14 @@ public class DataSeeder implements CommandLineRunner {
 
                     Boolean isAuction = generateIsAuction();
                     product.setIsAuction(isAuction);
+                    product.setStatus(resolveProductStatus(p, isAuction));
 
                     product.setIsApproved(true);
                     product.setIsDeleted(false);
 
                     if (isAuction) {
                         product.setStockQuantity(1);
+                        applyAuctionSeedData(product);
                     } else {
                         product.setStockQuantity(generateStockQuantity());
                     }
@@ -128,7 +130,7 @@ public class DataSeeder implements CommandLineRunner {
         List<User> sellers = new ArrayList<>();
         Role sellerRole = roleRepository.findByRoleName("SELLER")
                 .orElseThrow(() -> new RuntimeException("SELLER role not found"));
-        for (int i = 1; i <= 50; i++) {
+        for (int i = 1; i <= 2; i++) {
             String email = "seller" + i + "@gmail.com";
 
             User seller = userRepository.findByEmail(email).orElse(null);
@@ -217,5 +219,44 @@ public class DataSeeder implements CommandLineRunner {
 
     private Boolean generateIsAuction() {
         return Math.random() < 0.2;
+    }
+
+    private ProductStatus resolveProductStatus(ProductJson p, Boolean isAuction) {
+        if (Boolean.TRUE.equals(isAuction)) {
+            return Math.random() < 0.5
+                    ? ProductStatus.OPEN
+                    : ProductStatus.SCHEDULED;
+        }
+
+        if (p.getItemInfo() != null && p.getItemInfo().getStatus() != null) {
+            String status = p.getItemInfo().getStatus().toLowerCase();
+
+            if (status.contains("pre")) {
+                return ProductStatus.PRE_ORDER;
+            }
+        }
+
+        return ProductStatus.RELEASED;
+    }
+
+    private void applyAuctionSeedData(Product product) {
+        BigDecimal startPrice = BigDecimal.valueOf(product.getPrice());
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime;
+
+        if (product.getStatus() == ProductStatus.OPEN) {
+            startTime = now.minusHours(randomBetween(1, 24));
+        } else {
+            startTime = now.plusHours(randomBetween(1, 72));
+        }
+
+        product.setAuctionStartPrice(startPrice);
+        product.setCurrentPrice(startPrice);
+        product.setAuctionStartTime(startTime);
+        product.setAuctionEndTime(startTime.plusDays(randomBetween(1, 7)));
+    }
+
+    private int randomBetween(int min, int max) {
+        return min + (int) (Math.random() * (max - min + 1));
     }
 }
