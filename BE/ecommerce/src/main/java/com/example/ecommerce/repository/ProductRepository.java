@@ -1,6 +1,7 @@
 package com.example.ecommerce.repository;
 
 import com.example.ecommerce.entity.Product;
+import com.example.ecommerce.enums.ProductStatus;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -12,6 +13,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByIsDeletedFalseAndIsApprovedTrue();
 
     List<Product> findByIsAuctionAndIsDeletedFalseAndIsApprovedTrue(Boolean isAuction);
+
+    List<Product> findByIsAuctionTrueAndStatusInAndIsApprovedTrueAndIsDeletedFalse(List<ProductStatus> statuses);
 
     List<Product> findByIsDeletedFalseAndIsApprovedTrue(Sort sort);
 
