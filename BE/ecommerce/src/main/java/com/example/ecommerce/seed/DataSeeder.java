@@ -236,7 +236,7 @@ public class DataSeeder implements CommandLineRunner {
             }
         }
 
-        return ProductStatus.RELEASED;
+        return ProductStatus.Released;
     }
 
     private void applyAuctionSeedData(Product product) {

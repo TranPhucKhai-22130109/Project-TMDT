@@ -1,7 +1,7 @@
 package com.example.ecommerce.enums;
 
 public enum ProductStatus {
-    RELEASED,
+    Released,
     PRE_ORDER,
     SCHEDULED,
     OPEN,
