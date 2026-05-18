@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import NextLink from "next/link";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { checkout } from "@/services/orderService";
+import { getCartItems } from "@/services/cartService";
 import Navbar from "@/components/Navbar";
 import {
     MapPin, Phone, User, CreditCard, Truck,
@@ -29,6 +30,7 @@ const CITIES = [
 ];
 
 function formatPrice(price) {
+    if (isNaN(price)) return "0 ₫";
     return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 }
 
@@ -69,9 +71,12 @@ function StepIndicator({ step }) {
 export default function Page() {
     const router = useRouter();
 
-    // ✅ Dùng đúng field từ AuthContext: isAuthenticated, userId, username, isLoading
-    const { isAuthenticated, userId, username, isLoading } = useAuth();
-    const { cart, cartTotal, clearCart } = useCart();
+    const { isAuthenticated, username, isLoading } = useAuth();
+    const { reloadCartCount } = useCart();
+
+    const [cart, setCart] = useState([]);
+    const [cartTotal, setCartTotal] = useState(0);
+    const [loadingCart, setLoadingCart] = useState(true);
 
     const [step, setStep] = useState(1);
     const [form, setForm] = useState({
@@ -86,6 +91,55 @@ export default function Page() {
     const [loading, setLoading] = useState(false);
     const [orderError, setOrderError] = useState(null);
 
+    // Lấy lại bước hiện tại nếu khách hàng bấm Back từ trang VNPay
+    useEffect(() => {
+        try {
+            const savedStep = sessionStorage.getItem("checkoutStep");
+            if (savedStep) {
+                setStep(Number(savedStep));
+            }
+        } catch (error) {
+            console.warn("Lỗi truy cập sessionStorage", error);
+        }
+    }, []);
+
+    // Fetch giỏ hàng từ Server
+    useEffect(() => {
+        if (!isLoading && isAuthenticated) {
+            const fetchCartItems = async () => {
+                try {
+                    const response = await getCartItems();
+
+                    let list = [];
+                    if (Array.isArray(response)) list = response;
+                    else if (response?.data && Array.isArray(response.data)) list = response.data;
+                    else if (response?.content && Array.isArray(response.content)) list = response.content;
+
+                    const filtered = list.filter((item) => {
+                        const product = item?.product || item;
+                        return product && !product?.isDeleted;
+                    });
+
+                    setCart(filtered);
+
+                    const total = filtered.reduce((sum, item) => {
+                        const product = item?.product || item;
+                        return sum + Number(product?.price || 0) * Number(item?.quantity || 1);
+                    }, 0);
+                    setCartTotal(total);
+
+                } catch (error) {
+                    console.error("Lỗi lấy giỏ hàng checkout:", error);
+                } finally {
+                    setLoadingCart(false);
+                }
+            };
+            fetchCartItems();
+        } else if (!isLoading && !isAuthenticated) {
+            setLoadingCart(false);
+        }
+    }, [isLoading, isAuthenticated]);
+
     const shippingFee = cartTotal >= 5_000_000 ? 0 : 50_000;
     const grandTotal = cartTotal + shippingFee;
 
@@ -97,11 +151,11 @@ export default function Page() {
 
     const validateStep1 = () => {
         const errs = {};
-        if (!form.receiverName.trim()) errs.receiverName = "Vui lòng nhập tên người nhận";
-        if (!form.receiverPhone.trim()) errs.receiverPhone = "Vui lòng nhập số điện thoại";
+        if (!form.receiverName?.trim()) errs.receiverName = "Vui lòng nhập tên người nhận";
+        if (!form.receiverPhone?.trim()) errs.receiverPhone = "Vui lòng nhập số điện thoại";
         else if (!/^(0|\+84)[0-9]{9,10}$/.test(form.receiverPhone))
             errs.receiverPhone = "Số điện thoại không hợp lệ";
-        if (!form.shippingAddress.trim()) errs.shippingAddress = "Vui lòng nhập địa chỉ";
+        if (!form.shippingAddress?.trim()) errs.shippingAddress = "Vui lòng nhập địa chỉ";
         return errs;
     };
 
@@ -109,41 +163,73 @@ export default function Page() {
         e.preventDefault();
         const errs = validateStep1();
         if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+
         setStep(2);
+        try {
+            sessionStorage.setItem("checkoutStep", "2");
+        } catch (e) {}
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handlePlaceOrder = async () => {
-        // ✅ Kiểm tra bằng isAuthenticated thay vì user object
+    // ==========================================
+    // HÀM XỬ LÝ ĐẶT HÀNG ĐÃ ĐƯỢC CẬP NHẬT CHUẨN
+    // ==========================================
+    const handlePlaceOrder = async (e) => {
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
+
         if (!isAuthenticated) { router.push("/login"); return; }
         if (cart.length === 0) return;
 
         setLoading(true);
         setOrderError(null);
+
         try {
-            const order = await checkout({
-                ...form,
-                paymentMethod,
-                items: cart.map((item) => ({
-                    productId: item.id,
-                    quantity: item.quantity,
-                })),
-            });
-            clearCart();
-            if (paymentMethod === "ONLINE" && order.paymentUrl) {
-                router.push(order.paymentUrl);
+            // 1. CHUẨN BỊ PAYLOAD VÀ LOG RA CONSOLE
+            const payload = {
+                receiverName: form.receiverName,
+                receiverPhone: form.receiverPhone,
+                shippingAddress: form.shippingAddress,
+                city: form.city,
+                note: form.note,
+                paymentMethod: paymentMethod, // Giá trị sẽ là "ONLINE" hoặc "COD"
+                items: cart.map((item) => {
+                    const product = item.product || item;
+                    return {
+                        productId: product.id || item.productId,
+                        quantity: item.quantity,
+                    }
+                }),
+            };
+
+            // Thêm dòng này để kiểm tra xem productId có bị undefined/null không
+            console.log("DỮ LIỆU GỬI XUỐNG SPRING BOOT:", payload);
+
+            // 2. GỌI API THẬT XUỐNG SPRING BOOT
+            const orderResult = await checkout(payload);
+
+            if (reloadCartCount) await reloadCartCount();
+
+            // 3. NHẢY SANG LINK VNPAY HOẶC SANG TRANG CHI TIẾT
+            if (paymentMethod === "ONLINE" && orderResult.paymentUrl) {
+                window.location.href = orderResult.paymentUrl; // Nhảy sang VNPay
             } else {
-                router.push(`/orders/${order.id}?success=true`);
+                try {
+                    sessionStorage.removeItem("checkoutStep");
+                } catch (e) {}
+                router.push(`/orders/${orderResult.id}?success=true`); // Chuyển sang trang xem đơn
             }
+
         } catch (err) {
+            console.error("Lỗi khi đặt hàng:", err);
             setOrderError(err.message || "Có lỗi xảy ra. Vui lòng thử lại.");
         } finally {
             setLoading(false);
         }
     };
 
-    // ✅ Chờ AuthContext load xong từ localStorage trước khi render
-    if (isLoading) {
+    if (isLoading || loadingCart) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
                 <Navbar />
@@ -154,7 +240,6 @@ export default function Page() {
         );
     }
 
-    // ✅ Dùng isAuthenticated thay vì !user
     if (!isAuthenticated) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -163,10 +248,7 @@ export default function Page() {
                     <AlertCircle className="w-16 h-16 text-orange-400 mb-5" />
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Bạn chưa đăng nhập</h2>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">Vui lòng đăng nhập để tiến hành thanh toán.</p>
-                    <NextLink
-                        href="/login"
-                        className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors"
-                    >
+                    <NextLink href="/login" className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
                         Đăng nhập ngay
                     </NextLink>
                 </div>
@@ -182,10 +264,7 @@ export default function Page() {
                     <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-5" />
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Giỏ hàng trống</h2>
                     <p className="text-gray-500 dark:text-gray-400 mb-6">Thêm sản phẩm vào giỏ trước khi thanh toán.</p>
-                    <NextLink
-                        href="/products"
-                        className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors"
-                    >
+                    <NextLink href="/products" className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
                         Tiếp tục mua sắm
                     </NextLink>
                 </div>
@@ -198,10 +277,7 @@ export default function Page() {
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10">
-                <NextLink
-                    href="/cart"
-                    className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6"
-                >
+                <NextLink href="/cart" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6">
                     <ArrowLeft className="w-4 h-4" /> Quay lại giỏ hàng
                 </NextLink>
 
@@ -219,10 +295,8 @@ export default function Page() {
                 )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
                     {/* ── LEFT ── */}
                     <div className="lg:col-span-2">
-
                         {/* STEP 1: Shipping */}
                         {step === 1 && (
                             <form onSubmit={handleNextStep} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 space-y-5">
@@ -230,13 +304,11 @@ export default function Page() {
                                     <MapPin className="w-5 h-5 text-red-500" /> Thông tin giao hàng
                                 </h2>
 
-                                {/* ✅ Hiển thị username từ AuthContext */}
                                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-3 text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                     <User className="w-4 h-4 text-gray-400" />
-                                    Đặt hàng với tài khoản: <span className="font-bold text-gray-900 dark:text-white">{username}</span>
+                                    Đặt hàng với tài khoản: <span className="font-bold text-gray-900 dark:text-white">{username || "Khách hàng"}</span>
                                 </div>
 
-                                {/* Tên người nhận */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Tên người nhận <span className="text-red-500">*</span>
@@ -257,7 +329,6 @@ export default function Page() {
                                     {errors.receiverName && <p className="text-xs text-red-500 mt-1">{errors.receiverName}</p>}
                                 </div>
 
-                                {/* Số điện thoại */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Số điện thoại <span className="text-red-500">*</span>
@@ -278,7 +349,6 @@ export default function Page() {
                                     {errors.receiverPhone && <p className="text-xs text-red-500 mt-1">{errors.receiverPhone}</p>}
                                 </div>
 
-                                {/* Tỉnh/Thành */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Tỉnh / Thành phố <span className="text-red-500">*</span>
@@ -293,7 +363,6 @@ export default function Page() {
                                     </select>
                                 </div>
 
-                                {/* Địa chỉ */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Địa chỉ cụ thể <span className="text-red-500">*</span>
@@ -311,7 +380,6 @@ export default function Page() {
                                     {errors.shippingAddress && <p className="text-xs text-red-500 mt-1">{errors.shippingAddress}</p>}
                                 </div>
 
-                                {/* Ghi chú */}
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
                                         Ghi chú (tuỳ chọn)
@@ -326,10 +394,7 @@ export default function Page() {
                                     />
                                 </div>
 
-                                <button
-                                    type="submit"
-                                    className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
-                                >
+                                <button type="submit" className="w-full py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold rounded-2xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                                     Tiếp tục <ChevronRight className="w-4 h-4" />
                                 </button>
                             </form>
@@ -338,11 +403,13 @@ export default function Page() {
                         {/* STEP 2: Payment */}
                         {step === 2 && (
                             <div className="space-y-4">
-                                {/* Recap shipping */}
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm">
                                     <div className="flex items-center justify-between mb-3">
                                         <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">Thông tin giao hàng</h3>
-                                        <button onClick={() => setStep(1)} className="text-xs text-red-600 hover:underline">Sửa</button>
+                                        <button onClick={() => {
+                                            setStep(1);
+                                            sessionStorage.setItem("checkoutStep", "1");
+                                        }} className="text-xs text-red-600 hover:underline">Sửa</button>
                                     </div>
                                     <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
                                         <p><span className="font-semibold text-gray-900 dark:text-white">{form.receiverName}</span> — {form.receiverPhone}</p>
@@ -351,7 +418,6 @@ export default function Page() {
                                     </div>
                                 </div>
 
-                                {/* Payment method */}
                                 <div className="bg-white dark:bg-gray-800 rounded-2xl p-5 border border-gray-100 dark:border-gray-700 shadow-sm space-y-3">
                                     <h2 className="text-lg font-bold flex items-center gap-2">
                                         <CreditCard className="w-5 h-5 text-red-500" /> Phương thức thanh toán
@@ -394,7 +460,10 @@ export default function Page() {
 
                                 <div className="flex gap-3">
                                     <button
-                                        onClick={() => setStep(1)}
+                                        onClick={() => {
+                                            setStep(1);
+                                            sessionStorage.setItem("checkoutStep", "1");
+                                        }}
                                         className="flex-1 py-4 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-bold rounded-2xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                                     >
                                         ← Quay lại
@@ -408,16 +477,12 @@ export default function Page() {
                                         {loading ? (
                                             <><Loader2 className="w-5 h-5 animate-spin" /> Đang xử lý...</>
                                         ) : paymentMethod === "ONLINE" ? (
-                                            <><CreditCard className="w-5 h-5" /> Tiến hành thanh toán — {formatPrice(grandTotal)}</>
+                                            <><CreditCard className="w-5 h-5" /> Thanh toán — {formatPrice(grandTotal)}</>
                                         ) : (
-                                            <><CheckCircle2 className="w-5 h-5" /> Đặt hàng ngay — {formatPrice(grandTotal)}</>
+                                            <><CheckCircle2 className="w-5 h-5" /> Đặt hàng — {formatPrice(grandTotal)}</>
                                         )}
                                     </button>
                                 </div>
-
-                                <p className="text-xs text-center text-gray-400 flex items-center justify-center gap-1">
-                                    <Lock className="w-3 h-3" /> Thông tin của bạn được mã hóa và bảo mật
-                                </p>
                             </div>
                         )}
                     </div>
@@ -431,25 +496,32 @@ export default function Page() {
                             </h3>
 
                             <div className="space-y-3 max-h-64 overflow-y-auto pr-1 mb-4">
-                                {cart.map((item) => (
-                                    <div key={item.id} className="flex gap-3">
-                                        <div className="relative flex-shrink-0">
-                                            <img
-                                                src={item.imageUrl || item.image || "/placeholder.png"}
-                                                alt={item.name}
-                                                className="w-14 h-14 object-contain rounded-xl bg-gray-100 dark:bg-gray-700 p-1"
-                                                onError={(e) => { e.target.src = "/placeholder.png"; }}
-                                            />
-                                            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                        {item.quantity}
-                      </span>
+                                {cart.map((item, index) => {
+                                    const product = item?.product || item;
+                                    return (
+                                        <div key={item?.id || index} className="flex gap-3">
+                                            <div className="relative flex-shrink-0">
+                                                <img
+                                                    src={product?.imageUrl || product?.image || "/placeholder.png"}
+                                                    alt={product?.name || "Product"}
+                                                    className="w-14 h-14 object-contain rounded-xl bg-gray-100 dark:bg-gray-700 p-1"
+                                                    onError={(e) => {
+                                                        if (!e.target.src.includes("/placeholder.png")) {
+                                                            e.target.src = "/placeholder.png";
+                                                        }
+                                                    }}
+                                                />
+                                                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-gray-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                                    {item?.quantity || 1}
+                                                </span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-medium text-gray-900 dark:text-white line-clamp-2">{product?.name || "Sản phẩm"}</p>
+                                                <p className="text-xs text-red-600 font-bold mt-0.5">{formatPrice((product?.price || 0) * (item?.quantity || 1))}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-xs font-medium text-gray-900 dark:text-white line-clamp-2">{item.name}</p>
-                                            <p className="text-xs text-red-600 font-bold mt-0.5">{formatPrice(item.price * item.quantity)}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    )
+                                })}
                             </div>
 
                             <div className="border-t border-gray-100 dark:border-gray-700 pt-4 space-y-2 text-sm">
@@ -460,8 +532,8 @@ export default function Page() {
                                 <div className="flex justify-between text-gray-500 dark:text-gray-400">
                                     <span>Phí vận chuyển</span>
                                     <span className={shippingFee === 0 ? "text-green-600 font-semibold" : ""}>
-                    {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
-                  </span>
+                                        {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between font-black text-gray-900 dark:text-white pt-2 border-t border-gray-100 dark:border-gray-700 text-base">
                                     <span>Tổng cộng</span>
