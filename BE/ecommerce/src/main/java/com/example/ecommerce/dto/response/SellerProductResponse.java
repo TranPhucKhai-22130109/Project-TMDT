@@ -1,8 +1,10 @@
 package com.example.ecommerce.dto.response;
 
-import com.example.ecommerce.entity.User;
+import com.example.ecommerce.enums.ProductStatus;
 import lombok.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -21,7 +23,7 @@ public class SellerProductResponse {
     private String itemNo;
     private String scale;
     private String marque;
-    private String status;
+    private ProductStatus status;
 
     private String description;
     private Double price;
@@ -33,4 +35,8 @@ public class SellerProductResponse {
     private String sellerName;
     private String sellerEmail;
     private Boolean isApproved;
+    private BigDecimal auctionStartPrice;
+    private LocalDateTime auctionStartTime;
+    private LocalDateTime auctionEndTime;
+    private BigDecimal currentPrice;
 }
