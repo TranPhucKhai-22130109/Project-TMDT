@@ -1,64 +1,36 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { X, Camera, User } from "lucide-react";
-
-const PRESET_AVATARS = [
-  "https://picsum.photos/seed/p1/128/128",
-  "https://picsum.photos/seed/p2/128/128",
-  "https://picsum.photos/seed/p3/128/128",
-  "https://picsum.photos/seed/p4/128/128",
-  "https://picsum.photos/seed/p5/128/128"
-];
+import { X } from "lucide-react";
 
 export default function UserFormModal({ isOpen, onClose, onSave, initialData }) {
   const [form, setForm] = useState({
-    name: "",
+    username: "",
     email: "",
-    phone: "",
-    role: "Customer",
-    status: "Active",
     password: "",
-    province: "",
-    city: "",
-    street: "",
-    note: "",
-    avatar: ""
+    status: "ACTIVE",
+    role: "USER",
   });
 
   const [errors, setErrors] = useState({});
-  const [avatarIdx, setAvatarIdx] = useState(0);
 
   useEffect(() => {
     if (initialData) {
       setForm({
-        name: initialData.name || "",
+        username: initialData.username || "",
         email: initialData.email || "",
-        phone: initialData.phone || "",
-        role: initialData.role || "Customer",
-        status: initialData.status || "Active",
         password: "",
-        province: initialData.address?.province || "",
-        city: initialData.address?.city || "",
-        street: initialData.address?.street || "",
-        note: initialData.note || "",
-        avatar: initialData.avatar || ""
+        status: initialData.status || "ACTIVE",
+        role: initialData.role || "USER",
       });
     } else {
       setForm({
-        name: "",
+        username: "",
         email: "",
-        phone: "",
-        role: "Customer",
-        status: "Active",
         password: "",
-        province: "",
-        city: "",
-        street: "",
-        note: "",
-        avatar: ""
+        status: "ACTIVE",
+        role: "USER",
       });
-      setAvatarIdx(0);
     }
     setErrors({});
   }, [initialData, isOpen]);
@@ -71,23 +43,17 @@ export default function UserFormModal({ isOpen, onClose, onSave, initialData }) 
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
-  const handleCycleAvatar = () => {
-    const nextIdx = (avatarIdx + 1) % PRESET_AVATARS.length;
-    setAvatarIdx(nextIdx);
-    setForm(prev => ({ ...prev, avatar: PRESET_AVATARS[nextIdx] }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     const newErrors = {};
-    if (!form.name.trim()) newErrors.name = "Name is required.";
+    if (!form.username.trim()) newErrors.username = "Username is required.";
     if (!form.email.trim()) {
       newErrors.email = "Email is required.";
     } else if (!form.email.includes("@") || !form.email.includes(".")) {
       newErrors.email = "Valid email is required.";
     }
-    if (!form.role) newErrors.role = "Role is required.";
     if (!initialData && !form.password) newErrors.password = "Password is required for new users.";
+    if (!form.role) newErrors.role = "Role is required.";
     
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -96,19 +62,11 @@ export default function UserFormModal({ isOpen, onClose, onSave, initialData }) 
 
     onSave({
       id: initialData?.id,
-      name: form.name,
+      username: form.username,
       email: form.email,
-      phone: form.phone,
-      role: form.role,
+      password: form.password || undefined,
       status: form.status,
-      avatar: form.avatar,
-      note: form.note,
-      address: {
-        street: form.street,
-        city: form.city,
-        province: form.province,
-        zip: initialData?.address?.zip || "00000"
-      }
+      role: form.role,
     });
   };
 
@@ -128,54 +86,18 @@ export default function UserFormModal({ isOpen, onClose, onSave, initialData }) 
         <div className="overflow-y-auto p-5 flex-1">
           <form id="user-form" onSubmit={handleSubmit} className="space-y-5">
             
-            {/* Avatar Section */}
-            <div className="flex items-center gap-4 mb-2">
-              <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
-                {form.avatar ? (
-                  <img src={form.avatar} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <User className="w-8 h-8 text-gray-400" />
-                )}
-              </div>
-              <div>
-                <button 
-                  type="button"
-                  onClick={handleCycleAvatar}
-                  className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors"
-                >
-                  <Camera className="w-4 h-4" />
-                  Upload Photo
-                </button>
-                <p className="text-xs text-gray-500 mt-1.5">Click to cycle mock images</p>
-              </div>
-            </div>
-
             {/* Grid Fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Username *</label>
                 <input 
                   type="text" 
-                  name="name" 
-                  value={form.name} 
+                  name="username" 
+                  value={form.username} 
                   onChange={handleChange}
-                  className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                  className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none ${errors.username ? 'border-red-500' : 'border-gray-300'}`}
                 />
-                {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select 
-                  name="status" 
-                  value={form.status} 
-                  onChange={handleChange}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                  <option value="Banned">Banned</option>
-                </select>
+                {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
               </div>
 
               <div>
@@ -204,28 +126,20 @@ export default function UserFormModal({ isOpen, onClose, onSave, initialData }) 
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input 
-                  type="text" 
-                  name="phone" 
-                  value={form.phone} 
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select 
+                  name="status" 
+                  value={form.status} 
                   onChange={handleChange}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                  <option value="BANNED">Banned</option>
+                </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Province</label>
-                <input 
-                  type="text" 
-                  name="province" 
-                  value={form.province} 
-                  onChange={handleChange}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-              </div>
-
-              <div>
+              <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
                 <select 
                   name="role" 
@@ -233,47 +147,12 @@ export default function UserFormModal({ isOpen, onClose, onSave, initialData }) 
                   onChange={handleChange}
                   className={`w-full p-2 text-sm border rounded-md focus:ring-2 focus:ring-indigo-500 outline-none bg-white ${errors.role ? 'border-red-500' : 'border-gray-300'}`}
                 >
-                  <option value="Customer">Customer</option>
-                  <option value="Manager">Manager</option>
-                  <option value="Admin">Admin</option>
+                  <option value="USER">User</option>
+                  <option value="SELLER">Seller</option>
+                  <option value="ADMIN">Admin</option>
                 </select>
                 {errors.role && <p className="text-red-500 text-xs mt-1">{errors.role}</p>}
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                <input 
-                  type="text" 
-                  name="city" 
-                  value={form.city} 
-                  onChange={handleChange}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
-              </div>
-            </div>
-
-            {/* Full-width Fields */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-              <input 
-                type="text" 
-                name="street" 
-                value={form.street} 
-                onChange={handleChange}
-                className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Internal Note</label>
-              <textarea 
-                name="note" 
-                rows="2" 
-                value={form.note} 
-                onChange={handleChange}
-                placeholder="Internal notes, not visible to user"
-                className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none resize-none"
-              ></textarea>
             </div>
 
           </form>

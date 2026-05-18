@@ -84,6 +84,5 @@ AGENTS.md
 GEMINI.md
 
 # Custom
-.guide/
-structure_be.md
-structure_fe.md
+.aiassistant/
+firebase-service-account.json
