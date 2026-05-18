@@ -12,6 +12,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -23,6 +24,7 @@ const navItems = [
 
 export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
+  const { username } = useAuth();
 
   return (
     <>
@@ -114,13 +116,13 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="px-4 py-4 border-t border-white/10">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/5">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
-              A
+              {username ? username.charAt(0).toUpperCase() : "A"}
             </div>
             <div className="overflow-hidden">
               <p className="text-white text-sm font-medium truncate">
-                Admin User
+                {username || "Admin User"}
               </p>
-              <p className="text-white/40 text-xs truncate">admin@cozy.com</p>
+              <p className="text-white/40 text-xs truncate">Admin</p>
             </div>
           </div>
         </div>

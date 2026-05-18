@@ -5,6 +5,7 @@ import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -37,7 +38,9 @@ public class SecurityConfig {
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/products/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll() // để tạm sửa lại sau
-                        .requestMatchers("/api/admin/users/**").permitAll() // để tạm sửa lại sau
+                        .requestMatchers("/api/auction/bid").authenticated()
+                        .requestMatchers("/api/auction/**").permitAll()
+                        .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(
