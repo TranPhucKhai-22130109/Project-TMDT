@@ -1,6 +1,6 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.requesy.AddToCartRequest;
+import com.example.ecommerce.dto.request.cart.AddToCartRequest;
 import com.example.ecommerce.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

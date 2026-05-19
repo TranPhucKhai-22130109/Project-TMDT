@@ -1,7 +1,6 @@
 package com.example.ecommerce.controller;
 
 import com.cloudinary.Cloudinary;
-import com.example.ecommerce.dto.response.ProductResponse;
 import com.example.ecommerce.dto.response.SellerProductResponse;
 import com.example.ecommerce.entity.Product;
 import com.example.ecommerce.entity.User;
@@ -206,6 +205,13 @@ public class SellerProductController {
 
                 product.getSeller() != null
                         ? product.getSeller().getEmail()
+                        : null,
+                product.getSeller() != null
+                        ? product.getSeller().getPhoneNumber()
+                        : null,
+
+                product.getSeller() != null
+                        ? product.getSeller().getAvatarUrl()
                         : null,
                 product.getIsApproved(),
                 product.getAuctionStartPrice(),

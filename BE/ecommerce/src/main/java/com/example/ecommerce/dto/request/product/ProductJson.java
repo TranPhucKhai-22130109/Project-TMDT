@@ -1,4 +1,4 @@
-package com.example.ecommerce.dto.requesy;
+package com.example.ecommerce.dto.request.product;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

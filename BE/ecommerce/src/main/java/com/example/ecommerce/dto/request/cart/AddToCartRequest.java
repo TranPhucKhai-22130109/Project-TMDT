@@ -1,4 +1,4 @@
-package com.example.ecommerce.dto.requesy;
+package com.example.ecommerce.dto.request.cart;
 
 import lombok.*;
 

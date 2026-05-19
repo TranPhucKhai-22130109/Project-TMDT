@@ -27,6 +27,21 @@ import { Navbar } from "@/components/Navbar";
 import { addToCart } from "@/services/cartService";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import {
+  getProductComments,
+  createProductComment,
+  replyProductComment,
+  updateProductComment,
+  deleteProductComment,
+} from "@/services/commentService";
+
+import {
+  MoreVertical,
+  MessageCircle,
+  Send,
+  Trash2,
+  Pencil,
+} from "lucide-react";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -38,6 +53,14 @@ export default function ProductDetailPage() {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [comments, setComments] = useState([]);
+  const [commentContent, setCommentContent] = useState("");
+  const [replyContent, setReplyContent] = useState("");
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingContent, setEditingContent] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
 
   // States cho Navbar (mobile menu & dark mode)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -61,6 +84,85 @@ export default function ProductDetailPage() {
       alert("Thêm vào giỏ hàng thất bại!");
     }
   };
+
+  const loadComments = async () => {
+    try {
+      const data = await getProductComments(params.id);
+      setComments(data);
+    } catch (error) {
+      console.error("Lỗi tải bình luận:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (params.id) {
+      loadComments();
+    }
+  }, [params.id]);
+
+  const handleCreateComment = async () => {
+    if (!isAuthenticated) {
+      alert("Bạn cần đăng nhập để bình luận!");
+      return;
+    }
+
+    if (!commentContent.trim()) return;
+
+    try {
+      await createProductComment(params.id, commentContent);
+      setCommentContent("");
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+      alert("Bình luận thất bại!");
+    }
+  };
+
+  const handleReplyComment = async (commentId) => {
+    if (!isAuthenticated) {
+      alert("Bạn cần đăng nhập để trả lời!");
+      return;
+    }
+
+    if (!replyContent.trim()) return;
+
+    try {
+      await replyProductComment(params.id, commentId, replyContent);
+      setReplyContent("");
+      setReplyingTo(null);
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+      alert("Trả lời thất bại!");
+    }
+  };
+
+  const handleUpdateComment = async (commentId) => {
+    if (!editingContent.trim()) return;
+
+    try {
+      await updateProductComment(params.id, commentId, editingContent);
+      setEditingCommentId(null);
+      setEditingContent("");
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+      alert("Cập nhật bình luận thất bại!");
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!confirm("Bạn có chắc muốn xoá bình luận này không?")) return;
+
+    try {
+      await deleteProductComment(params.id, commentId);
+      await loadComments();
+    } catch (error) {
+      console.error(error);
+      alert("Xoá bình luận thất bại!");
+    }
+  };
+
   // Lấy dữ liệu sản phẩm
   useEffect(() => {
     const fetchProductDetail = async () => {
@@ -178,12 +280,8 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-
-          
-          
           {/* Product Info */}
           <div className="space-y-8">
-            
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <span className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold px-4 py-1.5 rounded-full">
@@ -217,8 +315,6 @@ export default function ProductDetailPage() {
             <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
               {product.description || "Mô hình xe chất lượng cao từ MINI GT."}
             </p>
-
-           
 
             {/* Quantity */}
             <div>
@@ -271,12 +367,22 @@ export default function ProductDetailPage() {
                 Chia sẻ
               </Button>
             </div>
-             {/* Seller Info */}
+            {/* Seller Info */}
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-5 shadow-sm">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                    <Store className="w-7 h-7 text-red-600" />
+                    {product.sellerAvatar ? (
+                      <img
+                        src={product.sellerAvatar}
+                        alt={product.sellerName || "Seller"}
+                        className="w-14 h-14 rounded-full object-cover border border-gray-200"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                        <Store className="w-7 h-7 text-red-600" />
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -288,6 +394,10 @@ export default function ProductDetailPage() {
                     </h3>
                     <p className="text-sm text-gray-500">
                       Seller ID: {product.sellerId || "N/A"}
+                    </p>
+
+                    <p className="text-sm text-gray-500 mt-1">
+                      📞 {product.sellerPhoneNumber || "Chưa cập nhật"}
                     </p>
                   </div>
                 </div>
@@ -319,6 +429,268 @@ export default function ProductDetailPage() {
                 Xem shop
               </button>
             </div>
+          </div>
+        </div>
+
+        {/* ==================== PRODUCT COMMENTS ==================== */}
+        <div className="mt-14 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-3xl p-6 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <MessageCircle className="w-6 h-6 text-red-600" />
+            <h2 className="text-2xl font-black text-gray-900 dark:text-white">
+              Hỏi đáp về sản phẩm
+            </h2>
+          </div>
+
+          <div className="flex gap-3 mb-8">
+            <input
+              value={commentContent}
+              onChange={(e) => setCommentContent(e.target.value)}
+              placeholder="Đặt câu hỏi về sản phẩm này..."
+              className="flex-1 px-4 py-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white outline-none focus:border-red-500"
+            />
+
+            <button
+              onClick={handleCreateComment}
+              className="px-5 py-3 rounded-2xl bg-red-600 text-white font-bold hover:bg-red-700 flex items-center gap-2"
+            >
+              <Send className="w-4 h-4" />
+              Gửi
+            </button>
+          </div>
+
+          <div className="space-y-5">
+            {comments.filter((c) => !c.parentId).length === 0 && (
+              <p className="text-gray-500 text-center py-8">
+                Chưa có câu hỏi nào cho sản phẩm này.
+              </p>
+            )}
+
+            {comments
+              .filter((c) => !c.parentId)
+              .map((comment) => {
+                const replies = comments.filter(
+                  (r) => r.parentId === comment.id,
+                );
+
+                return (
+                  <div
+                    key={comment.id}
+                    className="border border-gray-200 dark:border-gray-700 rounded-2xl p-5"
+                  >
+                    <div className="flex justify-between gap-4">
+                      <img
+                        src={comment.userAvatar || "/default-avatar.png"}
+                        alt={comment.username}
+                        className="w-11 h-11 rounded-full object-cover border border-gray-200"
+                      />
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-900 dark:text-white">
+                          {comment.username}
+                        </p>
+
+                        {editingCommentId === comment.id ? (
+                          <div className="mt-2 flex gap-2">
+                            <input
+                              value={editingContent}
+                              onChange={(e) =>
+                                setEditingContent(e.target.value)
+                              }
+                              className="flex-1 px-3 py-2 rounded-xl border dark:bg-gray-900 dark:text-white"
+                            />
+                            <button
+                              onClick={() => handleUpdateComment(comment.id)}
+                              className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold"
+                            >
+                              Lưu
+                            </button>
+                            <button
+                              onClick={() => setEditingCommentId(null)}
+                              className="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700"
+                            >
+                              Huỷ
+                            </button>
+                          </div>
+                        ) : (
+                          <p className="mt-1 text-gray-700 dark:text-gray-300">
+                            {comment.content}
+                          </p>
+                        )}
+                      </div>
+
+                      {comment.isOwner && (
+                        <div className="relative">
+                          <button
+                            onClick={() =>
+                              setOpenMenuId(
+                                openMenuId === comment.id ? null : comment.id,
+                              )
+                            }
+                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <MoreVertical className="w-5 h-5" />
+                          </button>
+
+                          {openMenuId === comment.id && (
+                            <div className="absolute right-0 top-10 w-36 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10">
+                              <button
+                                onClick={() => {
+                                  setEditingCommentId(comment.id);
+                                  setEditingContent(comment.content);
+                                  setOpenMenuId(null);
+                                }}
+                                className="w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                              >
+                                <Pencil className="w-4 h-4" />
+                                Sửa
+                              </button>
+
+                              <button
+                                onClick={() => handleDeleteComment(comment.id)}
+                                className="w-full px-4 py-2 text-left flex items-center gap-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                Xoá
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() =>
+                        setReplyingTo(
+                          replyingTo === comment.id ? null : comment.id,
+                        )
+                      }
+                      className="mt-3 text-sm font-bold text-red-600 hover:underline"
+                    >
+                      Reply
+                    </button>
+
+                    {replyingTo === comment.id && (
+                      <div className="mt-3 flex gap-2">
+                        <input
+                          value={replyContent}
+                          onChange={(e) => setReplyContent(e.target.value)}
+                          placeholder="Viết câu trả lời..."
+                          className="flex-1 px-3 py-2 rounded-xl border dark:bg-gray-900 dark:text-white"
+                        />
+                        <button
+                          onClick={() => handleReplyComment(comment.id)}
+                          className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold"
+                        >
+                          Gửi
+                        </button>
+                      </div>
+                    )}
+
+                    {replies.length > 0 && (
+                      <div className="mt-5 ml-6 space-y-3 border-l-2 border-gray-200 dark:border-gray-700 pl-4">
+                        {replies.map((reply) => (
+                          <div
+                            key={reply.id}
+                            className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-4 flex gap-3"
+                          >
+                            <img
+                              src={reply.userAvatar || "/default-avatar.png"}
+                              alt={reply.username}
+                              className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                            />
+
+                            <div className="flex-1">
+                              <div className="flex justify-between gap-3">
+                                <div className="flex-1">
+                                  <p className="font-bold text-gray-900 dark:text-white">
+                                    {reply.username}
+                                  </p>
+
+                                  {editingCommentId === reply.id ? (
+                                    <div className="mt-2 flex gap-2">
+                                      <input
+                                        value={editingContent}
+                                        onChange={(e) =>
+                                          setEditingContent(e.target.value)
+                                        }
+                                        className="flex-1 px-3 py-2 rounded-xl border dark:bg-gray-900 dark:text-white"
+                                      />
+
+                                      <button
+                                        onClick={() =>
+                                          handleUpdateComment(reply.id)
+                                        }
+                                        className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold"
+                                      >
+                                        Lưu
+                                      </button>
+
+                                      <button
+                                        onClick={() =>
+                                          setEditingCommentId(null)
+                                        }
+                                        className="px-4 py-2 rounded-xl bg-gray-200 dark:bg-gray-700"
+                                      >
+                                        Huỷ
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <p className="mt-1 text-gray-700 dark:text-gray-300">
+                                      {reply.content}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {reply.isOwner && (
+                                  <div className="relative">
+                                    <button
+                                      onClick={() =>
+                                        setOpenMenuId(
+                                          openMenuId === reply.id
+                                            ? null
+                                            : reply.id,
+                                        )
+                                      }
+                                      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    >
+                                      <MoreVertical className="w-5 h-5" />
+                                    </button>
+
+                                    {openMenuId === reply.id && (
+                                      <div className="absolute right-0 top-10 w-36 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10">
+                                        <button
+                                          onClick={() => {
+                                            setEditingCommentId(reply.id);
+                                            setEditingContent(reply.content);
+                                            setOpenMenuId(null);
+                                          }}
+                                          className="w-full px-4 py-2 text-left flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                        >
+                                          <Pencil className="w-4 h-4" />
+                                          Sửa
+                                        </button>
+
+                                        <button
+                                          onClick={() =>
+                                            handleDeleteComment(reply.id)
+                                          }
+                                          className="w-full px-4 py-2 text-left flex items-center gap-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                          Xoá
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </div>
         </div>
       </div>

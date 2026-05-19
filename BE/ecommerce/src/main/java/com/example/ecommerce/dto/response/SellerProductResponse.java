@@ -34,6 +34,8 @@ public class SellerProductResponse {
     private String sellerId;
     private String sellerName;
     private String sellerEmail;
+    private String sellerPhoneNumber;
+    private String sellerAvatar;
     private Boolean isApproved;
     private BigDecimal auctionStartPrice;
     private LocalDateTime auctionStartTime;

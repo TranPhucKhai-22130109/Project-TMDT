@@ -1,6 +1,6 @@
 package com.example.ecommerce.seed;
 
-import com.example.ecommerce.dto.requesy.ProductJson;
+import com.example.ecommerce.dto.request.product.ProductJson;
 import com.example.ecommerce.entity.Product;
 import com.example.ecommerce.entity.Role;
 import com.example.ecommerce.entity.User;
@@ -40,6 +40,7 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        updateMissingUserInfo();
 
         if (productRepository.count() > 0) {
             System.out.println("Data already exists, skip seeding...");
@@ -47,6 +48,11 @@ public class DataSeeder implements CommandLineRunner {
         }
 
         List<User> sellers = seedSellers();
+
+        if (productRepository.count() > 0) {
+            System.out.println("Data already exists, skip seeding...");
+            return;
+        }
 
         File folder = new ClassPathResource("data/product").getFile();
 
@@ -130,7 +136,7 @@ public class DataSeeder implements CommandLineRunner {
         List<User> sellers = new ArrayList<>();
         Role sellerRole = roleRepository.findByRoleName("SELLER")
                 .orElseThrow(() -> new RuntimeException("SELLER role not found"));
-        for (int i = 1; i <= 2; i++) {
+        for (int i = 1; i <= 50; i++) {
             String email = "seller" + i + "@gmail.com";
 
             User seller = userRepository.findByEmail(email).orElse(null);
@@ -141,11 +147,15 @@ public class DataSeeder implements CommandLineRunner {
                 seller.setEmail(email);
                 seller.setPassword(passwordEncoder.encode("123456"));
 
+                seller.setAvatarUrl(generateAvatarUrl("Seller " + i));
+                seller.setPhoneNumber(generateVietnamPhoneNumber());
+
                 seller = userRepository.save(seller);
 
                 UserRole userRole = new UserRole();
                 userRole.setUser(seller);
                 userRole.setRole(sellerRole);
+
 
                 userRoleRepository.save(userRole);
 
@@ -162,6 +172,29 @@ public class DataSeeder implements CommandLineRunner {
 
     private Integer generateSoldQuantity() {
         return 500 + (int) (Math.random() * (1500 - 500 + 1));
+    }
+
+    private String generateAvatarUrl(String seed) {
+        return "https://api.dicebear.com/9.x/notionists/svg?seed="
+                + seed.replace(" ", "%20");
+    }
+
+    private String generateVietnamPhoneNumber() {
+        String[] prefixes = {
+                "032", "033", "034", "035", "036", "037", "038", "039",
+                "070", "076", "077", "078", "079",
+                "081", "082", "083", "084", "085",
+                "056", "058", "059"
+        };
+
+        String prefix = prefixes[randomBetween(0, prefixes.length - 1)];
+
+        StringBuilder phone = new StringBuilder(prefix);
+        for (int i = 0; i < 7; i++) {
+            phone.append(randomBetween(0, 9));
+        }
+
+        return phone.toString();
     }
 
     private Double generatePrice(ProductJson p) {
@@ -258,5 +291,29 @@ public class DataSeeder implements CommandLineRunner {
 
     private int randomBetween(int min, int max) {
         return min + (int) (Math.random() * (max - min + 1));
+    }
+
+    private void updateMissingUserInfo() {
+        List<User> users = userRepository.findAll();
+
+        for (User user : users) {
+            boolean changed = false;
+
+            if (user.getAvatarUrl() == null || user.getAvatarUrl().isBlank()) {
+                user.setAvatarUrl(generateAvatarUrl(user.getUsername()));
+                changed = true;
+            }
+
+            if (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank()) {
+                user.setPhoneNumber(generateVietnamPhoneNumber());
+                changed = true;
+            }
+
+            if (changed) {
+                userRepository.save(user);
+            }
+        }
+
+        System.out.println("Updated missing avatarUrl and phoneNumber");
     }
 }

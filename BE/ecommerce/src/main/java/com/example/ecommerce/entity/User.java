@@ -43,6 +43,12 @@ public class User extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserRole> userRoles = new ArrayList<>();
 
+    @Column(nullable = true, length = 255)
+    private String avatarUrl;
+
+    @Column(nullable = true, length = 25)
+    private String phoneNumber;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return userRoles.stream()
