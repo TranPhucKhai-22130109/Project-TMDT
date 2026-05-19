@@ -7,7 +7,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
  * @param {Object} checkoutData - { receiverName, receiverPhone, shippingAddress, city, note, paymentMethod, items }
  */
 export async function checkout(checkoutData) {
-    const res = await fetch(`${BASE_URL}/api/orders/checkout`, {
+    const res = await fetch(`${BASE_URL}/v1/orders/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include", // gửi cookie accessToken
