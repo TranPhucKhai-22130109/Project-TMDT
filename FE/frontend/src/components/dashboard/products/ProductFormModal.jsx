@@ -12,7 +12,7 @@ const emptyForm = {
   soldQuantity: "",
   scale: "",
   marque: "",
-  status: "Released",
+  status: "RELEASED",
   isAuction: false,
   description: "",
 };
@@ -38,7 +38,7 @@ export default function ProductFormModal({
         soldQuantity: initialData.soldQuantity?.toString() || "0",
         scale: initialData.scale || "",
         marque: initialData.marque || "",
-        status: initialData.status || "Released",
+        status: initialData.status || "RELEASED",
         isAuction: Boolean(initialData.isAuction),
         description: initialData.description || "",
       });
@@ -382,10 +382,11 @@ export default function ProductFormModal({
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white outline-none focus:border-indigo-500"
                 >
-                  <option value="Released">Released</option>
-                  <option value="Draft">Draft</option>
-                  <option value="SoldOut">Sold Out</option>
-                  <option value="Hidden">Hidden</option>
+                  <option value="RELEASED">Released</option>
+                  <option value="PRE_ORDER">Pre Order</option>
+                  <option value="SCHEDULED">Scheduled</option>
+                  <option value="OPEN">Open</option>
+                  <option value="ENDED">Ended</option>
                 </select>
               </div>
             </div>
