@@ -63,6 +63,10 @@ public class AuthService {
         user.setUsername(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setAvatarUrl(
+                "https://api.dicebear.com/9.x/notionists/svg?seed="
+                        + request.getName().replace(" ", "%20")
+        );
 
         User savedUser = userRepository.save(user);
 

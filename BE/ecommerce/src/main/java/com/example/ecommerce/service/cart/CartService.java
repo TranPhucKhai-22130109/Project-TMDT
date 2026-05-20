@@ -1,6 +1,6 @@
 package com.example.ecommerce.service.cart;
 
-import com.example.ecommerce.dto.requesy.AddToCartRequest;
+import com.example.ecommerce.dto.request.cart.AddToCartRequest;
 import com.example.ecommerce.entity.CartItem;
 import com.example.ecommerce.entity.Product;
 import com.example.ecommerce.repository.CartRepository;
