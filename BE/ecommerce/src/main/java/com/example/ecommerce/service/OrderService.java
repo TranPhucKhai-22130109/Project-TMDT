@@ -71,6 +71,10 @@ public class OrderService {
             totalAmount += product.getPrice() * itemReq.getQuantity();
         }
 
+        double shippingFee = 50000.0;
+        totalAmount += shippingFee;
+        // ========================================================
+
         // Chắc chắn 100% không bao giờ bị NPE nữa
         if (savedOrder.getItems() == null) {
             savedOrder.setItems(new ArrayList<>());

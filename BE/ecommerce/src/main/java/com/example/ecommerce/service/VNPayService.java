@@ -38,7 +38,7 @@ public class VNPayService {
         long amount = Math.round(order.getTotalAmount()) * 100L;
         String txnRef = String.valueOf(System.currentTimeMillis());
 
-        // 1. ÉP BUỘC DÙNG GMT+7 CHUẨN ĐỂ KHÔNG BỊ LỆCH GIỜ GÂY LỖI 70
+        // 1. Ép buộc múi giờ GMT+7 tránh lệch giờ hệ thống
         TimeZone tz = TimeZone.getTimeZone("GMT+7");
         Calendar cld = Calendar.getInstance(tz);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -46,7 +46,7 @@ public class VNPayService {
 
         String createDate = formatter.format(cld.getTime());
 
-        // VNPay v2.1.0 BẮT BUỘC có thời gian hết hạn (sau 15 phút)
+        // Hạn thanh toán 15 phút theo chuẩn VNPay v2.1.0
         cld.add(Calendar.MINUTE, 15);
         String expireDate = formatter.format(cld.getTime());
 
@@ -54,7 +54,6 @@ public class VNPayService {
             ipAddress = "127.0.0.1";
         }
 
-        // 2. BỎ KHOẢNG TRẮNG Ở ORDER INFO ĐỂ TRÁNH LỖI ENCODE SAI CHỮ KÝ (HASH)
         String orderInfo = "ThanhToanDonHang_" + txnRef;
 
         Map<String, String> vnpParams = new TreeMap<>();
@@ -63,8 +62,7 @@ public class VNPayService {
         vnpParams.put("vnp_TmnCode",    vnPayConfig.getTmnCode());
         vnpParams.put("vnp_Amount",     String.valueOf(amount));
         vnpParams.put("vnp_CurrCode",   "VND");
-        // 3. SET CỨNG NGÂN HÀNG NCB ĐỂ VÀO THẲNG FORM THANH TOÁN (TRÁNH LỖI ĐỊNH TUYẾN)
-        vnpParams.put("vnp_BankCode",   "NCB");
+        vnpParams.put("vnp_BankCode",   "NCB"); // Vào thẳng NCB Sandbox form
         vnpParams.put("vnp_TxnRef",     txnRef);
         vnpParams.put("vnp_OrderInfo",  orderInfo);
         vnpParams.put("vnp_OrderType",  "other");
@@ -74,34 +72,25 @@ public class VNPayService {
         vnpParams.put("vnp_CreateDate", createDate);
         vnpParams.put("vnp_ExpireDate", expireDate);
 
-        // Xóa các param rỗng
+        // Khử toàn bộ giá trị trống trước khi băm
         vnpParams.values().removeIf(v -> v == null || v.isBlank());
 
         try {
-            // 4. ÁP DỤNG CHUẨN ENCODE US_ASCII CỦA VNPAY
             StringBuilder hashData = new StringBuilder();
             StringBuilder query = new StringBuilder();
 
-            Iterator<Map.Entry<String, String>> itr = vnpParams.entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry<String, String> entry = itr.next();
+            // Sửa logic vòng lặp: Đảm bảo nối chuỗi mượt mà, không bao giờ thừa ký tự '&'
+            for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
                 String fieldName = entry.getKey();
                 String fieldValue = entry.getValue();
 
-                // Build hash data
-                hashData.append(fieldName);
-                hashData.append('=');
-                hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-
-                // Build query
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()));
-                query.append('=');
-                query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-
-                if (itr.hasNext()) {
-                    query.append('&');
+                if (hashData.length() > 0) {
                     hashData.append('&');
+                    query.append('&');
                 }
+
+                hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString())).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
             }
 
             String secureHash = hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
@@ -110,8 +99,6 @@ public class VNPayService {
             saveOrUpdatePayment(order, txnRef, orderId);
 
             System.out.println("=== VNPAY CHỐNG ĐẠN DEBUG ===");
-            System.out.println("CreateDate: " + createDate);
-            System.out.println("ExpireDate: " + expireDate);
             System.out.println("HashData: " + hashData.toString());
             System.out.println("===============================");
 
@@ -132,19 +119,17 @@ public class VNPayService {
 
         try {
             StringBuilder hashData = new StringBuilder();
-            Iterator<Map.Entry<String, String>> itr = signParams.entrySet().iterator();
-            while (itr.hasNext()) {
-                Map.Entry<String, String> entry = itr.next();
+
+            // SỬA LỖI: Thuật toán ráp chuỗi kiểm tra động, loại bỏ hoàn toàn lỗi thừa dấu & ở đuôi
+            for (Map.Entry<String, String> entry : signParams.entrySet()) {
                 String fieldName = entry.getKey();
                 String fieldValue = entry.getValue();
 
                 if (fieldValue != null && !fieldValue.isBlank()) {
-                    hashData.append(fieldName);
-                    hashData.append('=');
-                    hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
-                    if (itr.hasNext()) {
+                    if (hashData.length() > 0) {
                         hashData.append('&');
                     }
+                    hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
                 }
             }
 
@@ -174,7 +159,7 @@ public class VNPayService {
                 order.setStatus(OrderStatus.CONFIRMED);
             } else {
                 payment.setResult(PaymentResult.FAILED);
-                order.setStatus(OrderStatus.CANCELLED);
+                order.setStatus(OrderStatus.CANCELLED); // Khi ấn hủy thanh toán, đưa trạng thái về CANCELLED
             }
 
             paymentRepository.save(payment);
