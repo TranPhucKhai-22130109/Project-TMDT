@@ -23,10 +23,10 @@ public class OrderController {
             Principal principal,
             @RequestBody CheckoutRequest request,
             HttpServletRequest httpRequest) {
-            
+
         // 1. Lấy ID của user đang đăng nhập từ Token (JWT)
         String userId = principal.getName();
-        
+
         // 2. Lấy IP của máy khách (Dùng cho VNPay)
         String ipAddress = httpRequest.getRemoteAddr();
 
