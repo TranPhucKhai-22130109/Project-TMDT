@@ -1,7 +1,5 @@
 package com.example.ecommerce.entity;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,4 +22,3 @@ public class UserRole {
     private Role role;
 
 }
-
