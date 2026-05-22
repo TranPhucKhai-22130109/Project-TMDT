@@ -44,7 +44,8 @@ public class OrderController {
                 ipAddress = "127.0.0.1";
             }
 
-            // 🛠️ SỬA TẠI ĐÂY: Gọi đúng hàm checkout(userId, request, ipAddress) từ OrderService của bạn
+            // 🛠️ SỬA TẠI ĐÂY: Gọi đúng hàm checkout(userId, request, ipAddress) từ
+            // OrderService của bạn
             OrderResponse orderResponse = orderService.checkout(userId, request, ipAddress);
 
             return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
@@ -94,14 +95,15 @@ public class OrderController {
     }
 
     /**
-     * 3. API LẤY CHI TIẾT ĐƠN HÀNG THEO ID
+     * 3. API LẤY CHI TIẾT ĐƠN HÀNG THEO ID DON HANG
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<OrderResponse>> getOrderDetail(
             @PathVariable String id,
             Principal principal) {
 
-        // 🛠️ SỬA TẠI ĐÂY: Đổi đúng thứ tự truyền tham số là (userId, orderId) tương ứng (principal.getName(), id)
+        // 🛠️ SỬA TẠI ĐÂY: Đổi đúng thứ tự truyền tham số là (userId, orderId) tương
+        // ứng (principal.getName(), id)
         OrderResponse order = orderService.getOrderDetail(principal.getName(), id);
 
         return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()

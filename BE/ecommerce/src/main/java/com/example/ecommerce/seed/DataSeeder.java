@@ -156,7 +156,6 @@ public class DataSeeder implements CommandLineRunner {
                 userRole.setUser(seller);
                 userRole.setRole(sellerRole);
 
-
                 userRoleRepository.save(userRole);
 
                 seller = userRepository.save(seller);
@@ -269,7 +268,7 @@ public class DataSeeder implements CommandLineRunner {
             }
         }
 
-        return ProductStatus.Released;
+        return ProductStatus.RELEASED;
     }
 
     private void applyAuctionSeedData(Product product) {
