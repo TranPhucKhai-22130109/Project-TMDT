@@ -35,35 +35,34 @@ public class VNPayService {
         Order order = orderRepository.findByIdWithItems(orderId)
                 .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
-        // ✅ Amount: VNPay yêu cầu đơn vị VND * 100, PHẢI là số nguyên
         long amount = Math.round(order.getTotalAmount()) * 100L;
-
-        // ✅ vnp_TxnRef: chỉ [a-zA-Z0-9], tối đa 100 ký tự, UNIQUE mỗi lần
-        // Dùng timestamp milliseconds là đủ unique
         String txnRef = String.valueOf(System.currentTimeMillis());
 
-        // ✅ vnp_CreateDate: yyyyMMddHHmmss theo giờ Việt Nam (GMT+7)
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        // 1. Ép buộc múi giờ GMT+7 tránh lệch giờ hệ thống
+        TimeZone tz = TimeZone.getTimeZone("GMT+7");
+        Calendar cld = Calendar.getInstance(tz);
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        formatter.setTimeZone(TimeZone.getTimeZone("Etc/GMT+7"));
+        formatter.setTimeZone(tz);
+
         String createDate = formatter.format(cld.getTime());
 
-        // ✅ IP mặc định
+        // Hạn thanh toán 15 phút theo chuẩn VNPay v2.1.0
+        cld.add(Calendar.MINUTE, 15);
+        String expireDate = formatter.format(cld.getTime());
+
         if (ipAddress == null || ipAddress.isBlank() || "0:0:0:0:0:0:0:1".equals(ipAddress)) {
             ipAddress = "127.0.0.1";
         }
 
-        // ✅ vnp_OrderInfo: không dấu, không ký tự đặc biệt
-        String orderInfo = "Thanh toan don hang " + txnRef;
+        String orderInfo = "ThanhToanDonHang_" + txnRef;
 
-        // ✅ Tất cả params — TreeMap tự sort A-Z (bắt buộc)
         Map<String, String> vnpParams = new TreeMap<>();
         vnpParams.put("vnp_Version",    "2.1.0");
         vnpParams.put("vnp_Command",    "pay");
         vnpParams.put("vnp_TmnCode",    vnPayConfig.getTmnCode());
         vnpParams.put("vnp_Amount",     String.valueOf(amount));
         vnpParams.put("vnp_CurrCode",   "VND");
-        vnpParams.put("vnp_BankCode",   ""); // để trống → user tự chọn ngân hàng
+        vnpParams.put("vnp_BankCode",   "NCB"); // Vào thẳng NCB Sandbox form
         vnpParams.put("vnp_TxnRef",     txnRef);
         vnpParams.put("vnp_OrderInfo",  orderInfo);
         vnpParams.put("vnp_OrderType",  "other");
@@ -71,42 +70,43 @@ public class VNPayService {
         vnpParams.put("vnp_ReturnUrl",  vnPayConfig.getReturnUrl());
         vnpParams.put("vnp_IpAddr",     ipAddress);
         vnpParams.put("vnp_CreateDate", createDate);
+        vnpParams.put("vnp_ExpireDate", expireDate);
 
-        // ✅ Loại bỏ param rỗng trước khi build
+        // Khử toàn bộ giá trị trống trước khi băm
         vnpParams.values().removeIf(v -> v == null || v.isBlank());
 
-        // ✅ Build hash data: key=value, KHÔNG encode, join bằng &
-        StringBuilder hashData = new StringBuilder();
-        for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
-            if (hashData.length() > 0) hashData.append("&");
-            hashData.append(entry.getKey()).append("=").append(entry.getValue());
+        try {
+            StringBuilder hashData = new StringBuilder();
+            StringBuilder query = new StringBuilder();
+
+            // Sửa logic vòng lặp: Đảm bảo nối chuỗi mượt mà, không bao giờ thừa ký tự '&'
+            for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
+                String fieldName = entry.getKey();
+                String fieldValue = entry.getValue();
+
+                if (hashData.length() > 0) {
+                    hashData.append('&');
+                    query.append('&');
+                }
+
+                hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString())).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+            }
+
+            String secureHash = hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
+            query.append("&vnp_SecureHash=").append(secureHash);
+
+            saveOrUpdatePayment(order, txnRef, orderId);
+
+            System.out.println("=== VNPAY CHỐNG ĐẠN DEBUG ===");
+            System.out.println("HashData: " + hashData.toString());
+            System.out.println("===============================");
+
+            return vnPayConfig.getPaymentUrl() + "?" + query.toString();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Loi tao URL VNPay", e);
         }
-
-        // ✅ Build query string: encode UTF-8
-        StringBuilder queryString = new StringBuilder();
-        for (Map.Entry<String, String> entry : vnpParams.entrySet()) {
-            if (queryString.length() > 0) queryString.append("&");
-            queryString.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
-            queryString.append("=");
-            queryString.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
-        }
-
-        String secureHash = hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
-        queryString.append("&vnp_SecureHash=").append(secureHash);
-
-        // Lưu Payment record
-        saveOrUpdatePayment(order, txnRef, orderId);
-
-        // ================= THÊM LOG DEBUG Ở ĐÂY =================
-        System.out.println("=== VNPAY DEBUG ===");
-        System.out.println("TmnCode: '" + vnPayConfig.getTmnCode() + "'"); // Thêm dấu nháy đơn để dễ soi khoảng trắng thừa
-        System.out.println("HashSecret: '" + vnPayConfig.getHashSecret() + "'");
-        System.out.println("HashData: " + hashData.toString());
-        System.out.println("URL: " + vnPayConfig.getPaymentUrl() + "?" + queryString);
-        System.out.println("===================");
-        // ========================================================
-
-        return vnPayConfig.getPaymentUrl() + "?" + queryString;
     }
 
     @Transactional
@@ -117,58 +117,62 @@ public class VNPayService {
         signParams.remove("vnp_SecureHash");
         signParams.remove("vnp_SecureHashType");
 
-        // Build hash data từ callback params
-        StringBuilder hashData = new StringBuilder();
-        for (Map.Entry<String, String> entry : signParams.entrySet()) {
-            if (entry.getValue() != null && !entry.getValue().isBlank()) {
-                if (hashData.length() > 0) hashData.append("&");
-                hashData.append(entry.getKey()).append("=").append(entry.getValue());
+        try {
+            StringBuilder hashData = new StringBuilder();
+
+            // SỬA LỖI: Thuật toán ráp chuỗi kiểm tra động, loại bỏ hoàn toàn lỗi thừa dấu & ở đuôi
+            for (Map.Entry<String, String> entry : signParams.entrySet()) {
+                String fieldName = entry.getKey();
+                String fieldValue = entry.getValue();
+
+                if (fieldValue != null && !fieldValue.isBlank()) {
+                    if (hashData.length() > 0) {
+                        hashData.append('&');
+                    }
+                    hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                }
             }
-        }
 
-        String calculatedHash = hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
+            String calculatedHash = hmacSHA512(vnPayConfig.getHashSecret(), hashData.toString());
 
-        if (!calculatedHash.equalsIgnoreCase(receivedHash)) {
+            if (!calculatedHash.equalsIgnoreCase(receivedHash)) {
+                return VNPayCallbackResult.builder().success(false).message("Chu ky khong hop le").build();
+            }
+
+            String responseCode = params.get("vnp_ResponseCode");
+            String txnRef       = params.get("vnp_TxnRef");
+            String vnpTxnNo     = params.get("vnp_TransactionNo");
+
+            Payment payment = paymentRepository.findByTransactionId(txnRef).orElse(null);
+            if (payment == null) {
+                return VNPayCallbackResult.builder().success(false).message("Khong tim thay giao dich: " + txnRef).build();
+            }
+
+            Order order = payment.getOrder();
+            boolean isSuccess = "00".equals(responseCode);
+
+            if (isSuccess) {
+                payment.setResult(PaymentResult.SUCCESS);
+                payment.setPaidAt(Instant.now());
+                payment.setGatewayTransactionNo(vnpTxnNo);
+                order.setPaymentStatus(PaymentStatus.PAID);
+                order.setStatus(OrderStatus.CONFIRMED);
+            } else {
+                payment.setResult(PaymentResult.FAILED);
+                order.setStatus(OrderStatus.CANCELLED); // Khi ấn hủy thanh toán, đưa trạng thái về CANCELLED
+            }
+
+            paymentRepository.save(payment);
+            orderRepository.save(order);
+
             return VNPayCallbackResult.builder()
-                    .success(false)
-                    .message("Chu ky khong hop le")
+                    .success(isSuccess)
+                    .orderId(order.getId())
+                    .message(isSuccess ? "Thanh toan thanh cong" : "Thanh toan that bai (code: " + responseCode + ")")
                     .build();
+        } catch (Exception e) {
+            throw new RuntimeException("Loi callback VNPay", e);
         }
-
-        String responseCode = params.get("vnp_ResponseCode");
-        String txnRef       = params.get("vnp_TxnRef");
-        String vnpTxnNo     = params.get("vnp_TransactionNo");
-
-        Payment payment = paymentRepository.findByTransactionId(txnRef).orElse(null);
-        if (payment == null) {
-            return VNPayCallbackResult.builder()
-                    .success(false)
-                    .message("Khong tim thay giao dich: " + txnRef)
-                    .build();
-        }
-
-        Order order = payment.getOrder();
-        boolean isSuccess = "00".equals(responseCode);
-
-        if (isSuccess) {
-            payment.setResult(PaymentResult.SUCCESS);
-            payment.setPaidAt(Instant.now());
-            payment.setGatewayTransactionNo(vnpTxnNo);
-            order.setPaymentStatus(PaymentStatus.PAID);
-            order.setStatus(OrderStatus.CONFIRMED);
-        } else {
-            payment.setResult(PaymentResult.FAILED);
-            order.setStatus(OrderStatus.CANCELLED);
-        }
-
-        paymentRepository.save(payment);
-        orderRepository.save(order);
-
-        return VNPayCallbackResult.builder()
-                .success(isSuccess)
-                .orderId(order.getId())
-                .message(isSuccess ? "Thanh toan thanh cong" : "Thanh toan that bai (code: " + responseCode + ")")
-                .build();
     }
 
     private void saveOrUpdatePayment(Order order, String txnRef, String orderId) {

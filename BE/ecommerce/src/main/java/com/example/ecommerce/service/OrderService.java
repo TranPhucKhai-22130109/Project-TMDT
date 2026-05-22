@@ -48,6 +48,7 @@ public class OrderService {
                 .status(OrderStatus.PENDING)
                 .paymentStatus(PaymentStatus.UNPAID)
                 .totalAmount(0.0)
+                .items(new ArrayList<>()) // BẢO VỆ KHỎI LỖI NULL TẠI ĐÂY
                 .build();
 
         Order savedOrder = orderRepository.save(order);
@@ -70,8 +71,17 @@ public class OrderService {
             totalAmount += product.getPrice() * itemReq.getQuantity();
         }
 
+        double shippingFee = 50000.0;
+        totalAmount += shippingFee;
+        // ========================================================
+
+        // Chắc chắn 100% không bao giờ bị NPE nữa
+        if (savedOrder.getItems() == null) {
+            savedOrder.setItems(new ArrayList<>());
+        }
         savedOrder.getItems().addAll(orderItems);
         savedOrder.setTotalAmount(totalAmount);
+
         savedOrder = orderRepository.save(savedOrder);
 
         OrderResponse response = OrderResponse.from(savedOrder);
