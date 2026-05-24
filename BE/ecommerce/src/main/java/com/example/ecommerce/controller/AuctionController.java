@@ -2,6 +2,7 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.auction.PlaceBidRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
+import com.example.ecommerce.dto.response.AuctionWinnerResponse;
 import com.example.ecommerce.dto.response.BidResponse;
 import com.example.ecommerce.dto.response.ProductResponse;
 import com.example.ecommerce.service.AuctionService;
@@ -56,6 +57,23 @@ public class AuctionController {
         );
     }
 
+    @GetMapping("/my-won")
+    public ResponseEntity<ApiResponse<List<ProductResponse>>> getMyWonAuctions() {
+        Jwt jwt = (Jwt) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<ProductResponse>>builder()
+                        .success(true)
+                        .code("GET_MY_WON_AUCTIONS_SUCCESS")
+                        .message("Get my won auctions successfully")
+                        .data(auctionService.getMyWonAuctions(jwt.getSubject()))
+                        .build()
+        );
+    }
+
     @GetMapping("/{productId}/bids")
     public ResponseEntity<ApiResponse<List<BidResponse>>> getBidHistory(@PathVariable Long productId) {
         return ResponseEntity.ok(
@@ -76,6 +94,18 @@ public class AuctionController {
                         .code("GET_CURRENT_HIGHEST_BID_SUCCESS")
                         .message("Get current highest bid successfully")
                         .data(auctionService.getCurrentHighestBid(productId))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{productId}/winner")
+    public ResponseEntity<ApiResponse<AuctionWinnerResponse>> getAuctionWinner(@PathVariable Long productId) {
+        return ResponseEntity.ok(
+                ApiResponse.<AuctionWinnerResponse>builder()
+                        .success(true)
+                        .code("GET_AUCTION_WINNER_SUCCESS")
+                        .message("Get auction winner successfully")
+                        .data(auctionService.getAuctionWinner(productId))
                         .build()
         );
     }

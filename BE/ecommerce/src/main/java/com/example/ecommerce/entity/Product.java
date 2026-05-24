@@ -38,6 +38,7 @@ public class Product {
     private LocalDateTime auctionStartTime;
     private LocalDateTime auctionEndTime;
     private BigDecimal currentPrice;
+    private Boolean auctionPaid = false;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted = false;

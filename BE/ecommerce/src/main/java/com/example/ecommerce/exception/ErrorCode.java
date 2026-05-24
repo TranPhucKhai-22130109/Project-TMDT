@@ -29,6 +29,14 @@ public enum ErrorCode {
     // ==== PRODUCT ====
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "Product not found"),
 
+    // ==== AUCTION ====
+    AUCTION_ENDED(HttpStatus.BAD_REQUEST, "Auction has ended"),
+    AUCTION_NOT_ENDED(HttpStatus.BAD_REQUEST, "Auction has not ended"),
+    AUCTION_HAS_NO_BID(HttpStatus.BAD_REQUEST, "Auction has no bid"),
+    AUCTION_NOT_WINNER(HttpStatus.FORBIDDEN, "Only auction winner can checkout this product"),
+    AUCTION_ALREADY_PAID(HttpStatus.BAD_REQUEST, "Auction product has already been paid"),
+    INVALID_AUCTION_QUANTITY(HttpStatus.BAD_REQUEST, "Auction product quantity must be 1"),
+
     // ==== ORDER ====
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "Order not found"),
     PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "Payment processing failed"),

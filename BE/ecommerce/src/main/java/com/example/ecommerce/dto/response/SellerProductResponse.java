@@ -41,4 +41,5 @@ public class SellerProductResponse {
     private LocalDateTime auctionStartTime;
     private LocalDateTime auctionEndTime;
     private BigDecimal currentPrice;
+    private Boolean auctionPaid;
 }

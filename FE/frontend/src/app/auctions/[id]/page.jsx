@@ -1,18 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/Button";
-import { Zap } from "lucide-react";
+import { Zap, Trophy, AlertCircle } from "lucide-react";
 import NextLink from "next/link";
-import { getAuctionProducts, getAuctionBids, getAuctionCurrentBid, placeBid } from "@/services/auctionService";
+import { getAuctionProducts, getAuctionBids, getAuctionCurrentBid, placeBid, getAuctionWinner } from "@/services/auctionService";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/context/AuthContext";
 
 export default function AuctionDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, userId } = useAuth();
 
   const [activeImage, setActiveImage] = useState(0);
   const [auction, setAuction] = useState(null);
@@ -21,6 +21,14 @@ export default function AuctionDetailPage() {
   const [bidAmount, setBidAmount] = useState("");
   const [bids, setBids] = useState([]);
   const [submittingBid, setSubmittingBid] = useState(false);
+
+  // Countdown state
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [auctionEnded, setAuctionEnded] = useState(false);
+
+  // Winner state
+  const [winner, setWinner] = useState(null);
+  const [winnerLoading, setWinnerLoading] = useState(false);
 
   // Dark mode effect
   useEffect(() => {
@@ -36,7 +44,6 @@ export default function AuctionDetailPage() {
     const fetchAuctionDetail = async () => {
       try {
         setLoading(true);
-        // Lấy danh sách sản phẩm đấu giá
         const res = await getAuctionProducts();
         const allProducts = Array.isArray(res) ? res : (res.data || []);
         
@@ -45,7 +52,6 @@ export default function AuctionDetailPage() {
         );
 
         if (foundProduct) {
-          // Fetch current bid & bid history parallel
           const [currentBidRes, bidsRes] = await Promise.all([
             getAuctionCurrentBid(foundProduct.id).catch(() => null),
             getAuctionBids(foundProduct.id).catch(() => null)
@@ -66,15 +72,21 @@ export default function AuctionDetailPage() {
               foundProduct.imageUrl,
               foundProduct.imageUrl,
             ] : []),
-            auctionHash: foundProduct.id + "-abcd-efgh-ijkl", // Tạm dùng id làm một phần hash
+            auctionHash: foundProduct.id + "-abcd-efgh-ijkl",
             currentPrice: currentPrice,
             startingPrice: foundProduct.auctionStartPrice || foundProduct.price || 0,
-            buyNowPrice: currentPrice * 3, // Mock buy now price nếu backend ko trả về
-            minBid: currentPrice + 1000, // Tạm fix minBid = currentPrice + 1000
+            buyNowPrice: currentPrice * 3,
+            minBid: currentPrice + 1000,
           });
           
           if (bidsRes && bidsRes.data) {
              setBids(bidsRes.data);
+          }
+
+          // Nếu product đã ENDED, gọi winner ngay
+          if (foundProduct.status === "ENDED") {
+            setAuctionEnded(true);
+            fetchWinner(foundProduct.id);
           }
 
           setActiveImage(0);
@@ -94,12 +106,91 @@ export default function AuctionDetailPage() {
     }
   }, [params.id, router]);
 
+  // Fetch winner helper
+  const fetchWinner = async (productId) => {
+    try {
+      setWinnerLoading(true);
+      const res = await getAuctionWinner(productId);
+      if (res && res.data) {
+        setWinner(res.data);
+      } else {
+        setWinner(null);
+      }
+    } catch (err) {
+      console.error("Lỗi lấy winner:", err);
+      setWinner(null);
+    } finally {
+      setWinnerLoading(false);
+    }
+  };
+
+  // Countdown timer - chạy mỗi giây
+  useEffect(() => {
+    if (!auction?.auctionEndTime || auctionEnded) return;
+
+    const endTime = new Date(auction.auctionEndTime).getTime();
+
+    const calcTimeLeft = () => {
+      const now = Date.now();
+      const diff = endTime - now;
+
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setAuctionEnded(true);
+        // Khi countdown về 0, gọi API winner
+        fetchWinner(auction.id);
+        return false; // signal to clear interval
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTimeLeft({ days, hours, minutes, seconds });
+      return true; // continue
+    };
+
+    // Initial calc
+    const shouldContinue = calcTimeLeft();
+    if (!shouldContinue) return;
+
+    const interval = setInterval(() => {
+      const shouldContinue = calcTimeLeft();
+      if (!shouldContinue) clearInterval(interval);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [auction?.auctionEndTime, auction?.id, auctionEnded]);
+
+  // TODO: [POLLING PLACEHOLDER] Uncomment below để auto-refresh bid history mỗi 15 giây.
+  // useEffect(() => {
+  //   if (!auction?.id || auctionEnded) return;
+  //   const pollInterval = setInterval(async () => {
+  //     try {
+  //       const [currentBidRes, bidsRes] = await Promise.all([
+  //         getAuctionCurrentBid(auction.id).catch(() => null),
+  //         getAuctionBids(auction.id).catch(() => null),
+  //       ]);
+  //       if (currentBidRes?.data) {
+  //         setAuction(prev => ({ ...prev, currentPrice: currentBidRes.data.currentPrice }));
+  //       }
+  //       if (bidsRes?.data) {
+  //         setBids(bidsRes.data);
+  //       }
+  //     } catch (err) {
+  //       console.error("Poll error:", err);
+  //     }
+  //   }, 15000);
+  //   return () => clearInterval(pollInterval);
+  // }, [auction?.id, auctionEnded]);
+
   const formatPrice = (price) => {
     return Number(price).toLocaleString("vi-VN");
   };
 
   const handleQuickBid = (amount) => {
-    setBidAmount(amount); // Bid amount là số tiền cộng thêm
+    setBidAmount(amount);
   };
 
   const handlePlaceBid = async () => {
@@ -118,29 +209,60 @@ export default function AuctionDetailPage() {
         const res = await placeBid(auction.id, Number(bidAmount));
         
         if (res.success || res.code === "PLACE_BID_SUCCESS") {
-            // Update UI with new bid
             setAuction(prev => ({
                 ...prev,
                 currentPrice: res.data.currentPrice,
                 minBid: res.data.currentPrice + 1000
             }));
             
-            // Add new bid to history
             setBids(prev => [res.data, ...prev]);
             setBidAmount("");
             alert("Đặt giá thành công!");
         } else {
-            alert(res.message || "Lỗi khi đặt giá");
+            // Map error codes cụ thể
+            const errorMessages = {
+              "AUCTION_ENDED": "Phiên đấu giá đã kết thúc!",
+              "VALIDATION_ERROR": "Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.",
+            };
+            alert(errorMessages[res.code] || res.message || "Lỗi khi đặt giá");
+
+            if (res.code === "AUCTION_ENDED") {
+              setAuctionEnded(true);
+              fetchWinner(auction.id);
+            }
         }
     } catch (err) {
         console.error("Bid error:", err);
-        alert("Có lỗi xảy ra khi gửi yêu cầu.");
+        // Kiểm tra error message từ backend
+        const msg = err.message || "";
+        if (msg.includes("AUCTION_ENDED") || msg.includes("ended")) {
+          setAuctionEnded(true);
+          fetchWinner(auction.id);
+          alert("Phiên đấu giá đã kết thúc!");
+        } else {
+          alert("Có lỗi xảy ra khi gửi yêu cầu.");
+        }
     } finally {
         setSubmittingBid(false);
     }
   };
 
-  const isAuctionOpen = auction?.status === "OPEN";
+  // Checkout cho winner
+  const handleWinnerCheckout = () => {
+    if (!winner) return;
+    router.push(`/checkout?auctionProductId=${auction.id}&price=${winner.winningPrice}`);
+  };
+
+  const isAuctionOpen = auction?.status === "OPEN" && !auctionEnded;
+
+  // Format countdown display
+  const countdownDisplay = () => {
+    if (auctionEnded) return "Đã kết thúc";
+    if (auction?.status === "SCHEDULED") return "Chưa bắt đầu";
+    const { days, hours, minutes, seconds } = timeLeft;
+    if (days > 0) return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
 
   if (loading) {
     return (
@@ -223,7 +345,15 @@ export default function AuctionDetailPage() {
                   </div>
                 </div>
 
+                {/* Countdown display */}
                 <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Thời gian còn lại</span>
+                  <span className={`font-black ${auctionEnded ? "text-red-600" : "text-gray-900 dark:text-white"}`}>
+                    {countdownDisplay()}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl">
                   <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Giá khởi điểm</span>
                   <span className="font-black text-gray-900 dark:text-white">{formatPrice(auction.startingPrice)}</span>
                 </div>
@@ -238,6 +368,62 @@ export default function AuctionDetailPage() {
 
           {/* Right Column: Bidding Module */}
           <div className="space-y-6">
+            {/* Winner Block - hiển thị khi auction kết thúc */}
+            {auctionEnded && (
+              <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                {winnerLoading ? (
+                  <div className="text-center py-6 text-gray-500">Đang tải kết quả...</div>
+                ) : winner ? (
+                  <div className="text-center space-y-4">
+                    <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto">
+                      <Trophy className="w-8 h-8 text-yellow-600" />
+                    </div>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white">
+                      Phiên đấu giá đã kết thúc!
+                    </h3>
+
+                    {userId && userId === winner.winnerUserId ? (
+                      <>
+                        <p className="text-emerald-600 font-bold text-lg">
+                          🎉 Chúc mừng! Bạn đã thắng!
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Giá thắng: <span className="font-black text-red-600">{formatPrice(winner.winningPrice)}</span>
+                        </p>
+                        {winner.canPay && (
+                          <button
+                            onClick={handleWinnerCheckout}
+                            className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors shadow-md shadow-emerald-600/20"
+                          >
+                            Thanh toán ngay
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-gray-500 font-medium">
+                          Người thắng: <span className="font-bold text-gray-900 dark:text-white">{winner.winnerUsername}</span>
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          Giá thắng: <span className="font-bold text-red-600">{formatPrice(winner.winningPrice)}</span>
+                        </p>
+                      </>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center space-y-3">
+                    <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto">
+                      <AlertCircle className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white">
+                      Phiên đấu giá đã kết thúc
+                    </h3>
+                    <p className="text-sm text-gray-500">Không có người thắng cuộc.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Bid Box */}
             <div className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 sticky top-24">
               <div className="mb-4">

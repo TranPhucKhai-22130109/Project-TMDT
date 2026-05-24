@@ -12,6 +12,8 @@ import {
     Zap,
     Flame,
     X,
+    Trophy,
+    ChevronDown,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart/CartContext";
@@ -35,6 +37,7 @@ export default function Navbar() {
 
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState("");
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -252,16 +255,46 @@ export default function Navbar() {
                         <div className="hidden sm:flex items-center gap-4">
                             {!isLoading &&
                                 (isAuthenticated ? (
-                                    <div className="flex items-center gap-3">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                      Hi, <b>{username || "User"}</b>
-                    </span>
+                                    <div className="relative">
                                         <button
-                                            onClick={logout}
-                                            className="px-4 py-2 text-sm font-bold text-red-600 border border-red-600 hover:bg-red-50 dark:hover:bg-gray-800 rounded-full transition-colors shadow-sm"
+                                            onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                                            className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-red-600 transition-colors px-3 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                                         >
-                                            Đăng xuất
+                                            <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
+                                                <User className="w-4 h-4 text-red-600" />
+                                            </div>
+                                            <span className="font-bold">{username || "User"}</span>
+                                            <ChevronDown className={`w-4 h-4 transition-transform ${userDropdownOpen ? "rotate-180" : ""}`} />
                                         </button>
+
+                                        {userDropdownOpen && (
+                                            <>
+                                                <div
+                                                    onClick={() => setUserDropdownOpen(false)}
+                                                    className="fixed inset-0 z-[45]"
+                                                />
+                                                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-[50]">
+                                                    <NextLink
+                                                        href="/auctions/my-won"
+                                                        onClick={() => setUserDropdownOpen(false)}
+                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                    >
+                                                        <Trophy className="w-4 h-4 text-yellow-500" />
+                                                        Đấu giá đã thắng
+                                                    </NextLink>
+                                                    <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
+                                                    <button
+                                                        onClick={() => {
+                                                            setUserDropdownOpen(false);
+                                                            logout();
+                                                        }}
+                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 transition-colors"
+                                                    >
+                                                        Đăng xuất
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 ) : (
                                     <>

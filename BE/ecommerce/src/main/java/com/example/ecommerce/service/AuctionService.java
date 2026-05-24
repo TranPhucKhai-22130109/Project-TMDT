@@ -1,6 +1,7 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.request.auction.PlaceBidRequest;
+import com.example.ecommerce.dto.response.AuctionWinnerResponse;
 import com.example.ecommerce.dto.response.BidResponse;
 import com.example.ecommerce.dto.response.ProductResponse;
 import com.example.ecommerce.entity.AuctionBid;
@@ -19,6 +20,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class AuctionService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
-    @Transactional
+    @Transactional(noRollbackFor = AppException.class)
     public BidResponse placeBid(PlaceBidRequest request, String userId) {
         validatePlaceBidRequest(request, userId);
 
@@ -39,6 +41,7 @@ public class AuctionService {
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         validateBiddableProduct(product);
+        ensureAuctionNotEnded(product);
 
         BigDecimal currentPrice = resolveCurrentPrice(product);
         BigDecimal newPrice = currentPrice.add(request.getAmount());
@@ -82,6 +85,42 @@ public class AuctionService {
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public AuctionWinnerResponse getAuctionWinner(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        if (product.getStatus() != ProductStatus.ENDED) {
+            return null;
+        }
+
+        return auctionBidRepository.findTopByProductIdOrderByAmountDescCreatedAtDesc(productId)
+                .map(bid -> new AuctionWinnerResponse(
+                        product.getId(),
+                        bid.getUser().getId(),
+                        bid.getUser().getUsername(),
+                        bid.getAmount(),
+                        true
+                ))
+                .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResponse> getMyWonAuctions(String userId) {
+        return productRepository
+                .findByIsAuctionTrueAndStatusAndAuctionPaidFalseAndIsApprovedTrueAndIsDeletedFalse(ProductStatus.ENDED)
+                .stream()
+                .filter(product -> isWinner(product, userId))
+                .map(this::toProductResponse)
+                .toList();
+    }
+
+    private boolean isWinner(Product product, String userId) {
+        return auctionBidRepository.findTopByProductIdOrderByAmountDescCreatedAtDesc(product.getId())
+                .map(bid -> bid.getUser().getId().equals(userId))
+                .orElse(false);
+    }
+
     private void validatePlaceBidRequest(PlaceBidRequest request, String userId) {
         if (request == null
                 || request.getProductId() == null
@@ -99,6 +138,18 @@ public class AuctionService {
                 || Boolean.TRUE.equals(product.getIsDeleted())
                 || product.getStatus() != ProductStatus.OPEN) {
             throw new AppException(ErrorCode.VALIDATION_ERROR);
+        }
+    }
+
+    private void ensureAuctionNotEnded(Product product) {
+        if (product.getAuctionEndTime() == null) {
+            throw new AppException(ErrorCode.VALIDATION_ERROR);
+        }
+
+        if (!LocalDateTime.now().isBefore(product.getAuctionEndTime())) {
+            product.setStatus(ProductStatus.ENDED);
+            productRepository.save(product);
+            throw new AppException(ErrorCode.AUCTION_ENDED);
         }
     }
 
@@ -160,7 +211,8 @@ public class AuctionService {
                 product.getAuctionStartPrice(),
                 product.getAuctionStartTime(),
                 product.getAuctionEndTime(),
-                product.getCurrentPrice()
+                product.getCurrentPrice(),
+                Boolean.TRUE.equals(product.getAuctionPaid())
         );
     }
 
