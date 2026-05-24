@@ -5,9 +5,7 @@ import { Menu, Search, Bell, ChevronDown } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 const notifications = [
-  { id: 1, text: "New order #ORD-1234 received", time: "2m ago", unread: true },
-  { id: 2, text: "Product stock low: iPhone 16 Pro", time: "15m ago", unread: true },
-  { id: 3, text: "User John Doe registered", time: "1h ago", unread: false },
+
 ];
 
 export default function Topbar({ title, onMenuClick }) {

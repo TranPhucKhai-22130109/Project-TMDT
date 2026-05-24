@@ -34,3 +34,18 @@ export async function updateUserRole(id, role) {
     body: JSON.stringify({ role }),
   });
 }
+
+/** PATCH /api/admin/users/{id} — Cập nhật username */
+export async function updateUsername(id, username) {
+  return apiFetch(`/admin/users/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ username }),
+  });
+}
+
+/** DELETE /api/admin/users/{id} — Soft delete user */
+export async function deleteUser(id) {
+  return apiFetch(`/admin/users/${id}`, {
+    method: "DELETE",
+  });
+}

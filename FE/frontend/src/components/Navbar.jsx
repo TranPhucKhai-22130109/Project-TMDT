@@ -198,10 +198,10 @@ export default function Navbar() {
                             Trang chủ
                         </NextLink>
                         <NextLink
-                            href="/deals"
+                            href="/auctions"
                             className="text-sm font-bold uppercase tracking-wide text-red-600 flex items-center gap-1"
                         >
-                            <Flame className="w-4 h-4" /> Thoả thuậN
+                            <Flame className="w-4 h-4" /> Đấu giá
                         </NextLink>
                         <NextLink
                             href="/products"

@@ -19,7 +19,6 @@ const navItems = [
   { label: "Products", href: "/dashboard/products", icon: Package, badge: 3 },
   { label: "Orders", href: "/dashboard/orders", icon: ShoppingCart, badge: 12 },
   { label: "Users", href: "/dashboard/users", icon: Users },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
