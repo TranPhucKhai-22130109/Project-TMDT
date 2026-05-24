@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NextLink from "next/link";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { checkout } from "@/services/orderService";
 import { getCartItems } from "@/services/cartService";
+import { getAllProducts } from "@/services/productService";
+import { getAuctionProducts } from "@/services/auctionService";
 import Navbar from "@/components/Navbar";
 import {
     MapPin, Phone, User, CreditCard, Truck,
@@ -70,9 +72,15 @@ function StepIndicator({ step }) {
 
 export default function Page() {
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const { isAuthenticated, username, isLoading } = useAuth();
     const { reloadCartCount } = useCart();
+
+    // Auction checkout params
+    const auctionProductId = searchParams.get("auctionProductId");
+    const auctionPrice = searchParams.get("price");
+    const isAuctionCheckout = !!auctionProductId;
 
     const [cart, setCart] = useState([]);
     const [cartTotal, setCartTotal] = useState(0);
@@ -108,39 +116,71 @@ export default function Page() {
 
     useEffect(() => {
         if (!isLoading && isAuthenticated) {
-            const fetchCartItems = async () => {
-                try {
-                    const response = await getCartItems();
+            // Nếu là auction checkout, fetch product info thay vì cart
+            if (isAuctionCheckout) {
+                const fetchAuctionProduct = async () => {
+                    try {
+                        const res = await getAllProducts();
+                        const products = Array.isArray(res) ? res : (res.data || []);
+                        const product = products.find(p => String(p.id) === String(auctionProductId));
 
-                    let list = [];
-                    if (Array.isArray(response)) list = response;
-                    else if (response?.data && Array.isArray(response.data)) list = response.data;
-                    else if (response?.content && Array.isArray(response.content)) list = response.content;
+                        if (product) {
+                            const price = Number(auctionPrice || product.currentPrice || 0);
+                            setCart([{
+                                id: `auction-${product.id}`,
+                                quantity: 1,
+                                product: {
+                                    id: product.id,
+                                    name: product.name,
+                                    imageUrl: product.imageUrl,
+                                    price: price,
+                                    isAuction: true,
+                                },
+                            }]);
+                            setCartTotal(price);
+                        }
+                    } catch (error) {
+                        console.error("Lỗi lấy sản phẩm auction:", error);
+                    } finally {
+                        setLoadingCart(false);
+                    }
+                };
+                fetchAuctionProduct();
+            } else {
+                const fetchCartItems = async () => {
+                    try {
+                        const response = await getCartItems();
 
-                    const filtered = list.filter((item) => {
-                        const product = item?.product || item;
-                        return product && !product?.isDeleted;
-                    });
+                        let list = [];
+                        if (Array.isArray(response)) list = response;
+                        else if (response?.data && Array.isArray(response.data)) list = response.data;
+                        else if (response?.content && Array.isArray(response.content)) list = response.content;
 
-                    setCart(filtered);
+                        const filtered = list.filter((item) => {
+                            const product = item?.product || item;
+                            return product && !product?.isDeleted;
+                        });
 
-                    const total = filtered.reduce((sum, item) => {
-                        const product = item?.product || item;
-                        return sum + Number(product?.price || 0) * Number(item?.quantity || 1);
-                    }, 0);
-                    setCartTotal(total);
+                        setCart(filtered);
 
-                } catch (error) {
-                    console.error("Lỗi lấy giỏ hàng checkout:", error);
-                } finally {
-                    setLoadingCart(false);
-                }
-            };
-            fetchCartItems();
+                        const total = filtered.reduce((sum, item) => {
+                            const product = item?.product || item;
+                            return sum + Number(product?.price || 0) * Number(item?.quantity || 1);
+                        }, 0);
+                        setCartTotal(total);
+
+                    } catch (error) {
+                        console.error("Lỗi lấy giỏ hàng checkout:", error);
+                    } finally {
+                        setLoadingCart(false);
+                    }
+                };
+                fetchCartItems();
+            }
         } else if (!isLoading && !isAuthenticated) {
             setLoadingCart(false);
         }
-    }, [isLoading, isAuthenticated]);
+    }, [isLoading, isAuthenticated, isAuctionCheckout, auctionProductId, auctionPrice]);
 
     const shippingFee = cartTotal >= 5_000_000 ? 0 : 50_000;
     const grandTotal = cartTotal + shippingFee;
@@ -261,10 +301,14 @@ export default function Page() {
                 <Navbar />
                 <div className="flex flex-col items-center justify-center py-32 text-center px-4">
                     <ShoppingBag className="w-16 h-16 text-gray-300 dark:text-gray-600 mb-5" />
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Giỏ hàng trống</h2>
-                    <p className="text-gray-500 dark:text-gray-400 mb-6">Thêm sản phẩm vào giỏ trước khi thanh toán.</p>
-                    <NextLink href="/products" className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
-                        Tiếp tục mua sắm
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                        {isAuctionCheckout ? "Không tìm thấy sản phẩm đấu giá" : "Giỏ hàng trống"}
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">
+                        {isAuctionCheckout ? "Sản phẩm đấu giá không hợp lệ hoặc đã được thanh toán." : "Thêm sản phẩm vào giỏ trước khi thanh toán."}
+                    </p>
+                    <NextLink href={isAuctionCheckout ? "/auctions" : "/products"} className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-2xl transition-colors">
+                        {isAuctionCheckout ? "Quay lại đấu giá" : "Tiếp tục mua sắm"}
                     </NextLink>
                 </div>
             </div>
@@ -348,12 +392,12 @@ export default function Page() {
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 py-10">
-                <NextLink href="/cart" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6">
-                    <ArrowLeft className="w-4 h-4" /> Quay lại giỏ hàng
+                <NextLink href={isAuctionCheckout ? "/auctions" : "/cart"} className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-red-600 transition-colors mb-6">
+                    <ArrowLeft className="w-4 h-4" /> {isAuctionCheckout ? "Quay lại đấu giá" : "Quay lại giỏ hàng"}
                 </NextLink>
 
                 <h1 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900 dark:text-white mb-6">
-                    Thanh toán
+                    {isAuctionCheckout ? "Thanh toán đấu giá" : "Thanh toán"}
                 </h1>
 
                 <StepIndicator step={step} />

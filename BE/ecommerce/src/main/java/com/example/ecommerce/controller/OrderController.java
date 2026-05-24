@@ -3,6 +3,7 @@ package com.example.ecommerce.controller;
 import com.example.ecommerce.dto.request.auth.CheckoutRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.OrderResponse;
+import com.example.ecommerce.exception.AppException;
 import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +56,8 @@ public class OrderController {
                     .data(orderResponse)
                     .build());
 
+        } catch (AppException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -1,6 +1,7 @@
 package com.example.ecommerce.service;
 
 import com.example.ecommerce.dto.request.admin.CreateUserRequest;
+import com.example.ecommerce.dto.request.admin.UpdateUserRequest;
 import com.example.ecommerce.dto.response.UserResponse;
 import com.example.ecommerce.entity.Role;
 import com.example.ecommerce.entity.User;
@@ -60,6 +61,7 @@ public class AdminUserService {
     public List<UserResponse> getUsers() {
         return userRepository.findAll()
                 .stream()
+                // .filter(user -> !Boolean.TRUE.equals(user.getIsDeleted()))
                 .map(this::toUserResponse)
                 .toList();
     }
@@ -68,14 +70,56 @@ public class AdminUserService {
     public UserResponse getUserById(String id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (Boolean.TRUE.equals(user.getIsDeleted())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
 
         return toUserResponse(user);
+    }
+
+    @Transactional
+    public UserResponse updateUser(String id, UpdateUserRequest request) {
+        if (request == null || isBlank(request.getUsername())) {
+            throw new AppException(ErrorCode.VALIDATION_ERROR);
+        }
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (Boolean.TRUE.equals(user.getIsDeleted())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        if (!user.getUsername().equals(request.getUsername())
+                && userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USERNAME_ALREADY_EXISTS);
+        }
+
+        user.setUsername(request.getUsername());
+
+        return toUserResponse(userRepository.save(user));
+    }
+
+    @Transactional
+    public void softDeleteUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (Boolean.TRUE.equals(user.getIsDeleted())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        user.setIsDeleted(true);
+        user.setStatus(AccountStatus.INACTIVE);
+
+        userRepository.save(user);
     }
 
     @Transactional
     public UserResponse updateUserStatus(String id, String status) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (Boolean.TRUE.equals(user.getIsDeleted())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
 
         user.setStatus(parseStatus(status));
 
@@ -86,6 +130,9 @@ public class AdminUserService {
     public UserResponse updateUserRole(String id, String role) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        if (Boolean.TRUE.equals(user.getIsDeleted())) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
+        }
 
         RoleName roleName = parseRole(role);
         Role newRole = roleRepository.findByRoleName(roleName.name())
@@ -153,12 +200,12 @@ public class AdminUserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getStatus(),
+                Boolean.TRUE.equals(user.getIsDeleted()),
                 user.getUserRoles()
                         .stream()
                         .map(userRole -> userRole.getRole().getRoleName())
                         .toList(),
                 user.getCreatedAt(),
-                user.getUpdatedAt()
-        );
+                user.getUpdatedAt());
     }
 }

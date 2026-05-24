@@ -9,6 +9,7 @@ export default function UserDetailPanel({
   isOpen,
   onClose,
   onDelete,
+  onUpdateUsername,
   onToggleStatus,
   onChangeRole,
   getRelativeTime,
@@ -21,6 +22,8 @@ export default function UserDetailPanel({
   const [pendingRole, setPendingRole] = useState(null);
   const [pendingUsername, setPendingUsername] = useState("");
   const [pendingPassword, setPendingPassword] = useState("");
+  const [savingUsername, setSavingUsername] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -28,6 +31,7 @@ export default function UserDetailPanel({
       setPendingRole(null);
       setPendingUsername(user.username || "");
       setPendingPassword("");
+      setPendingStatus(null);
     }
   }, [user]);
 
@@ -68,10 +72,11 @@ export default function UserDetailPanel({
     }
   };
 
-  const handleToggleStatusConfirm = () => {
-    const action = displayUser.status === "BANNED" ? "unban" : "ban";
-    if (window.confirm(`Are you sure you want to ${action} this user?`)) {
-      onToggleStatus(displayUser.id);
+  const handleStatusChange = (newStatus) => {
+    if (newStatus === displayUser.status) return;
+    if (window.confirm(`Are you sure you want to set this user to ${newStatus}?`)) {
+      onToggleStatus(displayUser.id, newStatus);
+      setPendingStatus(null);
     }
   };
 
@@ -213,147 +218,65 @@ export default function UserDetailPanel({
                 <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   Username
                 </label>
-                <input
-                  type="text"
-                  value={pendingUsername}
-                  onChange={(e) => setPendingUsername(e.target.value)}
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
-                />
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={pendingUsername}
+                    onChange={(e) => setPendingUsername(e.target.value)}
+                    className="flex-1 p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
+                  />
+                  <button
+                    onClick={async () => {
+                      const trimmed = pendingUsername.trim();
+                      if (!trimmed) return alert("Username cannot be empty.");
+                      if (trimmed === displayUser.username) return;
+                      setSavingUsername(true);
+                      await onUpdateUsername(displayUser.id, trimmed);
+                      setSavingUsername(false);
+                    }}
+                    disabled={savingUsername || pendingUsername.trim() === displayUser.username || !pendingUsername.trim()}
+                    className="shrink-0 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingUsername ? "Saving..." : "Save"}
+                  </button>
+                </div>
               </div>
 
               {/* Password */}
               <div>
                 <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                  New Password
+                  Password
                 </label>
                 <input
+                disabled
                   type="password"
                   value={pendingPassword}
                   onChange={(e) => setPendingPassword(e.target.value)}
-                  placeholder="Leave blank to keep current"
-                  className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none"
+                  placeholder="Can not change user password"
+                  className="px-3 py-1.5 text-sm font-medium text-white bg-red-400 opacity-70 cursor-not-allowed rounded shadow-sm w-full"
                 />
               </div>
-
-              {/* Role */}
-              <div>
-                <label className="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
-                  Role
-                </label>
-                <div className="flex items-center gap-3">
-                  <select
-                    value={pendingRole ?? role}
-                    onChange={(e) => setPendingRole(e.target.value)}
-                    className="flex-1 p-2 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
-                  >
-                    <option value="USER">User</option>
-                    <option value="SELLER">Seller</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                  <button
-                    onClick={() => {
-                      const newRole = pendingRole ?? role;
-                      if (newRole === role) return;
-                      if (
-                        window.confirm(
-                          `Are you sure you want to change role from ${role} to ${newRole}?`,
-                        )
-                      ) {
-                        onChangeRole(displayUser.id, newRole);
-                        setPendingRole(null);
-                      }
-                    }}
-                    disabled={!pendingRole || pendingRole === role}
-                    className="shrink-0 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Confirm
-                  </button>
-                </div>
-              </div>
-
-              <p className="text-xs text-red-500 font-semibold">
-                Username and password changes are not yet connected to the
-                backend.
-              </p>
-            </div>
-          </div>
-
-          {/* Danger Zone */}
-          <div
-            className="p-6 py-4 pb-6"
-            style={{
-              transition: "opacity 300ms 180ms",
-              opacity: isOpen ? 1 : 0,
-            }}
-          >
-            <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setDangerZoneOpen(!dangerZoneOpen)}
-                className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-2 text-red-600 font-semibold text-sm">
-                  <AlertTriangle className="w-4 h-4" />
-                  Danger Zone
-                </div>
-                <ChevronDown
-                  className={`w-4 h-4 text-gray-400 transition-transform ${dangerZoneOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-
-              {dangerZoneOpen && (
-                <div className="p-4 border-t border-red-100 bg-red-50/50 space-y-4">
-                  {/* Ban/Unban */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-sm font-semibold text-gray-900">
-                        {displayUser.status === "BANNED"
-                          ? "Unban this user"
-                          : "Ban this user"}
-                      </h4>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {displayUser.status === "BANNED"
-                          ? "Restore their access to the platform."
-                          : "Prevent them from logging in and making purchases."}
-                      </p>
-                    </div>
-                    <button
-                      onClick={handleToggleStatusConfirm}
-                      className="shrink-0 px-3 py-1.5 text-sm font-medium text-red-600 bg-white border border-red-200 rounded hover:bg-red-50 transition-colors"
-                    >
-                      {displayUser.status === "BANNED"
-                        ? "Unban User"
-                        : "Ban User"}
-                    </button>
-                  </div>
-
-                  <div className="w-full h-px bg-red-100"></div>
-
                   {/* Delete */}
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-sm font-semibold text-gray-900">
-                        Delete account permanently
+                        Delete account
                       </h4>
                       <p className="text-xs text-gray-500 mt-0.5">
-                        This action cannot be undone.
+                        Soft delete — user will be deactivated and hidden.
                       </p>
                     </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <button
-                        disabled
-                        onClick={handleDeleteConfirm}
-                        className="px-3 py-1.5 text-sm font-medium text-white bg-red-400 opacity-70 cursor-not-allowed rounded shadow-sm w-full"
-                        title="Delete is not yet connected to backend"
-                      >
-                        Delete User
-                      </button>
-                      <span className="text-[10px] text-red-500 max-w-[120px] text-right">Not yet connected to backend</span>
-                    </div>
+                    <button
+                      onClick={handleDeleteConfirm}
+                      className="shrink-0 px-3 py-1.5 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors shadow-sm"
+                    >
+                      Delete User
+                    </button>
                   </div>
-                </div>
-              )}
+
             </div>
           </div>
+
         </div>
 
         {/* STICKY FOOTER */}

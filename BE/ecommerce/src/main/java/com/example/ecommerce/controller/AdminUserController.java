@@ -2,12 +2,14 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.request.admin.CreateUserRequest;
 import com.example.ecommerce.dto.request.admin.UpdateUserRoleRequest;
+import com.example.ecommerce.dto.request.admin.UpdateUserRequest;
 import com.example.ecommerce.dto.request.admin.UpdateUserStatusRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.UserResponse;
 import com.example.ecommerce.service.AdminUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,6 +61,34 @@ public class AdminUserController {
                         .code("GET_USER_SUCCESS")
                         .message("Get user successfully")
                         .data(adminUserService.getUserById(id))
+                        .build()
+        );
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+            @PathVariable String id,
+            @RequestBody UpdateUserRequest request
+    ) {
+        return ResponseEntity.ok(
+                ApiResponse.<UserResponse>builder()
+                        .success(true)
+                        .code("UPDATE_USER_SUCCESS")
+                        .message("Update user successfully")
+                        .data(adminUserService.updateUser(id, request))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> softDeleteUser(@PathVariable String id) {
+        adminUserService.softDeleteUser(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .code("DELETE_USER_SUCCESS")
+                        .message("Delete user successfully")
                         .build()
         );
     }

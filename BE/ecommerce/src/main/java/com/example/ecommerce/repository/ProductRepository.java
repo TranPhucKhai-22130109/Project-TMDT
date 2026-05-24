@@ -16,6 +16,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByIsAuctionTrueAndStatusInAndIsApprovedTrueAndIsDeletedFalse(List<ProductStatus> statuses);
 
+    List<Product> findByIsAuctionTrueAndStatusAndAuctionPaidFalseAndIsApprovedTrueAndIsDeletedFalse(ProductStatus status);
+
     List<Product> findByIsDeletedFalseAndIsApprovedTrue(Sort sort);
 
     List<Product> findBySellerIdAndIsDeletedFalse(String sellerId);

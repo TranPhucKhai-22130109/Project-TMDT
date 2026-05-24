@@ -101,6 +101,7 @@ public class AdminProductController {
                                 product.getAuctionStartPrice(),
                                 product.getAuctionStartTime(),
                                 product.getAuctionEndTime(),
-                                product.getCurrentPrice());
+                                product.getCurrentPrice(),
+                                Boolean.TRUE.equals(product.getAuctionPaid()));
         }
 }

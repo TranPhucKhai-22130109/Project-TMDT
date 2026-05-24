@@ -115,12 +115,22 @@ export default function UserTable({
                       <span className={`w-2 h-2 rounded-full ${statusStyle.dot}`}></span>
                       <span className={`font-medium ${statusStyle.color}`}>{statusStyle.label}</span>
                     </div>
-                    <button 
-                      onClick={() => onToggleStatus(user.id)}
-                      className="opacity-0 group-hover/status:opacity-100 text-xs text-gray-400 hover:text-indigo-600 px-1.5 py-0.5 border border-gray-200 rounded hover:border-indigo-300 hover:bg-indigo-50 transition-all bg-white"
+                    <select
+                      value={user.status}
+                      onChange={(e) => {
+                        const newStatus = e.target.value;
+                        if (newStatus !== user.status && window.confirm(`Change status from ${user.status} to ${newStatus}?`)) {
+                          onToggleStatus(user.id, newStatus);
+                        } else {
+                          e.target.value = user.status;
+                        }
+                      }}
+                      className="opacity-0 group-hover/status:opacity-100 text-xs text-gray-500 px-1 py-0.5 border border-gray-200 rounded hover:border-indigo-300 bg-white cursor-pointer transition-all focus:opacity-100"
                     >
-                      {user.status === "BANNED" ? "Unban" : "Ban"}
-                    </button>
+                      <option value="ACTIVE">Active</option>
+                      <option value="INACTIVE">Inactive</option>
+                      <option value="BANNED">Banned</option>
+                    </select>
                   </div>
                 </td>
                 
@@ -150,10 +160,13 @@ export default function UserTable({
                       <Edit className="w-4 h-4" />
                     </button>
                     <button 
-                      disabled
-                      onClick={() => onDelete(user.id)} 
-                      className="p-1.5 text-gray-300 cursor-not-allowed rounded"
-                      title="Delete is not yet connected to backend"
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to delete this user?')) {
+                          onDelete(user.id);
+                        }
+                      }}
+                      className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      title="Delete user"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

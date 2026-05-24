@@ -6,7 +6,7 @@ import DashboardLayout from "@/components/dashboard/layout/DashboardLayout.jsx";
 import UserTable from "./UserTable.jsx";
 import UserDetailPanel from "./UserDetailPanel.jsx";
 import UserFormModal from "./UserFormModal.jsx";
-import { fetchUsers, createUser, updateUserStatus, updateUserRole } from "@/services/adminUserService";
+import { fetchUsers, createUser, updateUserStatus, updateUserRole, updateUsername, deleteUser } from "@/services/adminUserService";
 
 // Helper Functions
 const getRelativeTime = (dateString) => {
@@ -142,8 +142,29 @@ export default function UsersPage() {
     setFormModal({ isOpen: true, data: user });
   };
 
-  const handleDelete = (id) => {
-    alert("Delete user is not yet connected to the backend.");
+  const handleDelete = async (id) => {
+    try {
+      await deleteUser(id);
+      setUsers(prev => prev.filter(u => u.id !== id));
+      if (detailPanel.isOpen && detailPanel.user?.id === id) {
+        setDetailPanel({ isOpen: false, user: null });
+      }
+    } catch (err) {
+      alert("Failed to delete user: " + err.message);
+    }
+  };
+
+  const handleUpdateUsername = async (id, newUsername) => {
+    try {
+      const res = await updateUsername(id, newUsername);
+      const updatedUser = res.data;
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, ...updatedUser } : u));
+      if (detailPanel.isOpen && detailPanel.user?.id === id) {
+        setDetailPanel(prev => ({ ...prev, user: { ...prev.user, ...updatedUser } }));
+      }
+    } catch (err) {
+      alert("Failed to update username: " + err.message);
+    }
   };
 
   const handleSave = async (formData) => {
@@ -166,15 +187,13 @@ export default function UsersPage() {
     }
   };
 
-  const handleToggleStatus = async (id) => {
+  const handleToggleStatus = async (id, newStatus) => {
     const user = users.find(u => u.id === id);
     if (!user) return;
 
-    const nextStatus = user.status === "BANNED" ? "ACTIVE" : "BANNED";
-    
     try {
-      await updateUserStatus(id, nextStatus);
-      const updatedUser = { ...user, status: nextStatus };
+      await updateUserStatus(id, newStatus);
+      const updatedUser = { ...user, status: newStatus };
       setUsers(prev => prev.map(u => u.id === id ? updatedUser : u));
       if (detailPanel.isOpen && detailPanel.user?.id === id) {
         setDetailPanel(prev => ({ ...prev, user: updatedUser }));
@@ -232,8 +251,15 @@ export default function UsersPage() {
     }
   };
 
-  const handleBulkDelete = () => {
-    alert("Bulk delete users is not yet connected to the backend.");
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Are you sure you want to delete ${selectedIds.length} users?`)) return;
+    try {
+      await Promise.all(selectedIds.map(id => deleteUser(id)));
+      setUsers(prev => prev.filter(u => !selectedIds.includes(u.id)));
+      setSelectedIds([]);
+    } catch (err) {
+      alert("Failed to delete some users: " + err.message);
+    }
   };
 
   // Loading state
@@ -385,10 +411,8 @@ export default function UsersPage() {
                   Ban Users
                 </button>
                 <button 
-                  disabled
                   onClick={handleBulkDelete}
-                  className="px-3 py-1.5 text-xs font-medium text-white bg-red-400 opacity-70 cursor-not-allowed rounded"
-                  title="Bulk delete is not yet connected to backend"
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-red-600 rounded hover:bg-red-700 transition-colors"
                 >
                   Delete Selected
                 </button>
@@ -434,6 +458,7 @@ export default function UsersPage() {
         user={detailPanel.user}
         onClose={() => setDetailPanel({ isOpen: false, user: null })}
         onDelete={handleDelete}
+        onUpdateUsername={handleUpdateUsername}
         onToggleStatus={handleToggleStatus}
         onChangeRole={handleChangeRole}
         getRelativeTime={getRelativeTime}

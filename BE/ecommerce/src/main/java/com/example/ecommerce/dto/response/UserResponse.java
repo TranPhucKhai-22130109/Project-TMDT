@@ -17,6 +17,7 @@ public class UserResponse {
     private String username;
     private String email;
     private AccountStatus status;
+    private Boolean isDeleted;
     private List<String> roles;
     private Instant createdAt;
     private Instant updatedAt;

@@ -80,6 +80,7 @@ public class SellerProductController {
         product.setSeller(seller);
         product.setIsApproved(false);
         product.setIsDeleted(false);
+        product.setAuctionPaid(false);
 
         try {
             product.setImages(objectMapper.writeValueAsString(
@@ -217,7 +218,8 @@ public class SellerProductController {
                 product.getAuctionStartPrice(),
                 product.getAuctionStartTime(),
                 product.getAuctionEndTime(),
-                product.getCurrentPrice()
+                product.getCurrentPrice(),
+                Boolean.TRUE.equals(product.getAuctionPaid())
         );
     }
 

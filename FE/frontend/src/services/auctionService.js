@@ -18,3 +18,11 @@ export function placeBid(productId, amount) {
     body: JSON.stringify({ productId, amount }),
   });
 }
+
+export function getAuctionWinner(productId) {
+  return apiFetch(`/auction/${productId}/winner`);
+}
+
+export function getMyWonAuctions() {
+  return apiFetch("/auction/my-won");
+}

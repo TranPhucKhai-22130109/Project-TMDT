@@ -36,6 +36,8 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false, length = 255)
     private String password;
 
+    private Boolean isDeleted = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AccountStatus status = AccountStatus.ACTIVE;
