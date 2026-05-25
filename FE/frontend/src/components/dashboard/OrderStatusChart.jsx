@@ -4,11 +4,19 @@ import { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 
 const colorMap = {
+  // Class cũ để tương thích ngược
   "text-green-800": { hex: "#22c55e", bg: "bg-green-500" },
   "text-purple-800": { hex: "#a855f7", bg: "bg-purple-500" },
   "text-blue-800": { hex: "#3b82f6", bg: "bg-blue-500" },
   "text-yellow-800": { hex: "#eab308", bg: "bg-yellow-500" },
   "text-red-800": { hex: "#ef4444", bg: "bg-red-500" },
+
+  // Mã màu HEX trực tiếp từ Backend
+  "#10b981": { hex: "#10b981", bg: "bg-emerald-500" },
+  "#a855f7": { hex: "#a855f7", bg: "bg-purple-500" },
+  "#3b82f6": { hex: "#3b82f6", bg: "bg-blue-500" },
+  "#eab308": { hex: "#eab308", bg: "bg-yellow-500" },
+  "#ef4444": { hex: "#ef4444", bg: "bg-red-500" },
 };
 
 export default function OrderStatusChart({ data }) {
@@ -25,11 +33,11 @@ export default function OrderStatusChart({ data }) {
         <div className="bg-white p-3 rounded-lg shadow-md border border-gray-100 min-w-[120px]">
           <div className="font-bold text-gray-900 mb-1">{data.name}</div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Orders:</span>
+            <span className="text-gray-500">Đơn hàng:</span>
             <span className="font-medium text-gray-900">{data.value.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Share:</span>
+            <span className="text-gray-500">Tỉ trọng:</span>
             <span className="font-medium text-gray-900">{percentage}%</span>
           </div>
         </div>
@@ -40,7 +48,7 @@ export default function OrderStatusChart({ data }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
-      <h2 className="text-lg font-bold text-gray-900 mb-6">Order Status</h2>
+      <h2 className="text-lg font-bold text-gray-900 mb-6">Trạng thái đơn hàng</h2>
 
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6 flex-1">
         
@@ -70,7 +78,7 @@ export default function OrderStatusChart({ data }) {
           {/* Center Text */}
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
             <span className="text-2xl font-bold text-gray-900 leading-none mb-1">{totalOrders.toLocaleString()}</span>
-            <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Total Orders</span>
+            <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Tổng Đơn Hàng</span>
           </div>
         </div>
 

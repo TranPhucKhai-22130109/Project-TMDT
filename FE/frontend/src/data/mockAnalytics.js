@@ -1,9 +1,9 @@
 export const DATE_PRESETS = [
-  { label: "Today", value: "today" },
-  { label: "Last 7 days", value: "7days" },
-  { label: "Last 30 days", value: "30days" },
-  { label: "Last 6 months", value: "6months" },
-  { label: "This year", value: "year" }
+  { label: "Hôm nay", value: "today" },
+  { label: "7 ngày qua", value: "7days" },
+  { label: "30 ngày qua", value: "30days" },
+  { label: "6 tháng qua", value: "6months" },
+  { label: "Năm nay", value: "year" }
 ];
 
 export const statCards = [
