@@ -8,12 +8,12 @@ export default function RecentOrdersTable({ orders, onViewAll }) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
       {/* HEADER */}
       <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
-        <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
+        <h2 className="text-lg font-bold text-gray-900">Đơn hàng gần đây</h2>
         <button 
           onClick={onViewAll}
           className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1 transition-colors"
         >
-          View All <ArrowRight className="w-4 h-4" />
+          Xem tất cả <ArrowRight className="w-4 h-4" />
         </button>
       </div>
 
@@ -22,12 +22,12 @@ export default function RecentOrdersTable({ orders, onViewAll }) {
         <table className="w-full text-left text-sm whitespace-nowrap">
           <thead className="bg-gray-50 text-gray-500 border-b border-gray-100 hidden sm:table-header-group">
             <tr>
-              <th className="px-6 py-3 font-medium">Customer</th>
-              <th className="px-6 py-3 font-medium">Order ID</th>
-              <th className="px-6 py-3 font-medium">Items</th>
-              <th className="px-6 py-3 font-medium">Amount</th>
-              <th className="px-6 py-3 font-medium">Date</th>
-              <th className="px-6 py-3 font-medium text-right">Status</th>
+              <th className="px-6 py-3 font-medium">Khách hàng</th>
+              <th className="px-6 py-3 font-medium">Mã đơn hàng</th>
+              <th className="px-6 py-3 font-medium">Số lượng</th>
+              <th className="px-6 py-3 font-medium">Tổng tiền</th>
+              <th className="px-6 py-3 font-medium">Ngày đặt</th>
+              <th className="px-6 py-3 font-medium text-right">Trạng thái</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 bg-white">
@@ -49,10 +49,10 @@ export default function RecentOrdersTable({ orders, onViewAll }) {
                   <span className="font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">{order.orderId}</span>
                 </td>
                 <td className="px-6 py-4 text-gray-500">
-                  {order.itemCount} item{order.itemCount > 1 ? 's' : ''}
+                  {order.itemCount} sản phẩm
                 </td>
                 <td className="px-6 py-4 font-bold text-gray-900">
-                  ${order.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {Math.round(order.amount).toLocaleString("vi-VN")} đ
                 </td>
                 <td className="px-6 py-4 text-gray-500">
                   {order.date}
@@ -69,13 +69,13 @@ export default function RecentOrdersTable({ orders, onViewAll }) {
       {/* FOOTER */}
       <div className="p-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between shrink-0">
         <span className="text-sm text-gray-500 font-medium">
-          Showing <span className="font-bold text-gray-900">{orders.length}</span> of <span className="font-bold text-gray-900">1,284</span> orders
+          Hiển thị <span className="font-bold text-gray-900">{orders.length}</span> đơn hàng gần nhất
         </span>
         <button 
           onClick={onViewAll}
           className="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1"
         >
-          Go to Orders <ArrowRight className="w-4 h-4" />
+          Xem chi tiết đơn hàng <ArrowRight className="w-4 h-4" />
         </button>
       </div>
     </div>
