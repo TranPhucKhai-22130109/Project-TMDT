@@ -14,6 +14,7 @@ import {
     X,
     Trophy,
     ChevronDown,
+    Store,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/cart/CartContext";
@@ -24,6 +25,7 @@ import {
     updateCartItem,
     removeCartItem,
 } from "@/services/cartService";
+import { getMyProfile } from "@/services/userService";
 
 export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,10 +40,22 @@ export default function Navbar() {
     const router = useRouter();
     const [searchKeyword, setSearchKeyword] = useState("");
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+    const [navbarAvatar, setNavbarAvatar] = useState(null);
 
     useEffect(() => {
         if (isAuthenticated) {
             reloadCartCount();
+            
+            // Tải thông tin ảnh đại diện thực tế của user lên thanh Navbar
+            getMyProfile()
+                .then(data => {
+                    if (data && data.avatarUrl) {
+                        setNavbarAvatar(data.avatarUrl);
+                    }
+                })
+                .catch(err => console.error("Lỗi tải avatar trên Navbar:", err));
+        } else {
+            setNavbarAvatar(null);
         }
     }, [isAuthenticated]);
 
@@ -258,13 +272,17 @@ export default function Navbar() {
                                     <div className="relative">
                                         <button
                                             onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                                            className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-red-600 transition-colors px-3 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                                            className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:text-red-600 transition-colors px-2 py-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
                                         >
-                                            <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
-                                                <User className="w-4 h-4 text-red-600" />
+                                            <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-red-500/80 flex items-center justify-center bg-red-50 dark:bg-gray-800 text-red-600 font-bold shrink-0 shadow-sm">
+                                                {navbarAvatar ? (
+                                                    <img src={navbarAvatar} alt="Avatar" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User className="w-4 h-4 text-red-600" />
+                                                )}
                                             </div>
-                                            <span className="font-bold">{username || "User"}</span>
-                                            <ChevronDown className={`w-4 h-4 transition-transform ${userDropdownOpen ? "rotate-180" : ""}`} />
+                                            <span className="font-bold hidden md:inline">{username || "User"}</span>
+                                            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${userDropdownOpen ? "rotate-180" : ""}`} />
                                         </button>
 
                                         {userDropdownOpen && (
@@ -274,6 +292,23 @@ export default function Navbar() {
                                                     className="fixed inset-0 z-[45]"
                                                 />
                                                 <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 py-2 z-[50]">
+                                                    <NextLink
+                                                        href="/profile"
+                                                        onClick={() => setUserDropdownOpen(false)}
+                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                    >
+                                                        <User className="w-4 h-4 text-indigo-500" />
+                                                        Trang cá nhân
+                                                    </NextLink>
+                                                    <NextLink
+                                                        href="/dashboard"
+                                                        onClick={() => setUserDropdownOpen(false)}
+                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                    >
+                                                        <Store className="w-4 h-4 text-emerald-500" />
+                                                        Kênh người bán
+                                                    </NextLink>
+                                                    <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
                                                     <NextLink
                                                         href="/auctions/my-won"
                                                         onClick={() => setUserDropdownOpen(false)}
