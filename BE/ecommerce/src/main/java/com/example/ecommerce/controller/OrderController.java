@@ -3,32 +3,42 @@ package com.example.ecommerce.controller;
 import com.example.ecommerce.dto.request.auth.CheckoutRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.OrderResponse;
+import com.example.ecommerce.entity.Order;
+import com.example.ecommerce.entity.Payment;
+import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.enums.PaymentMethod;
+import com.example.ecommerce.enums.PaymentStatus;
 import com.example.ecommerce.exception.AppException;
+import com.example.ecommerce.exception.ErrorCode;
+import com.example.ecommerce.repository.OrderRepository;
+import com.example.ecommerce.repository.PaymentRepository;
 import com.example.ecommerce.service.OrderService;
 import com.example.ecommerce.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/v1/orders")
+@RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class OrderController {
 
     private final OrderService orderService;
     private final VNPayService vnPayService;
+    private final OrderRepository orderRepository;
+    private final PaymentRepository paymentRepository;
 
     /**
-     * 1. API ĐẶT HÀNG (Gọi chính xác hàm checkout của OrderService)
+     * 1. API ĐẶT HÀNG (Checkout)
      */
     @PostMapping("/checkout")
     public ResponseEntity<ApiResponse<OrderResponse>> checkout(
@@ -38,75 +48,64 @@ public class OrderController {
 
         try {
             String userId = principal.getName();
+            OrderResponse order = orderService.checkout(userId, request);
 
-            // Lấy IP Address và chuẩn hóa từ IPv6 về IPv4 khi chạy localhost
-            String ipAddress = httpRequest.getRemoteAddr();
-            if (ipAddress == null || ipAddress.equals("0:0:0:0:0:0:0:1")) {
-                ipAddress = "127.0.0.1";
+            // Nếu thanh toán ONLINE qua VNPay, tạo URL thanh toán
+            if (request.getPaymentMethod() == PaymentMethod.ONLINE) {
+                String ipAddress = httpRequest.getRemoteAddr();
+                String paymentUrl = vnPayService.createPaymentUrl(order.getId(), ipAddress);
+                order.setPaymentUrl(paymentUrl);
             }
-
-            // 🛠️ SỬA TẠI ĐÂY: Gọi đúng hàm checkout(userId, request, ipAddress) từ
-            // OrderService của bạn
-            OrderResponse orderResponse = orderService.checkout(userId, request, ipAddress);
 
             return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
                     .success(true)
                     .code("ORDER_CREATED")
                     .message("Đặt hàng thành công")
-                    .data(orderResponse)
+                    .data(order)
                     .build());
-
         } catch (AppException e) {
             throw e;
+        }
+    }
+
+    /**
+     * 2. API CALLBACK VNPAY
+     * Trả về JSON để Frontend (Next.js) nhận biết trạng thái và tự xử lý giao diện
+     */
+    @GetMapping("/vnpay-callback")
+    public ResponseEntity<ApiResponse<String>> vnpayCallback(HttpServletRequest request) {
+        try {
+            Map<String, String> params = new HashMap<>();
+            request.getParameterMap().forEach((k, v) -> params.put(k, v[0]));
+
+            // Xử lý callback (Bạn đã ép luôn thành công trong VNPayService)
+            vnPayService.processCallback(params);
+
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .success(true)
+                    .code("PAYMENT_VERIFIED")
+                    .message("Xác thực thanh toán thành công")
+                    .build());
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(ApiResponse.<OrderResponse>builder()
+            System.err.println("Lỗi xử lý callback VNPay: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<String>builder()
                             .success(false)
-                            .code("ORDER_FAILED")
-                            .message("Đặt hàng thất bại: " + e.getMessage())
+                            .code("PAYMENT_FAILED")
+                            .message("Lỗi xử lý thanh toán: " + e.getMessage())
                             .build());
         }
     }
 
     /**
-     * 2. API CALLBACK ĐÓN KẾT QUẢ TỪ VNPAY ĐỂ ĐIỀU HƯỚNG TRÌNH DUYỆT
-     */
-    @GetMapping("/vnpay-callback")
-    public ResponseEntity<?> vnpayCallback(@RequestParam Map<String, String> params) {
-        String frontendUrl = "http://localhost:3000";
-        String redirectUrl = "";
-
-        try {
-            var callbackResult = vnPayService.handleCallback(params);
-
-            if (callbackResult.isSuccess()) {
-                // Điều hướng về trang chi tiết đơn hàng của Next.js kèm param thành công
-                redirectUrl = frontendUrl + "/orders/" + callbackResult.getOrderId() + "?payment=success";
-            } else {
-                redirectUrl = frontendUrl + "/checkout?payment=cancelled";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            redirectUrl = frontendUrl + "/checkout?payment=error";
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create(redirectUrl));
-        return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    }
-
-    /**
-     * 3. API LẤY CHI TIẾT ĐƠN HÀNG THEO ID DON HANG
+     * 3. API LẤY CHI TIẾT ĐƠN HÀNG THEO ID
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<OrderResponse>> getOrderDetail(
             @PathVariable String id,
             Principal principal) {
 
-        // 🛠️ SỬA TẠI ĐÂY: Đổi đúng thứ tự truyền tham số là (userId, orderId) tương
-        // ứng (principal.getName(), id)
         OrderResponse order = orderService.getOrderDetail(principal.getName(), id);
 
         return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
@@ -128,6 +127,18 @@ public class OrderController {
                 .code("HISTORY_FETCHED")
                 .message("Lấy lịch sử đơn hàng thành công")
                 .data(history)
+                .build());
+    }
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse<OrderResponse>> cancelOrder(
+            @PathVariable String id,
+            Principal principal) {
+        OrderResponse order = orderService.cancelOrder(principal.getName(), id);
+        return ResponseEntity.ok(ApiResponse.<OrderResponse>builder()
+                .success(true)
+                .code("ORDER_CANCELLED")
+                .message("Hủy đơn hàng thành công")
+                .data(order)
                 .build());
     }
 }

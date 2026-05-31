@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,6 +27,7 @@ import java.util.Arrays;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final UserDetailServiceCustomize userDetailsService;
 
     @Bean
@@ -35,16 +35,35 @@ public class SecurityConfig {
         res.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
+                        // VNPay callback - không cần xác thực
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/vnpay-callback").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/orders/vnpay-callback").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/payments/vnpay-callback").permitAll()
+
+                        // Auth - public
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/v1/auth/**").permitAll()
+
+                        // Products - public
+                        .requestMatchers("/api/v1/products/**").permitAll()
                         .requestMatchers("/v1/products/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll() // để tạm sửa lại sau
+                        .requestMatchers("/api/products/**").permitAll()
+
+                        // Auction
                         .requestMatchers("/api/auction/bid").authenticated()
                         .requestMatchers("/api/auction/**").permitAll()
+
+                        // Admin
                         .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
+
+                        // Tất cả còn lại yêu cầu xác thực
                         .anyRequest().authenticated())
-                .oauth2ResourceServer(
-                        oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
+                .oauth2ResourceServer(oauth -> oauth
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .bearerTokenResolver(bearerTokenResolver())
+                );
 
         return res.build();
     }
@@ -72,7 +91,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
-
         return new ProviderManager(authenticationProvider);
     }
 
