@@ -34,9 +34,9 @@ const colorStyles = {
 export default function ActivityFeed({ activities }) {
   // Simple parser to highlight Order IDs, items in quotes, and prices
   const highlightMessage = (msg) => {
-    const parts = msg.split(/(#ORD-\d+|'[^']+'|\$[0-9,.]+)/g);
+    const parts = msg.split(/(#[A-Za-z0-9-]+|'[^']+'|\$[0-9,.]+|[0-9,.]+\s*(?:đ|VND))/gi);
     return parts.map((part, index) => {
-      if (/(#ORD-\d+|'[^']+'|\$[0-9,.]+)/.test(part)) {
+      if (/(#[A-Za-z0-9-]+|'[^']+'|\$[0-9,.]+|[0-9,.]+\s*(?:đ|VND))/i.test(part)) {
         return <span key={index} className="font-bold text-gray-900">{part.replace(/'/g, '')}</span>;
       }
       return part;
@@ -49,9 +49,9 @@ export default function ActivityFeed({ activities }) {
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 flex flex-col h-full overflow-hidden">
       {/* HEADER */}
       <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
-        <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
+        <h2 className="text-lg font-bold text-gray-900">Hoạt động gần đây</h2>
         <span className="px-2.5 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-bold rounded-full">
-          {unreadCount} new
+          {unreadCount} mới
         </span>
       </div>
 
@@ -98,7 +98,7 @@ export default function ActivityFeed({ activities }) {
       {/* FOOTER */}
       <div className="p-3 border-t border-gray-100 bg-white shrink-0 text-center">
         <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors w-full">
-          Load more activity
+          Tải thêm hoạt động
         </button>
       </div>
     </div>
