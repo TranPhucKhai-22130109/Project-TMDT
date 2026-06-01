@@ -18,9 +18,10 @@ function VNPayCallbackContent() {
                 setOrderId(txnRef);
                 const queryString = window.location.search;
 
+                // Gọi API backend để verify chữ ký (checksum) và cập nhật trạng thái đơn hàng
                 const response = await fetch(`http://localhost:8080/api/v1/orders/vnpay-callback${queryString}`, {
                     method: 'GET',
-                    credentials: 'include', // dùng cookie thay vì localStorage token
+                    credentials: 'include', // Sử dụng cookie nếu backend yêu cầu định danh
                 });
 
                 if (response.ok) {
@@ -81,7 +82,7 @@ function VNPayCallbackContent() {
                                 href={`/orders/${orderId}?vnpay=success`}
                                 className="flex w-full items-center justify-center rounded-xl bg-[#1e293b] py-3.5 text-[15px] font-semibold text-white hover:bg-[#0f172a] transition-all shadow-sm"
                             >
-                                <span className="mr-2"></span> Xem chi tiết đơn hàng vừa đặt
+                                Xem chi tiết đơn hàng vừa đặt
                             </Link>
                             <Link
                                 href="/products"
@@ -109,7 +110,7 @@ function VNPayCallbackContent() {
 
                         <div className="mt-9 space-y-3">
                             <Link href="/cart" className="block w-full rounded-xl bg-red-600 py-3.5 text-[15px] font-semibold text-white hover:bg-red-700 transition-all">
-                                 Quay lại giỏ hàng để thử lại
+                                Quay lại giỏ hàng để thử lại
                             </Link>
                         </div>
                     </>
