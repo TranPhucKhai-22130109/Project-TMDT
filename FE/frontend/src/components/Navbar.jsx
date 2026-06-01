@@ -317,6 +317,20 @@ export default function Navbar() {
                                                         <Trophy className="w-4 h-4 text-yellow-500" />
                                                         Đấu giá đã thắng
                                                     </NextLink>
+
+                                                    {/* --- NÚT LỊCH SỬ ĐẶT HÀNG MỚI ĐƯỢC CHÈN VÀO ĐÂY --- */}
+                                                    <NextLink
+                                                        href="/orders"
+                                                        onClick={() => setUserDropdownOpen(false)}
+                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                                        </svg>
+                                                        Lịch sử đặt hàng
+                                                    </NextLink>
+                                                    {/* ------------------------------------------------ */}
+
                                                     <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
                                                     <button
                                                         onClick={() => {

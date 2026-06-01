@@ -3,5 +3,6 @@ package com.example.ecommerce.enums;
 public enum PaymentStatus {
     UNPAID,
     PAID,
-    REFUNDED
+    REFUNDED,
+    FAILED
 }

@@ -14,8 +14,8 @@ import com.example.ecommerce.enums.ProductStatus;
 import com.example.ecommerce.exception.AppException;
 import com.example.ecommerce.exception.ErrorCode;
 import com.example.ecommerce.repository.AuctionBidRepository;
+import com.example.ecommerce.repository.CartItemRepository;
 import com.example.ecommerce.repository.OrderRepository;
-import com.example.ecommerce.repository.PaymentRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +31,13 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    private final PaymentRepository paymentRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final AuctionBidRepository auctionBidRepository;
-    private final VNPayService vnPayService;
+    private final CartItemRepository cartItemRepository;
 
     @Transactional
-    public OrderResponse checkout(String userId, CheckoutRequest request, String ipAddress) {
+    public OrderResponse checkout(String userId, CheckoutRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -52,101 +51,71 @@ public class OrderService {
                 .paymentMethod(request.getPaymentMethod())
                 .status(OrderStatus.PENDING)
                 .paymentStatus(PaymentStatus.UNPAID)
-                .totalAmount(0.0)
-                .items(new ArrayList<>()) // BẢO VỆ KHỎI LỖI NULL TẠI ĐÂY
+                .items(new ArrayList<>())
                 .build();
 
-        Order savedOrder = orderRepository.save(order);
-
-        List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0;
 
-        for (CheckoutRequest.OrderItemRequest itemReq : request.getItems()) {
-            Product product = productRepository.findById(itemReq.getProductId())
+        for (CheckoutRequest.OrderItemRequest itemRequest : request.getItems()) {
+            Product product = productRepository.findById(itemRequest.getProductId())
                     .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-            double unitPrice = resolveCheckoutUnitPrice(product, user.getId(), itemReq.getQuantity());
 
-            OrderItem item = OrderItem.builder()
-                    .order(savedOrder)
+            double price = product.getPrice() != null ? product.getPrice() : 0.0;
+
+            if (product.getIsAuction() != null && product.getIsAuction()) {
+                price = validateAndGetAuctionPrice(product, userId, itemRequest.getQuantity());
+            } else {
+                if (product.getStockQuantity() != null && product.getStockQuantity() < itemRequest.getQuantity()) {
+                    throw new AppException(ErrorCode.VALIDATION_ERROR);
+                }
+                product.setStockQuantity(product.getStockQuantity() - itemRequest.getQuantity());
+                productRepository.save(product);
+            }
+
+            double subtotal = price * itemRequest.getQuantity();
+            totalAmount += subtotal;
+
+            OrderItem orderItem = OrderItem.builder()
+                    .order(order)
                     .product(product)
-                    .quantity(itemReq.getQuantity())
-                    .unitPrice(unitPrice)
+                    .quantity(itemRequest.getQuantity())
+                    .unitPrice(price)
                     .build();
 
-            orderItems.add(item);
-            totalAmount += unitPrice * itemReq.getQuantity();
+            order.getItems().add(orderItem);
         }
 
         double shippingFee = 50000.0;
-        totalAmount += shippingFee;
-        // ========================================================
+        order.setTotalAmount(totalAmount + shippingFee);
+        // ------------------------------------------------------------------
 
-        // Chắc chắn 100% không bao giờ bị NPE nữa
-        if (savedOrder.getItems() == null) {
-            savedOrder.setItems(new ArrayList<>());
+        Order savedOrder = orderRepository.save(order);
+        if (request.getPaymentMethod() == PaymentMethod.COD) {
+            cartItemRepository.deleteByUserId(userId);
         }
-        savedOrder.getItems().addAll(orderItems);
-        savedOrder.setTotalAmount(totalAmount);
-
-        savedOrder = orderRepository.save(savedOrder);
-
-        OrderResponse response = OrderResponse.from(savedOrder);
-
-        // Thanh toán Online → tạo URL VNPay thật
-        if (request.getPaymentMethod() == PaymentMethod.ONLINE) {
-            String paymentUrl = vnPayService.createPaymentUrl(savedOrder.getId(), ipAddress);
-            response.setPaymentUrl(paymentUrl);
+        // Xóa toàn bộ giỏ hàng của user sau khi checkout thành công
+        try {
+            cartItemRepository.deleteByUserId(userId);
+        } catch (Exception e) {
+            System.err.println("Lỗi khi xóa giỏ hàng sau checkout: " + e.getMessage());
         }
 
-        return response;
+        return OrderResponse.from(savedOrder);
     }
 
-    @Transactional(readOnly = true)
-    public List<OrderResponse> getOrderHistory(String userId) {
-        return orderRepository.findByUserIdWithItems(userId)
-                .stream()
-                .map(OrderResponse::from)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public OrderResponse getOrderDetail(String userId, String orderId) {
-        Order order = orderRepository.findByIdWithItems(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-
-        if (!order.getUser().getId().equals(userId)) {
-            throw new AppException(ErrorCode.FORBIDDEN);
-        }
-
-        return OrderResponse.from(order);
-    }
-
-    private double resolveCheckoutUnitPrice(Product product, String userId, Integer quantity) {
-        if (!Boolean.TRUE.equals(product.getIsAuction())) {
-            return product.getPrice();
-        }
-
-        validateAuctionCheckout(product, userId, quantity);
-
-        return product.getCurrentPrice().doubleValue();
-    }
-
-    private void validateAuctionCheckout(Product product, String userId, Integer quantity) {
+    private double validateAndGetAuctionPrice(Product product, String userId, Integer quantity) {
         if (quantity == null || quantity != 1) {
             throw new AppException(ErrorCode.INVALID_AUCTION_QUANTITY);
         }
-
         if (Boolean.TRUE.equals(product.getAuctionPaid())) {
             throw new AppException(ErrorCode.AUCTION_ALREADY_PAID);
         }
-
         if (product.getStatus() == ProductStatus.OPEN
                 && product.getAuctionEndTime() != null
                 && !LocalDateTime.now().isBefore(product.getAuctionEndTime())) {
             product.setStatus(ProductStatus.ENDED);
             productRepository.save(product);
         }
-
         if (product.getStatus() != ProductStatus.ENDED) {
             throw new AppException(ErrorCode.AUCTION_NOT_ENDED);
         }
@@ -158,12 +127,55 @@ public class OrderService {
         if (!winningBid.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.AUCTION_NOT_WINNER);
         }
-
         if (product.getCurrentPrice() == null) {
             throw new AppException(ErrorCode.VALIDATION_ERROR);
         }
 
         product.setAuctionPaid(true);
         productRepository.save(product);
+
+        return product.getCurrentPrice().doubleValue();
+    }
+
+    @Transactional(readOnly = true)
+    public OrderResponse getOrderDetail(String userId, String orderId) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+        return OrderResponse.from(order);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getOrderHistory(String userId) {
+        List<Order> orders = orderRepository.findByUserIdWithItems(userId);
+        return orders.stream().map(OrderResponse::from).toList();
+    }
+    @Transactional
+    public OrderResponse cancelOrder(String userId, String orderId) {
+        Order order = orderRepository.findByIdWithItems(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
+        if (!order.getUser().getId().equals(userId)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING && order.getStatus() != OrderStatus.CONFIRMED) {
+            throw new AppException(ErrorCode.VALIDATION_ERROR);
+        }
+
+        // Hoàn lại stock
+        for (OrderItem item : order.getItems()) {
+            Product product = item.getProduct();
+            if (product.getStockQuantity() != null) {
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                productRepository.save(product);
+            }
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        return OrderResponse.from(orderRepository.save(order));
     }
 }

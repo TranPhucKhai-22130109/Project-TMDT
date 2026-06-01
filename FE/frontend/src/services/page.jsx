@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import NextLink from "next/link";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { checkout } from "@/services/orderService";
+import { checkout } from "@/services/order";
 import { getCartItems } from "@/services/cartService";
 import Navbar from "@/components/Navbar";
 import {
