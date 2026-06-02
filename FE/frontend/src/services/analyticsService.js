@@ -4,8 +4,12 @@ function getRevenueChartData(period) {
   return apiFetch(`/seller/analytics/revenue?period=${period}`);
 }
 
-function getCategoryRevenueData(period = "all") {
-  return apiFetch(`/seller/analytics/category-revenue?period=${period}`);
+function getCategoryRevenueData(period = "all", startDate = null, endDate = null) {
+  let url = `/seller/analytics/category-revenue?period=${period}`;
+  if (period === "custom" && startDate && endDate) {
+    url += `&startDate=${startDate}&endDate=${endDate}`;
+  }
+  return apiFetch(url);
 }
 
 function getStatCardsData(period = "year") {

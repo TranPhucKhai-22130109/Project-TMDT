@@ -31,6 +31,8 @@ export default function DashboardPage() {
   const router = useRouter();
   const [activePeriod, setActivePeriod] = useState("year");
   const [categoryPeriod, setCategoryPeriod] = useState("all"); // 🟢 Quản lý bộ lọc của biểu đồ tròn Donut
+  const [categoryStartDate, setCategoryStartDate] = useState("");
+  const [categoryEndDate, setCategoryEndDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const [realStatCards, setRealStatCards] = useState([]);
@@ -59,14 +61,17 @@ export default function DashboardPage() {
 
   // 2. useEffect nạp dữ liệu biểu đồ doanh thu xe (Donut) theo kỳ lọc
   useEffect(() => {
+    if (categoryPeriod === "custom" && (!categoryStartDate || !categoryEndDate)) {
+      return;
+    }
     setIsLoading(true);
-    analyticsService.getCategoryRevenueData(categoryPeriod)
+    analyticsService.getCategoryRevenueData(categoryPeriod, categoryStartDate, categoryEndDate)
       .then((categories) => {
         setRealTopProducts(categories);
       })
       .catch(err => console.error("Lỗi nạp dữ liệu tỉ lệ xe:", err))
       .finally(() => setIsLoading(false));
-  }, [categoryPeriod]);
+  }, [categoryPeriod, categoryStartDate, categoryEndDate]);
 
   // 3. useEffect nạp dữ liệu biểu đồ cột doanh thu VÀ thẻ số liệu Stats khi đổi mốc thời gian lọc
   useEffect(() => {
@@ -165,7 +170,13 @@ export default function DashboardPage() {
             <TopProductsChart 
               data={realTopProducts} 
               activePeriod={categoryPeriod} 
-              onPeriodChange={setCategoryPeriod} 
+              onPeriodChange={(period, start = "", end = "") => {
+                setCategoryPeriod(period);
+                setCategoryStartDate(start);
+                setCategoryEndDate(end);
+              }} 
+              startDate={categoryStartDate}
+              endDate={categoryEndDate}
             />
           </div>
           <div className="h-full">

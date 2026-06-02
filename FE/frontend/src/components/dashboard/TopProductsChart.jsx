@@ -27,8 +27,17 @@ const PERIOD_OPTIONS = [
   { value: "year", label: "Năm nay" }
 ];
 
-export default function TopProductsChart({ data, activePeriod = "all", onPeriodChange }) {
+export default function TopProductsChart({ data, activePeriod = "all", onPeriodChange, startDate, endDate }) {
   const [activeMetric, setActiveMetric] = useState("revenue");
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [tempStartDate, setTempStartDate] = useState(startDate || "");
+  const [tempEndDate, setTempEndDate] = useState(endDate || "");
+
+  const formatDisplayDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}`;
+  };
 
   // Tính tổng doanh thu thực tế trong kỳ lọc từ DB
   const totalRevenue = useMemo(() => {
@@ -90,21 +99,93 @@ export default function TopProductsChart({ data, activePeriod = "all", onPeriodC
           <p className="text-xs text-gray-500 mt-0.5">Phân tích thị phần doanh số theo phân loại tỉ lệ mô hình</p>
         </div>
 
-        {/* PERIOD SELECTOR BUTTONS */}
-        <div className="flex items-center gap-1 p-1 bg-gray-50 rounded-xl border border-gray-100 self-start">
-          {PERIOD_OPTIONS.map((opt) => (
+        {/* PERIOD SELECTOR BUTTONS & CALENDAR */}
+        <div className="relative self-start">
+          <div className="flex items-center gap-1 p-1 bg-gray-50 rounded-xl border border-gray-100">
+            {PERIOD_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => {
+                  setIsDatePickerOpen(false);
+                  onPeriodChange && onPeriodChange(opt.value);
+                }}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
+                  activePeriod === opt.value
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+
+            {/* Custom Date Picker Toggle Button */}
             <button
-              key={opt.value}
-              onClick={() => onPeriodChange && onPeriodChange(opt.value)}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 ${
-                activePeriod === opt.value
+              onClick={() => {
+                setTempStartDate(startDate || "");
+                setTempEndDate(endDate || "");
+                setIsDatePickerOpen(!isDatePickerOpen);
+              }}
+              className={`px-2.5 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 ${
+                activePeriod === "custom"
                   ? "bg-indigo-600 text-white shadow-sm"
                   : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
               }`}
+              title="Chọn khoảng ngày tùy chỉnh"
             >
-              {opt.label}
+              <Calendar className="w-3.5 h-3.5" />
+              {activePeriod === "custom" && startDate && endDate ? (
+                <span className="text-[10px] font-bold">{formatDisplayDate(startDate)} - {formatDisplayDate(endDate)}</span>
+              ) : null}
             </button>
-          ))}
+          </div>
+
+          {/* Date Picker Popover */}
+          {isDatePickerOpen && (
+            <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-4 z-50 min-w-[260px]">
+              <h3 className="font-semibold text-gray-800 text-xs mb-3">Chọn khoảng thời gian</h3>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-[10px] font-medium text-gray-400 mb-1">Từ ngày</label>
+                  <input
+                    type="date"
+                    value={tempStartDate}
+                    onChange={(e) => setTempStartDate(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 focus:outline-none focus:border-indigo-500 text-gray-700 font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-medium text-gray-400 mb-1">Đến ngày</label>
+                  <input
+                    type="date"
+                    value={tempEndDate}
+                    onChange={(e) => setTempEndDate(e.target.value)}
+                    className="w-full px-2.5 py-1.5 text-xs rounded-lg border border-gray-200 focus:outline-none focus:border-indigo-500 text-gray-700 font-medium"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-50">
+                <button
+                  onClick={() => setIsDatePickerOpen(false)}
+                  className="px-2.5 py-1.5 text-xs font-semibold text-gray-500 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={() => {
+                    if (tempStartDate && tempEndDate) {
+                      setIsDatePickerOpen(false);
+                      onPeriodChange && onPeriodChange("custom", tempStartDate, tempEndDate);
+                    }
+                  }}
+                  disabled={!tempStartDate || !tempEndDate}
+                  className="px-2.5 py-1.5 text-xs font-semibold bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Áp dụng
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -173,9 +254,11 @@ export default function TopProductsChart({ data, activePeriod = "all", onPeriodC
               ? `${Math.round(totalRevenue).toLocaleString("vi-VN")} đ`
               : `${totalSold.toLocaleString("vi-VN")} chiếc`}
           </span>
-          <span className="text-[10px] font-medium text-indigo-500 mt-1 flex items-center gap-0.5">
+          <span className="text-[10px] font-semibold text-indigo-500 mt-1 flex items-center gap-0.5">
             <Calendar className="w-3 h-3" />
-            {PERIOD_OPTIONS.find((o) => o.value === activePeriod)?.label || "Tất cả"}
+            {activePeriod === "custom" && startDate && endDate
+              ? `${formatDisplayDate(startDate)} - ${formatDisplayDate(endDate)}`
+              : (PERIOD_OPTIONS.find((o) => o.value === activePeriod)?.label || "Tất cả")}
           </span>
         </div>
       </div>
