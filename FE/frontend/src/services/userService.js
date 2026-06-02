@@ -118,3 +118,15 @@ export async function updateMyShop(shopData) {
   }
   return data.data;
 }
+
+export async function getUserProfileById(userId) {
+  const res = await fetch(`${AUTH_BASE}/api/users/${userId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to load profile");
+  }
+  return data.data;
+}

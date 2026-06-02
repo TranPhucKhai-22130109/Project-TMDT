@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -21,4 +22,12 @@ public class UserResponse {
     private List<String> roles;
     private Instant createdAt;
     private Instant updatedAt;
+    private String avatarUrl;
+    private String phoneNumber;
+    private String fullName;
+    private String gender;
+    private LocalDate dateOfBirth;
+    private String shopName;
+    private String shopCoverUrl;
+    private String shopDescription;
 }

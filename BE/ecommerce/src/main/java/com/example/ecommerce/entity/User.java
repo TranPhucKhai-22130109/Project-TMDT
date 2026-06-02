@@ -1,6 +1,5 @@
 package com.example.ecommerce.entity;
 
-
 import com.example.ecommerce.enums.AccountStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +50,25 @@ public class User extends BaseEntity implements UserDetails {
 
     @Column(nullable = true, length = 25)
     private String phoneNumber;
+
+    @Column(nullable = true, length = 100)
+    private String fullName;
+
+    @Column(nullable = true, length = 10)
+    private String gender;
+
+    @Column(nullable = true)
+    private LocalDate dateOfBirth;
+
+    // Seller fields
+    @Column(nullable = true, length = 100)
+    private String shopName;
+
+    @Column(nullable = true, length = 255)
+    private String shopCoverUrl;
+
+    @Column(columnDefinition = "TEXT")
+    private String shopDescription;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

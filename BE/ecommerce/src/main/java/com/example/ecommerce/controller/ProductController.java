@@ -288,4 +288,12 @@ public class ProductController {
 
         return Map.of("message", "Delete product successfully");
     }
+
+    @GetMapping("/seller/{sellerId}")
+    public List<ProductResponse> getProductsBySellerId(@PathVariable String sellerId) {
+        return productRepository.findBySellerIdAndIsDeletedFalse(sellerId)
+                .stream()
+                .map(this::toProductResponse)
+                .toList();
+    }
 }

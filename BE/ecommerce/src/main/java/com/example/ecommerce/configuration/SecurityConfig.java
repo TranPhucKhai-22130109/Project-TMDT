@@ -42,6 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auction/**").permitAll()
                         .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/seller/**").hasRole("SELLER")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
