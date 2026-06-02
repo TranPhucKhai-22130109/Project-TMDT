@@ -64,6 +64,25 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             nativeQuery = true)
     List<TopCategoryDTO> getRevenueByCategory(@Param("sellerId") String sellerId, @Param("period") String period);
 
+    // Biểu đồ tròn doanh thu theo Tỉ lệ xe (Khoảng ngày tùy chỉnh)
+    @Query(value = "SELECT " +
+            "  p.scale AS name, " +
+            "  COUNT(i.id) AS sold, " +
+            "  CAST(SUM(i.quantity * i.unit_price) AS DECIMAL(10,2)) AS revenue " +
+            "FROM orders o " +
+            "JOIN order_items i ON o.id = i.order_id " +
+            "JOIN product p ON i.product_id = p.id " +
+            "WHERE o.status = 'DELIVERED' " +
+            "  AND p.seller_id = :sellerId " +
+            "  AND o.created_at >= :startDate " +
+            "  AND o.created_at <= :endDate " +
+            "GROUP BY p.scale",
+            nativeQuery = true)
+    List<TopCategoryDTO> getRevenueByCategoryAndCustomRange(
+            @Param("sellerId") String sellerId,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
+
         // Lấy thống kê tổng quan (Lọc theo Seller đăng nhập và kỳ thời gian lọc)
         @Query(value = "SELECT " +
                 "  COALESCE(SUM(i.quantity * i.unit_price), 0) as totalRevenue, " +

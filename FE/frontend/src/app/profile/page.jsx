@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   User as UserIcon,
   MapPin,
@@ -13,7 +13,11 @@ import {
   Check,
   Loader2,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Package,
+  Search,
+  SlidersHorizontal,
+  ArrowUpDown
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -27,11 +31,18 @@ import {
   getMyAddresses,
   addMyAddress,
   updateMyAddress,
-  deleteMyAddress
+  deleteMyAddress,
+  getUserProfileById
 } from "@/services/userService";
+import { getAllProducts } from "@/services/sellerProductService";
+import { getProductsBySellerId } from "@/services/productService";
 
-export default function UserProfilePage() {
+function UserProfilePageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sellerId = searchParams.get("sellerId");
+  const isViewOnly = !!sellerId;
+
   const { isAuthenticated, isLoading: authLoading, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("personal");
 
@@ -64,6 +75,15 @@ export default function UserProfilePage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Seller products states
+  const [sellerProducts, setSellerProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(false);
+  const [productSearch, setProductSearch] = useState("");
+  const [scaleFilter, setScaleFilter] = useState("all");
+  const [marqueFilter, setMarqueFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all"); // 'all', 'buy-now', 'auction'
+  const [sortBy, setSortBy] = useState("newest"); // 'newest', 'price-asc', 'price-desc', 'sold-desc'
+
   // UI Toast notifications
   const [toast, setToast] = useState(null);
 
@@ -76,7 +96,7 @@ export default function UserProfilePage() {
   const fetchProfile = async () => {
     try {
       setProfileLoading(true);
-      const data = await getMyProfile();
+      const data = isViewOnly ? await getUserProfileById(sellerId) : await getMyProfile();
       setProfile(data);
       setFullName(data.fullName || "");
       setPhoneNumber(data.phoneNumber || "");
@@ -93,6 +113,7 @@ export default function UserProfilePage() {
 
   // Load User Addresses
   const fetchAddresses = async () => {
+    if (isViewOnly) return;
     try {
       setAddressesLoading(true);
       const list = await getMyAddresses();
@@ -109,13 +130,61 @@ export default function UserProfilePage() {
     if (isAuthenticated) {
       fetchProfile();
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, sellerId, isViewOnly]);
+
+  useEffect(() => {
+    setActiveTab("personal");
+  }, [sellerId]);
 
   useEffect(() => {
     if (isAuthenticated && activeTab === "addresses") {
       fetchAddresses();
     }
   }, [isAuthenticated, activeTab]);
+
+  // Load Seller Products
+  const fetchSellerProducts = async () => {
+    try {
+      setProductsLoading(true);
+      const data = isViewOnly ? await getProductsBySellerId(sellerId) : await getAllProducts();
+      setSellerProducts(data || []);
+    } catch (err) {
+      console.error(err);
+      showToast("Không thể tải danh sách sản phẩm", "error");
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && activeTab === "my-products") {
+      fetchSellerProducts();
+    }
+  }, [isAuthenticated, activeTab]);
+
+  // Extract unique marques and scales from products
+  const availableMarques = ["all", ...new Set(sellerProducts.map(p => p.marque).filter(Boolean))];
+  const availableScales = ["all", ...new Set(sellerProducts.map(p => p.scale).filter(Boolean))];
+
+  // In-memory filtering and sorting
+  const filteredProducts = sellerProducts
+    .filter(p => {
+      const matchesSearch = !productSearch || 
+                            p.name?.toLowerCase().includes(productSearch.toLowerCase()) || 
+                            p.itemNo?.toLowerCase().includes(productSearch.toLowerCase());
+      const matchesScale = scaleFilter === "all" || p.scale === scaleFilter;
+      const matchesMarque = marqueFilter === "all" || p.marque === marqueFilter;
+      const matchesType = typeFilter === "all" || 
+                          (typeFilter === "auction" && p.isAuction) || 
+                          (typeFilter === "buy-now" && !p.isAuction);
+      return matchesSearch && matchesScale && matchesMarque && matchesType;
+    })
+    .sort((a, b) => {
+      if (sortBy === "price-asc") return a.price - b.price;
+      if (sortBy === "price-desc") return b.price - a.price;
+      if (sortBy === "sold-desc") return b.soldQuantity - a.soldQuantity;
+      return b.id - a.id; // default: newest
+    });
 
   // Handle Avatar Change
   const handleAvatarChange = async (e) => {
@@ -311,8 +380,8 @@ export default function UserProfilePage() {
             <aside className="w-full md:w-80 shrink-0 bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 self-start transition-all">
               <div className="flex flex-col items-center pb-6 border-b border-gray-100 dark:border-gray-800 mb-6">
                 <div 
-                  onClick={() => !uploading && fileInputRef.current?.click()}
-                  className="relative group cursor-pointer"
+                  onClick={() => !isViewOnly && !uploading && fileInputRef.current?.click()}
+                  className={`relative group ${isViewOnly ? "" : "cursor-pointer"}`}
                 >
                   <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-indigo-50 dark:border-indigo-950 shadow-md">
                     {avatarUrl ? (
@@ -324,13 +393,15 @@ export default function UserProfilePage() {
                     )}
                   </div>
                   
-                  <div className="absolute inset-0 bg-black/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    {uploading ? (
-                      <Loader2 className="w-7 h-7 text-white animate-spin" />
-                    ) : (
-                      <Camera className="w-7 h-7 text-white" />
-                    )}
-                  </div>
+                  {!isViewOnly && (
+                    <div className="absolute inset-0 bg-black/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      {uploading ? (
+                        <Loader2 className="w-7 h-7 text-white animate-spin" />
+                      ) : (
+                        <Camera className="w-7 h-7 text-white" />
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <input 
@@ -345,9 +416,19 @@ export default function UserProfilePage() {
                   {profile?.fullName || profile?.username || "Người dùng"}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">@{profile?.username}</p>
-                <div className="mt-3 flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-full">
-                  User Account
-                </div>
+                {profile?.roles && profile.roles.length > 0 ? (
+                  <div className="flex flex-wrap gap-1 mt-3 justify-center">
+                    {profile.roles.map((role) => (
+                      <div key={role} className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                        {role} Account
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-3 flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-xs font-bold rounded-full">
+                    User Account
+                  </div>
+                )}
               </div>
 
               {/* Navigation Menu */}
@@ -361,32 +442,50 @@ export default function UserProfilePage() {
                   }`}
                 >
                   <UserIcon className="w-5 h-5 shrink-0" />
-                  Thông tin cá nhân
+                  {isViewOnly ? "Thông tin người bán" : "Thông tin cá nhân"}
                 </button>
 
-                <button
-                  onClick={() => setActiveTab("addresses")}
-                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all ${
-                    activeTab === "addresses"
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-                  }`}
-                >
-                  <MapPin className="w-5 h-5 shrink-0" />
-                  Sổ địa chỉ nhận hàng
-                </button>
+                {!isViewOnly && !profile?.roles?.includes("SELLER") && (
+                  <button
+                    onClick={() => setActiveTab("addresses")}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all ${
+                      activeTab === "addresses"
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <MapPin className="w-5 h-5 shrink-0" />
+                    Sổ địa chỉ nhận hàng
+                  </button>
+                )}
 
-                <button
-                  onClick={() => setActiveTab("security")}
-                  className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all ${
-                    activeTab === "security"
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
-                      : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-                  }`}
-                >
-                  <KeyRound className="w-5 h-5 shrink-0" />
-                  Đổi mật khẩu bảo mật
-                </button>
+                {!isViewOnly && (
+                  <button
+                    onClick={() => setActiveTab("security")}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all ${
+                      activeTab === "security"
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <KeyRound className="w-5 h-5 shrink-0" />
+                    Đổi mật khẩu bảo mật
+                  </button>
+                )}
+
+                {(isViewOnly || (profile?.roles && (profile.roles.includes("SELLER") || profile.roles.includes("ADMIN")))) && (
+                  <button
+                    onClick={() => setActiveTab("my-products")}
+                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all ${
+                      activeTab === "my-products"
+                        ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    }`}
+                  >
+                    <Package className="w-5 h-5 shrink-0" />
+                    {isViewOnly ? "Sản phẩm của Shop" : "Sản phẩm của tôi"}
+                  </button>
+                )}
               </nav>
             </aside>
 
@@ -397,7 +496,7 @@ export default function UserProfilePage() {
               {activeTab === "personal" && (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-800 pb-4 mb-6">
-                    Thông tin cá nhân
+                    {isViewOnly ? "Thông tin người bán" : "Thông tin cá nhân"}
                   </h3>
 
                   {profileLoading && !profile ? (
@@ -408,7 +507,7 @@ export default function UserProfilePage() {
                     <form onSubmit={handleSaveProfile} className="space-y-6 max-w-2xl">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tên đăng nhập</label>
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tên hiển thị</label>
                           <input 
                             type="text" 
                             disabled 
@@ -429,34 +528,52 @@ export default function UserProfilePage() {
                           <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Họ & Tên của bạn</label>
                           <input 
                             type="text" 
+                            disabled={isViewOnly}
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Nhập đầy đủ họ và tên"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none font-medium"
+                            className={`w-full px-4 py-3 rounded-xl border font-medium transition-all ${
+                              isViewOnly 
+                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                                : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none"
+                            }`}
                           />
                         </div>
                         <div>
                           <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Số điện thoại liên hệ</label>
                           <input 
                             type="text" 
+                            disabled={isViewOnly}
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             placeholder="Nhập số điện thoại của bạn"
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none font-medium"
+                            className={`w-full px-4 py-3 rounded-xl border font-medium transition-all ${
+                              isViewOnly 
+                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                                : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none"
+                            }`}
                           />
                         </div>
                         <div>
                           <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Giới tính</label>
                           <div className="flex gap-4">
                             {["Nam", "Nữ", "Khác"].map((g) => (
-                              <label key={g} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 cursor-pointer font-medium hover:bg-gray-50 dark:hover:bg-gray-800/55 transition-all">
+                              <label 
+                                key={g} 
+                                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-medium transition-all ${
+                                  isViewOnly 
+                                    ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                                    : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/55"
+                                }`}
+                              >
                                 <input 
                                   type="radio" 
                                   name="gender" 
                                   value={g} 
                                   checked={gender === g}
+                                  disabled={isViewOnly}
                                   onChange={() => setGender(g)}
-                                  className="text-indigo-600 focus:ring-indigo-500" 
+                                  className={`text-indigo-600 focus:ring-indigo-500 ${isViewOnly ? "cursor-not-allowed" : ""}`} 
                                 />
                                 {g}
                               </label>
@@ -467,23 +584,30 @@ export default function UserProfilePage() {
                           <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Ngày sinh</label>
                           <input 
                             type="date" 
+                            disabled={isViewOnly}
                             value={dateOfBirth}
                             onChange={(e) => setDateOfBirth(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none font-medium"
+                            className={`w-full px-4 py-3 rounded-xl border font-medium transition-all ${
+                              isViewOnly 
+                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                                : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none"
+                            }`}
                           />
                         </div>
                       </div>
 
-                      <div className="border-t border-gray-100 dark:border-gray-800 pt-6">
-                        <button
-                          type="submit"
-                          disabled={profileLoading}
-                          className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl transition-all shadow-md shadow-indigo-600/15"
-                        >
-                          {profileLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                          Lưu thông tin cá nhân
-                        </button>
-                      </div>
+                      {!isViewOnly && (
+                        <div className="border-t border-gray-100 dark:border-gray-800 pt-6">
+                          <button
+                            type="submit"
+                            disabled={profileLoading}
+                            className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl transition-all shadow-md shadow-indigo-600/15"
+                          >
+                            {profileLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Lưu thông tin cá nhân
+                          </button>
+                        </div>
+                      )}
                     </form>
                   )}
                 </div>
@@ -622,6 +746,242 @@ export default function UserProfilePage() {
                 </div>
               )}
 
+              {/* TAB 4: MY PRODUCTS (SELLER ONLY) */}
+              {activeTab === "my-products" && (
+                <div>
+                  <div className="border-b border-gray-100 dark:border-gray-800 pb-4 mb-6">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <Package className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                      Sản phẩm của tôi
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Quản lý và lọc nhanh danh sách các mặt hàng xe mô hình bạn đang kinh doanh.
+                    </p>
+                  </div>
+
+                  {/* QUICK STATS PANEL */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="bg-gray-50/50 dark:bg-gray-800/40 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/75">
+                      <span className="block text-2xl font-black text-indigo-600 dark:text-indigo-400">
+                        {sellerProducts.length}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
+                        Tổng sản phẩm
+                      </span>
+                    </div>
+                    <div className="bg-gray-50/50 dark:bg-gray-800/40 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/75">
+                      <span className="block text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                        {sellerProducts.filter(p => !p.isAuction).length}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
+                        Đang bán (Mua ngay)
+                      </span>
+                    </div>
+                    <div className="bg-gray-50/50 dark:bg-gray-800/40 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/75">
+                      <span className="block text-2xl font-black text-amber-600 dark:text-amber-400">
+                        {sellerProducts.filter(p => p.isAuction).length}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
+                        Đang Đấu giá
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* FILTER CONTROLLER BAR */}
+                  <div className="bg-gray-50/30 dark:bg-gray-800/20 rounded-2xl p-4 border border-gray-100 dark:border-gray-800 mb-6 space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                      {/* Search */}
+                      <div className="relative col-span-1 sm:col-span-2">
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                          Tìm kiếm sản phẩm
+                        </label>
+                        <div className="relative">
+                          <input 
+                            type="text" 
+                            value={productSearch}
+                            onChange={(e) => setProductSearch(e.target.value)}
+                            placeholder="Nhập tên sản phẩm, mã xe..."
+                            className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
+                          />
+                          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        </div>
+                      </div>
+
+                      {/* Filter Scale */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                          Tỉ lệ (Scale)
+                        </label>
+                        <select 
+                          value={scaleFilter}
+                          onChange={(e) => setScaleFilter(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
+                        >
+                          <option value="all">Tất cả tỉ lệ</option>
+                          {availableScales.filter(s => s !== "all").map(scale => (
+                            <option key={scale} value={scale}>{scale}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Filter Marque */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                          Hãng xe (Marque)
+                        </label>
+                        <select 
+                          value={marqueFilter}
+                          onChange={(e) => setMarqueFilter(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
+                        >
+                          <option value="all">Tất cả hãng xe</option>
+                          {availableMarques.filter(m => m !== "all").map(marque => (
+                            <option key={marque} value={marque}>{marque}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Filter Method */}
+                      <div>
+                        <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
+                          Cách bán
+                        </label>
+                        <select 
+                          value={typeFilter}
+                          onChange={(e) => setTypeFilter(e.target.value)}
+                          className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
+                        >
+                          <option value="all">Tất cả hình thức</option>
+                          <option value="buy-now">Mua ngay (Buy Now)</option>
+                          <option value="auction">Đấu giá (Auction)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800/60">
+                      <span className="text-xs text-gray-400 dark:text-gray-500 font-semibold">
+                        Hiển thị <strong className="text-gray-700 dark:text-gray-300">{filteredProducts.length}</strong> / {sellerProducts.length} sản phẩm
+                      </span>
+
+                      {/* Sort Dropdown */}
+                      <div className="flex items-center gap-2">
+                        <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1">
+                          <ArrowUpDown className="w-3 h-3" /> Sắp xếp
+                        </label>
+                        <select 
+                          value={sortBy}
+                          onChange={(e) => setSortBy(e.target.value)}
+                          className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-xs font-semibold"
+                        >
+                          <option value="newest">Mới đăng bán</option>
+                          <option value="price-asc">Giá: Thấp đến Cao</option>
+                          <option value="price-desc">Giá: Cao đến Thấp</option>
+                          <option value="sold-desc">Bán chạy nhất</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PRODUCTS GRID */}
+                  {productsLoading ? (
+                    <div className="flex items-center justify-center py-16">
+                      <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+                    </div>
+                  ) : filteredProducts.length === 0 ? (
+                    <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+                      <SlidersHorizontal className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                      <p className="font-semibold text-sm">Không tìm thấy sản phẩm phù hợp</p>
+                      <p className="text-xs text-gray-400 mt-1">Vui lòng thay đổi từ khóa hoặc bộ lọc của bạn.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {filteredProducts.map((product) => (
+                        <div 
+                          key={product.id}
+                          className="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800/80 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-lg transition-all duration-300 flex flex-col h-full"
+                        >
+                          {/* PRODUCT IMAGE */}
+                          <div className="h-44 bg-gray-50 dark:bg-gray-950/65 relative flex items-center justify-center overflow-hidden border-b border-gray-50 dark:border-gray-800/40">
+                            {product.imageUrl ? (
+                              <img 
+                                src={product.imageUrl} 
+                                alt={product.name} 
+                                className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-gray-700 bg-gray-100 dark:bg-gray-900 text-sm font-bold uppercase tracking-wider">
+                                No Image
+                              </div>
+                            )}
+
+                            {/* BADGES */}
+                            <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+                              {product.isAuction ? (
+                                <span className="px-2.5 py-0.5 bg-gradient-to-r from-amber-500 to-red-500 text-white text-[9px] font-extrabold uppercase tracking-wider rounded-md shadow-sm">
+                                  Đấu giá
+                                </span>
+                              ) : (
+                                <span className="px-2.5 py-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[9px] font-extrabold uppercase tracking-wider rounded-md shadow-sm">
+                                  Mua ngay
+                                </span>
+                              )}
+                              
+                              {product.scale && (
+                                <span className="px-2 py-0.5 bg-indigo-500/10 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-[9px] font-extrabold rounded-md border border-indigo-100/35 uppercase tracking-wider self-start">
+                                  Tỉ lệ {product.scale}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* PRODUCT DETAILS */}
+                          <div className="p-4 flex flex-col flex-1 justify-between">
+                            <div>
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                {product.marque && (
+                                  <span className="text-[10px] font-extrabold text-indigo-600 dark:text-indigo-400 uppercase bg-indigo-50 dark:bg-indigo-950/20 px-2 py-0.5 rounded-md">
+                                    {product.marque}
+                                  </span>
+                                )}
+                                {product.itemNo && (
+                                  <span className="text-[10px] font-mono text-gray-400 dark:text-gray-500 uppercase">
+                                    #{product.itemNo}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <h4 className="font-extrabold text-gray-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                {product.name}
+                              </h4>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex items-center justify-between">
+                              <div>
+                                <span className="block text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
+                                  {product.isAuction ? "Giá hiện tại" : "Đơn giá"}
+                                </span>
+                                <span className="text-sm font-black text-rose-600 dark:text-rose-500">
+                                  {product.price ? product.price.toLocaleString("vi-VN") : "0"} ₫
+                                </span>
+                              </div>
+
+                              <div className="text-right">
+                                <span className="block text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
+                                  Kho: <strong className="text-gray-700 dark:text-gray-300">{product.stockQuantity}</strong>
+                                </span>
+                                <span className="block text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
+                                  Đã bán: <strong className="text-gray-700 dark:text-gray-300">{product.soldQuantity}</strong>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
             </main>
           </div>
         </div>
@@ -723,5 +1083,20 @@ export default function UserProfilePage() {
         )}
       </div>
     </ProtectedRoute>
+  );
+}
+
+export default function UserProfilePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-3" />
+          <p className="text-gray-500 text-sm">Đang tải...</p>
+        </div>
+      </div>
+    }>
+      <UserProfilePageContent />
+    </Suspense>
   );
 }

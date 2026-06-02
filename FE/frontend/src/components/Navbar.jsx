@@ -41,6 +41,7 @@ export default function Navbar() {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
     const [navbarAvatar, setNavbarAvatar] = useState(null);
+    const [userRoles, setUserRoles] = useState([]);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -49,13 +50,19 @@ export default function Navbar() {
             // Tải thông tin ảnh đại diện thực tế của user lên thanh Navbar
             getMyProfile()
                 .then(data => {
-                    if (data && data.avatarUrl) {
-                        setNavbarAvatar(data.avatarUrl);
+                    if (data) {
+                        if (data.avatarUrl) {
+                            setNavbarAvatar(data.avatarUrl);
+                        }
+                        if (data.roles) {
+                            setUserRoles(data.roles);
+                        }
                     }
                 })
                 .catch(err => console.error("Lỗi tải avatar trên Navbar:", err));
         } else {
             setNavbarAvatar(null);
+            setUserRoles([]);
         }
     }, [isAuthenticated]);
 
@@ -300,14 +307,16 @@ export default function Navbar() {
                                                         <User className="w-4 h-4 text-indigo-500" />
                                                         Trang cá nhân
                                                     </NextLink>
-                                                    <NextLink
-                                                        href="/dashboard"
-                                                        onClick={() => setUserDropdownOpen(false)}
-                                                        className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                                                    >
-                                                        <Store className="w-4 h-4 text-emerald-500" />
-                                                        Kênh người bán
-                                                    </NextLink>
+                                                    {(userRoles.includes("SELLER") || userRoles.includes("ADMIN")) && (
+                                                         <NextLink
+                                                             href="/dashboard"
+                                                             onClick={() => setUserDropdownOpen(false)}
+                                                             className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                                         >
+                                                             <Store className="w-4 h-4 text-emerald-500" />
+                                                             Kênh người bán
+                                                         </NextLink>
+                                                     )}
                                                     <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
                                                     <NextLink
                                                         href="/auctions/my-won"

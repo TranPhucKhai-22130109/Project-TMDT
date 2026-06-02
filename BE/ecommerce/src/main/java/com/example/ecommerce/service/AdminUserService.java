@@ -206,6 +206,14 @@ public class AdminUserService {
                         .map(userRole -> userRole.getRole().getRoleName())
                         .toList(),
                 user.getCreatedAt(),
-                user.getUpdatedAt());
+                user.getUpdatedAt(),
+                user.getAvatarUrl(),
+                user.getPhoneNumber(),
+                user.getFullName(),
+                user.getGender(),
+                user.getDateOfBirth(),
+                user.getShopName(),
+                user.getShopCoverUrl(),
+                user.getShopDescription());
     }
 }

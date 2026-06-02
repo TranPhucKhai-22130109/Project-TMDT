@@ -425,9 +425,12 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <button className="mt-5 w-full py-3 rounded-2xl border border-red-200 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+              <NextLink 
+                href={`/profile?sellerId=${product.sellerId}`}
+                className="mt-5 w-full py-3 block text-center rounded-2xl border border-red-200 text-red-600 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition"
+              >
                 Xem shop
-              </button>
+              </NextLink>
             </div>
           </div>
         </div>

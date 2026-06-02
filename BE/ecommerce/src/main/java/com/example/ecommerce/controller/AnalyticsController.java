@@ -57,42 +57,28 @@ public class AnalyticsController {
         return ResponseEntity.ok(mockData);
     }
 
-    // 🟢 LẤY DATA TỈ LỆ XE CỦA RIÊNG SELLER VỚI BỘ LỌC THỜI GIAN, CÓ DỰ PHÒNG MOCK DATA THEO KỲ NẾU DB TRỐNG
+    // 🟢 LẤY DATA TỈ LỆ XE CỦA RIÊNG SELLER VỚI BỘ LỌC THỜI GIAN, TRẢ VỀ DỮ LIỆU THỰC TẾ DB
     @GetMapping("/category-revenue")
-    public ResponseEntity<?> getCategoryRevenue(@RequestParam(value = "period", defaultValue = "all") String period) {
+    public ResponseEntity<?> getCategoryRevenue(
+            @RequestParam(value = "period", defaultValue = "all") String period,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate) {
         try {
             Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String sellerId = jwt.getSubject();
             
-            List<com.example.ecommerce.dto.response.TopCategoryDTO> dbData = orderRepository.getRevenueByCategory(sellerId, period);
-            if (dbData != null && !dbData.isEmpty()) {
-                return ResponseEntity.ok(dbData);
+            List<com.example.ecommerce.dto.response.TopCategoryDTO> dbData = null;
+            if ("custom".equals(period) && startDate != null && endDate != null && !startDate.isEmpty() && !endDate.isEmpty()) {
+                dbData = orderRepository.getRevenueByCategoryAndCustomRange(sellerId, startDate + " 00:00:00", endDate + " 23:59:59");
+            } else {
+                dbData = orderRepository.getRevenueByCategory(sellerId, period);
             }
+            
+            return ResponseEntity.ok(dbData != null ? dbData : new ArrayList<>());
         } catch (Exception e) {
-            System.out.println(">>> Đang nạp biểu đồ tròn mẫu dự phòng do DB chưa sẵn sàng...");
+            System.err.println("Lỗi truy vấn tỷ lệ xe: " + e.getMessage());
+            return ResponseEntity.ok(new ArrayList<>());
         }
-
-        // Mock data tỉ lệ xe dự phòng tự động thay đổi theo mốc thời gian lọc để nhảy số
-        List<Map<String, Object>> mockCategories = new ArrayList<>();
-        String[] names = {"Tỉ lệ 1:18", "Tỉ lệ 1:24", "Tỉ lệ 1:43", "Tỉ lệ 1:64"};
-        
-        double multiplier = 1.0;
-        if ("today".equals(period)) multiplier = 0.08;
-        else if ("7days".equals(period)) multiplier = 0.25;
-        else if ("30days".equals(period)) multiplier = 0.5;
-        else if ("6months".equals(period)) multiplier = 0.8;
-
-        long[] solds = {Math.round(12 * multiplier), Math.round(25 * multiplier), Math.round(8 * multiplier), Math.round(45 * multiplier)};
-        double[] revenues = {9600000.0 * multiplier, 15000000.0 * multiplier, 4800000.0 * multiplier, 24000000.0 * multiplier};
-
-        for (int i = 0; i < names.length; i++) {
-            Map<String, Object> row = new HashMap<>();
-            row.put("name", names[i]);
-            row.put("sold", solds[i]);
-            row.put("revenue", revenues[i]);
-            mockCategories.add(row);
-        }
-        return ResponseEntity.ok(mockCategories);
     }
 
     // 🟢 LẤY THỐNG KÊ TỔNG QUAN TỔNG DOANH THU & TỔNG ĐƠN CỦA RIÊNG SELLER, CÓ DỰ PHÒNG MOCK DATA THEO KỲ NẾU DB TRỐNG

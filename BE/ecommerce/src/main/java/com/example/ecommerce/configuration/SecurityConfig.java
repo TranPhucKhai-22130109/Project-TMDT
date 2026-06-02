@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/users/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/seller/**").hasRole("SELLER")
 
                         // Tất cả còn lại yêu cầu xác thực
                         .anyRequest().authenticated())
@@ -106,7 +107,7 @@ public class SecurityConfig {
         grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
 
         // 🌟 SỬA QUAN TRỌNG: Chỉ định Spring Boot đọc quyền hạn từ trường nào trong chuỗi JWT của bạn.
-        // Mặc định là "scope", ở đây ta ép đọc từ "roles" (hoặc "role" / "authorities" tùy theo cách bạn tạo JWT)
+        // Mặc định is "scope", ở đây ta ép đọc từ "roles" (hoặc "role" / "authorities" tùy theo cách bạn tạo JWT)
         // Bác hãy kiểm tra hàm tạo Token (JwtProvider/JwtService) xem đang put tên gì nhé, thường là "roles"
         grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
 

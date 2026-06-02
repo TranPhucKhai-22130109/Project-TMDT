@@ -62,3 +62,7 @@ export function deleteProduct(id) {
     method: "DELETE",
   });
 }
+
+export function getProductsBySellerId(sellerId) {
+  return apiFetch(`/products/seller/${sellerId}`);
+}
