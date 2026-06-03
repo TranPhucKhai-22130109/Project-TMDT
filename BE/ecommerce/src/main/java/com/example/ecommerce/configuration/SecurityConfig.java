@@ -65,6 +65,12 @@ public class SecurityConfig {
                         .requestMatchers("/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/seller/**").hasRole("SELLER")
 
+                        //Search
+                        .requestMatchers("/api/search/**").permitAll()
+
+                        //Profile
+                        .requestMatchers("/api/users/*").permitAll()
+
                         // Tất cả còn lại yêu cầu xác thực
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth

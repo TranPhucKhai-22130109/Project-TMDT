@@ -120,10 +120,7 @@ export async function updateMyShop(shopData) {
 }
 
 export async function getUserProfileById(userId) {
-  const res = await fetch(`${AUTH_BASE}/api/users/${userId}`, {
-    method: "GET",
-    credentials: "include",
-  });
+  const res = await fetch(`${AUTH_BASE}/api/users/${userId}`);
   const data = await res.json();
   if (!res.ok || !data.success) {
     throw new Error(data.message || "Failed to load profile");

@@ -84,6 +84,15 @@ public class ProductController {
                 })
                 .toList();
     }
+
+    @GetMapping("/{id}")
+    public ProductResponse getProductById(@PathVariable Long id) {
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        return toProductResponse(product);
+    }
     @GetMapping("/normal")
     public List<ProductResponse> getAllNormalProducts() {
         return productRepository.findByIsAuctionAndIsDeletedFalseAndIsApprovedTrue(false)
