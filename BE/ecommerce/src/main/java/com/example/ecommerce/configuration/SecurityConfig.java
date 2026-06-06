@@ -69,7 +69,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                        .bearerTokenResolver(bearerTokenResolver()));
+                        .bearerTokenResolver(bearerTokenResolver())
+                );
 
         return res.build();
     }
@@ -105,12 +106,9 @@ public class SecurityConfig {
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
 
-        // 🌟 SỬA QUAN TRỌNG: Chỉ định Spring Boot đọc quyền hạn từ trường nào trong
-        // chuỗi JWT của bạn.
-        // Mặc định is "scope", ở đây ta ép đọc từ "roles" (hoặc "role" / "authorities"
-        // tùy theo cách bạn tạo JWT)
-        // Bác hãy kiểm tra hàm tạo Token (JwtProvider/JwtService) xem đang put tên gì
-        // nhé, thường là "roles"
+        // 🌟 SỬA QUAN TRỌNG: Chỉ định Spring Boot đọc quyền hạn từ trường nào trong chuỗi JWT của bạn.
+        // Mặc định is "scope", ở đây ta ép đọc từ "roles" (hoặc "role" / "authorities" tùy theo cách bạn tạo JWT)
+        // Bác hãy kiểm tra hàm tạo Token (JwtProvider/JwtService) xem đang put tên gì nhé, thường là "roles"
         grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
@@ -122,11 +120,9 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        // Cấu hình rõ nguồn gốc và các method được phép hoạt động khi truyền Cookie kèm
-        // theo
+        // Cấu hình rõ nguồn gốc và các method được phép hoạt động khi truyền Cookie kèm theo
         config.setAllowedOriginPatterns(Collections.singletonList("http://localhost:3000"));
-        config.setAllowedHeaders(
-                Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Accept", "X-Requested-With"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Accept", "X-Requested-With"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
