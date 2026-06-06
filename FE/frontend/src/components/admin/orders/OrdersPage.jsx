@@ -72,11 +72,13 @@ async function parseResponse(res) {
 // Chuẩn hóa 1 order từ backend → UI (field names có thể khác nhau)
 function normalizeOrder(order) {
     const status = (order.status || "PENDING").toUpperCase();
+    const subtotal = order.totalAmount ?? order.total ?? 0;
+    const shippingFee = (subtotal === 0 || subtotal >= 5000000) ? 0 : 50000;
     return {
         ...order,
         id: order.id || order.orderId,
-        status,                                         // giữ nguyên enum BE
-        totalAmount: order.totalAmount ?? order.total ?? 0,
+        status,
+        totalAmount: subtotal + shippingFee,
         receiverName: order.receiverName || order.customerName || "Khách hàng",
         receiverPhone: order.receiverPhone || order.phone || "—",
         shippingAddress: order.shippingAddress || order.address || "",
@@ -391,12 +393,12 @@ export default function OrdersPage() {
                                             <td className="p-4">
                                                 <div className="font-bold text-gray-900">{fmt(order.totalAmount)}</div>
                                                 <div className="flex items-center gap-1 mt-1 flex-wrap">
-                                                    <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium uppercase">
-                                                        {order.paymentMethod}
-                                                    </span>
+        <span className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px] font-medium uppercase">
+            {order.paymentMethod}
+        </span>
                                                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${payCfg.color}`}>
-                                                        {payCfg.label}
-                                                    </span>
+            {payCfg.label}
+        </span>
                                                 </div>
                                             </td>
 
