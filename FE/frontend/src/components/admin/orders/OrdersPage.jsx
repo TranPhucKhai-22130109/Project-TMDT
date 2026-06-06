@@ -338,6 +338,7 @@ export default function OrdersPage() {
                                     <th className="p-4">Sản Phẩm</th>
                                     <th className="p-4">Tổng Tiền</th>
                                     <th className="p-4">Trạng Thái</th>
+                                    <th className="p-4">Ghi Chú</th>
                                     <th className="p-4 text-right">Hành Động</th>
                                 </tr>
                                 </thead>
@@ -404,6 +405,25 @@ export default function OrdersPage() {
                                                 <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusCfg.color}`}>
                                                     {statusCfg.label}
                                                 </span>
+                                            </td>
+
+                                            {/* Ghi chú */}
+                                            <td className="p-4 max-w-[160px]">
+                                                {order.note ? (
+                                                    <div className="group relative">
+                                                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2 py-1 truncate cursor-default italic">
+                                                            {order.note}
+                                                        </p>
+                                                        {/* Tooltip full text */}
+                                                        <div className="absolute bottom-full left-0 mb-1.5 z-20 hidden group-hover:block w-56 bg-gray-900 text-white text-xs rounded-xl p-3 shadow-xl leading-relaxed pointer-events-none">
+                                                            <p className="font-semibold text-amber-300 mb-1">Ghi chú:</p>
+                                                            <p className="italic opacity-90">{order.note}</p>
+                                                            <div className="absolute top-full left-4 border-4 border-transparent border-t-gray-900" />
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-xs text-gray-300">—</span>
+                                                )}
                                             </td>
 
                                             {/* Hành động */}
