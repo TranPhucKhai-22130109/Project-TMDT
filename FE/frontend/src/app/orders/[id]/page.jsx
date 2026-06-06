@@ -25,6 +25,9 @@ function formatDate(dateStr) {
     }).format(new Date(dateStr));
 }
 
+const FREE_SHIP_THRESHOLD = 5_000_000;
+const SHIPPING_FEE        = 50_000;
+
 const ORDER_STATUS_CONFIG = {
     PENDING:   { label: "Chờ xác nhận",   color: "text-amber-600 bg-amber-50 border-amber-200",     icon: Clock },
     CONFIRMED: { label: "Đã xác nhận",    color: "text-blue-600 bg-blue-50 border-blue-200",        icon: BadgeCheck },
@@ -96,6 +99,11 @@ export default function OrderDetailPage() {
     const StatusIcon  = statusInfo.icon;
     const payStatus   = PAYMENT_STATUS_LABEL[order.paymentStatus];
     const totalItems  = order.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+
+    // ── Tính phí ship đồng bộ với CheckoutPage ──
+    const subtotal    = order.totalAmount ?? 0;
+    const shippingFee = subtotal === 0 || subtotal >= FREE_SHIP_THRESHOLD ? 0 : SHIPPING_FEE;
+    const grandTotal  = subtotal + shippingFee;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-950 pb-12">
@@ -202,15 +210,17 @@ export default function OrderDetailPage() {
                     <div className="px-6 py-4 bg-gray-50/50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700 space-y-2">
                         <div className="flex justify-between text-sm text-gray-500">
                             <span>Tạm tính ({totalItems} sản phẩm)</span>
-                            <span>{formatPrice(order.totalAmount)}</span>
+                            <span>{formatPrice(subtotal)}</span>
                         </div>
                         <div className="flex justify-between text-sm text-gray-500">
                             <span>Phí vận chuyển</span>
-                            <span className="text-green-600 font-medium">Miễn phí</span>
+                            <span className={shippingFee === 0 ? "text-green-600 font-medium" : "text-gray-700 dark:text-gray-300"}>
+                                {shippingFee === 0 ? "Miễn phí" : formatPrice(shippingFee)}
+                            </span>
                         </div>
                         <div className="flex justify-between font-black text-base pt-2 border-t border-gray-100 dark:border-gray-700">
                             <span className="text-gray-900 dark:text-white">Tổng cộng</span>
-                            <span className="text-orange-500 text-lg">{formatPrice(order.totalAmount)}</span>
+                            <span className="text-orange-500 text-lg">{formatPrice(grandTotal)}</span>
                         </div>
                     </div>
                 </div>
