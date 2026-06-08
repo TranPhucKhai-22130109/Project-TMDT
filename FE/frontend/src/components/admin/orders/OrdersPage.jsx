@@ -46,13 +46,16 @@ function fmtDate(val) {
 
 // Lấy JWT token từ localStorage (hỗ trợ cả hai key phổ biến)
 function getAuthHeaders() {
-    const headers = { "Content-Type": "application/json" };
+    const headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+    };
     if (typeof window !== "undefined") {
-        const token = localStorage.getItem("token")
-            || localStorage.getItem("accessToken")
-            || localStorage.getItem("blitz-token")  // thử thêm
-            || localStorage.getItem("access_token");
-        if (token) headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+        const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+        if (token) {
+            // Đảm bảo không bị đè Bearer
+            headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+        }
     }
     return headers;
 }
@@ -119,14 +122,18 @@ export default function OrdersPage() {
         setError(null);
         try {
             const url = new URL(ADMIN_ORDER_API);
-            // Gửi thẳng enum BE lên server, chỉ bỏ qua khi ALL
-            if (tabStatus && tabStatus !== "ALL") {
-                url.searchParams.set("status", tabStatus);
-            }
+            if (tabStatus && tabStatus !== "ALL") url.searchParams.set("status", tabStatus);
+
             const res = await fetch(url.toString(), {
                 headers: getAuthHeaders(),
                 credentials: "include",
             });
+
+            // BẮT LỖI 403 Ở ĐÂY
+            if (res.status === 403) {
+                throw new Error("Bạn không có quyền truy cập (Admin Role Required)");
+            }
+
             const data = await parseResponse(res);
 
             let raw = [];
