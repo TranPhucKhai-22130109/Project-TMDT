@@ -21,7 +21,7 @@ import {
   PackageCheck,
 } from "lucide-react";
 import NextLink from "next/link";
-import { getProducts } from "@/services/productService";
+import { getProducts, getProductById } from "@/services/productService";
 import { Text } from "@/components/Text";
 import { Navbar } from "@/components/Navbar";
 import { addToCart } from "@/services/cartService";
@@ -165,40 +165,32 @@ export default function ProductDetailPage() {
 
   // Lấy dữ liệu sản phẩm
   useEffect(() => {
-    const fetchProductDetail = async () => {
-      try {
-        setLoading(true);
-        const allProducts = await getProducts();
+  const fetchProductDetail = async () => {
+    try {
+      setLoading(true);
 
-        const foundProduct = allProducts.find(
-          (p) => String(p.id) === String(params.id),
-        );
+      const foundProduct = await getProductById(params.id);
 
-        if (foundProduct) {
-          setProduct({
-            ...foundProduct,
-            images: foundProduct.images || [
-              foundProduct.imageUrl,
-              foundProduct.imageUrl,
-              foundProduct.imageUrl,
-            ],
-          });
-          setActiveImage(0);
-        } else {
-          router.push("/products");
-        }
-      } catch (error) {
-        console.error("Lỗi tải chi tiết sản phẩm:", error);
-        router.push("/products");
-      } finally {
-        setLoading(false);
-      }
-    };
+      setProduct({
+        ...foundProduct,
+        images: foundProduct.images?.length
+          ? foundProduct.images
+          : [foundProduct.imageUrl],
+      });
 
-    if (params.id) {
-      fetchProductDetail();
+      setActiveImage(0);
+    } catch (error) {
+      console.error(error);
+      // router.push("/products");
+    } finally {
+      setLoading(false);
     }
-  }, [params.id, router]);
+  };
+
+  if (params.id) {
+    fetchProductDetail();
+  }
+}, [params.id]);
 
   const handleQuantityChange = (type) => {
     if (type === "minus" && quantity > 1) setQuantity((prev) => prev - 1);

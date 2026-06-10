@@ -17,7 +17,7 @@ import {
   Package,
   Search,
   SlidersHorizontal,
-  ArrowUpDown
+  ArrowUpDown,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -32,7 +32,7 @@ import {
   addMyAddress,
   updateMyAddress,
   deleteMyAddress,
-  getUserProfileById
+  getUserProfileById,
 } from "@/services/userService";
 import { getAllProducts } from "@/services/sellerProductService";
 import { getProductsBySellerId } from "@/services/productService";
@@ -54,7 +54,7 @@ function UserProfilePageContent() {
   const [gender, setGender] = useState("Nam");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  
+
   // Avatar upload states
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
@@ -96,7 +96,9 @@ function UserProfilePageContent() {
   const fetchProfile = async () => {
     try {
       setProfileLoading(true);
-      const data = isViewOnly ? await getUserProfileById(sellerId) : await getMyProfile();
+      const data = isViewOnly
+        ? await getUserProfileById(sellerId)
+        : await getMyProfile();
       setProfile(data);
       setFullName(data.fullName || "");
       setPhoneNumber(data.phoneNumber || "");
@@ -127,7 +129,9 @@ function UserProfilePageContent() {
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isViewOnly) {
+      fetchProfile();
+    } else if (isAuthenticated) {
       fetchProfile();
     }
   }, [isAuthenticated, sellerId, isViewOnly]);
@@ -146,7 +150,9 @@ function UserProfilePageContent() {
   const fetchSellerProducts = async () => {
     try {
       setProductsLoading(true);
-      const data = isViewOnly ? await getProductsBySellerId(sellerId) : await getAllProducts();
+      const data = isViewOnly
+        ? await getProductsBySellerId(sellerId)
+        : await getAllProducts();
       setSellerProducts(data || []);
     } catch (err) {
       console.error(err);
@@ -157,26 +163,37 @@ function UserProfilePageContent() {
   };
 
   useEffect(() => {
-    if (isAuthenticated && activeTab === "my-products") {
-      fetchSellerProducts();
-    }
-  }, [isAuthenticated, activeTab]);
+  if (
+    activeTab === "my-products" &&
+    (isViewOnly || isAuthenticated)
+  ) {
+    fetchSellerProducts();
+  }
+}, [activeTab, isAuthenticated, sellerId, isViewOnly]);
 
   // Extract unique marques and scales from products
-  const availableMarques = ["all", ...new Set(sellerProducts.map(p => p.marque).filter(Boolean))];
-  const availableScales = ["all", ...new Set(sellerProducts.map(p => p.scale).filter(Boolean))];
+  const availableMarques = [
+    "all",
+    ...new Set(sellerProducts.map((p) => p.marque).filter(Boolean)),
+  ];
+  const availableScales = [
+    "all",
+    ...new Set(sellerProducts.map((p) => p.scale).filter(Boolean)),
+  ];
 
   // In-memory filtering and sorting
   const filteredProducts = sellerProducts
-    .filter(p => {
-      const matchesSearch = !productSearch || 
-                            p.name?.toLowerCase().includes(productSearch.toLowerCase()) || 
-                            p.itemNo?.toLowerCase().includes(productSearch.toLowerCase());
+    .filter((p) => {
+      const matchesSearch =
+        !productSearch ||
+        p.name?.toLowerCase().includes(productSearch.toLowerCase()) ||
+        p.itemNo?.toLowerCase().includes(productSearch.toLowerCase());
       const matchesScale = scaleFilter === "all" || p.scale === scaleFilter;
       const matchesMarque = marqueFilter === "all" || p.marque === marqueFilter;
-      const matchesType = typeFilter === "all" || 
-                          (typeFilter === "auction" && p.isAuction) || 
-                          (typeFilter === "buy-now" && !p.isAuction);
+      const matchesType =
+        typeFilter === "all" ||
+        (typeFilter === "auction" && p.isAuction) ||
+        (typeFilter === "buy-now" && !p.isAuction);
       return matchesSearch && matchesScale && matchesMarque && matchesType;
     })
     .sort((a, b) => {
@@ -217,7 +234,7 @@ function UserProfilePageContent() {
           setAvatarUrl(downloadUrl);
           showToast("Cập nhật ảnh đại diện thành công!");
           setUploading(false);
-        }
+        },
       );
     } catch (err) {
       console.error(err);
@@ -235,7 +252,7 @@ function UserProfilePageContent() {
         fullName,
         phoneNumber,
         gender,
-        dateOfBirth
+        dateOfBirth,
       });
       setProfile(updated);
       showToast("Cập nhật thông tin cá nhân thành công!");
@@ -277,8 +294,14 @@ function UserProfilePageContent() {
 
     try {
       setAddressesLoading(true);
-      const payload = { receiverName, receiverPhone, addressDetails, city, isDefault };
-      
+      const payload = {
+        receiverName,
+        receiverPhone,
+        addressDetails,
+        city,
+        isDefault,
+      };
+
       if (editingAddress) {
         await updateMyAddress(editingAddress.id, payload);
         showToast("Cập nhật địa chỉ thành công!");
@@ -365,34 +388,51 @@ function UserProfilePageContent() {
 
         {/* TOAST ALERT */}
         {toast && (
-          <div className={`fixed bottom-5 right-5 z-[100] flex items-center gap-3 px-5 py-4 rounded-xl shadow-lg border text-white transition-all duration-300 ${
-            toast.type === "success" ? "bg-emerald-600 border-emerald-500 shadow-emerald-950/20" : "bg-rose-600 border-rose-500 shadow-rose-950/20"
-          }`}>
-            {toast.type === "success" ? <CheckCircle className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
+          <div
+            className={`fixed bottom-5 right-5 z-[100] flex items-center gap-3 px-5 py-4 rounded-xl shadow-lg border text-white transition-all duration-300 ${
+              toast.type === "success"
+                ? "bg-emerald-600 border-emerald-500 shadow-emerald-950/20"
+                : "bg-rose-600 border-rose-500 shadow-rose-950/20"
+            }`}
+          >
+            {toast.type === "success" ? (
+              <CheckCircle className="w-5 h-5 shrink-0" />
+            ) : (
+              <AlertCircle className="w-5 h-5 shrink-0" />
+            )}
             <span className="text-sm font-semibold">{toast.message}</span>
           </div>
         )}
 
         <div className="flex-1 container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex flex-col md:flex-row gap-8">
-            
             {/* SIDEBAR */}
             <aside className="w-full md:w-80 shrink-0 bg-white dark:bg-gray-900 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 self-start transition-all">
               <div className="flex flex-col items-center pb-6 border-b border-gray-100 dark:border-gray-800 mb-6">
-                <div 
-                  onClick={() => !isViewOnly && !uploading && fileInputRef.current?.click()}
+                <div
+                  onClick={() =>
+                    !isViewOnly && !uploading && fileInputRef.current?.click()
+                  }
                   className={`relative group ${isViewOnly ? "" : "cursor-pointer"}`}
                 >
                   <div className="w-28 h-28 rounded-full overflow-hidden border-4 border-indigo-50 dark:border-indigo-950 shadow-md">
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                      <img
+                        src={avatarUrl}
+                        alt="Avatar"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl font-black">
-                        {profile?.fullName ? profile.fullName.charAt(0).toUpperCase() : (profile?.username ? profile.username.charAt(0).toUpperCase() : "U")}
+                        {profile?.fullName
+                          ? profile.fullName.charAt(0).toUpperCase()
+                          : profile?.username
+                            ? profile.username.charAt(0).toUpperCase()
+                            : "U"}
                       </div>
                     )}
                   </div>
-                  
+
                   {!isViewOnly && (
                     <div className="absolute inset-0 bg-black/45 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       {uploading ? (
@@ -404,22 +444,27 @@ function UserProfilePageContent() {
                   )}
                 </div>
 
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  onChange={handleAvatarChange} 
-                  accept="image/*" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  accept="image/*"
+                  className="hidden"
                 />
 
                 <h2 className="mt-4 font-extrabold text-gray-900 dark:text-white text-xl">
                   {profile?.fullName || profile?.username || "Người dùng"}
                 </h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">@{profile?.username}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  @{profile?.username}
+                </p>
                 {profile?.roles && profile.roles.length > 0 ? (
                   <div className="flex flex-wrap gap-1 mt-3 justify-center">
                     {profile.roles.map((role) => (
-                      <div key={role} className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-full uppercase tracking-wider">
+                      <div
+                        key={role}
+                        className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold rounded-full uppercase tracking-wider"
+                      >
                         {role} Account
                       </div>
                     ))}
@@ -473,7 +518,10 @@ function UserProfilePageContent() {
                   </button>
                 )}
 
-                {(isViewOnly || (profile?.roles && (profile.roles.includes("SELLER") || profile.roles.includes("ADMIN")))) && (
+                {(isViewOnly ||
+                  (profile?.roles &&
+                    (profile.roles.includes("SELLER") ||
+                      profile.roles.includes("ADMIN")))) && (
                   <button
                     onClick={() => setActiveTab("my-products")}
                     className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-semibold transition-all ${
@@ -491,7 +539,6 @@ function UserProfilePageContent() {
 
             {/* MAIN PANELS CONTAINER */}
             <main className="flex-1 bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 dark:border-gray-800 min-h-[550px] transition-all">
-              
               {/* TAB 1: PERSONAL INFORMATION */}
               {activeTab === "personal" && (
                 <div>
@@ -504,76 +551,89 @@ function UserProfilePageContent() {
                       <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
                     </div>
                   ) : (
-                    <form onSubmit={handleSaveProfile} className="space-y-6 max-w-2xl">
+                    <form
+                      onSubmit={handleSaveProfile}
+                      className="space-y-6 max-w-2xl"
+                    >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tên hiển thị</label>
-                          <input 
-                            type="text" 
-                            disabled 
-                            value={profile?.username || ""} 
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                            Tên hiển thị
+                          </label>
+                          <input
+                            type="text"
+                            disabled
+                            value={profile?.username || ""}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 cursor-not-allowed font-medium"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Địa chỉ Email</label>
-                          <input 
-                            type="email" 
-                            disabled 
-                            value={profile?.email || ""} 
+                          <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                            Địa chỉ Email
+                          </label>
+                          <input
+                            type="email"
+                            disabled
+                            value={profile?.email || ""}
                             className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-950 text-gray-500 dark:text-gray-400 cursor-not-allowed font-medium"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Họ & Tên của bạn</label>
-                          <input 
-                            type="text" 
+                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                            Họ & Tên của bạn
+                          </label>
+                          <input
+                            type="text"
                             disabled={isViewOnly}
                             value={fullName}
                             onChange={(e) => setFullName(e.target.value)}
                             placeholder="Nhập đầy đủ họ và tên"
                             className={`w-full px-4 py-3 rounded-xl border font-medium transition-all ${
-                              isViewOnly 
-                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                              isViewOnly
+                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed"
                                 : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none"
                             }`}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Số điện thoại liên hệ</label>
-                          <input 
-                            type="text" 
+                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                            Số điện thoại liên hệ
+                          </label>
+                          <input
+                            type="text"
                             disabled={isViewOnly}
                             value={phoneNumber}
                             onChange={(e) => setPhoneNumber(e.target.value)}
                             placeholder="Nhập số điện thoại của bạn"
                             className={`w-full px-4 py-3 rounded-xl border font-medium transition-all ${
-                              isViewOnly 
-                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                              isViewOnly
+                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed"
                                 : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none"
                             }`}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Giới tính</label>
+                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                            Giới tính
+                          </label>
                           <div className="flex gap-4">
                             {["Nam", "Nữ", "Khác"].map((g) => (
-                              <label 
-                                key={g} 
+                              <label
+                                key={g}
                                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-medium transition-all ${
-                                  isViewOnly 
-                                    ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                                  isViewOnly
+                                    ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed"
                                     : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/55"
                                 }`}
                               >
-                                <input 
-                                  type="radio" 
-                                  name="gender" 
-                                  value={g} 
+                                <input
+                                  type="radio"
+                                  name="gender"
+                                  value={g}
                                   checked={gender === g}
                                   disabled={isViewOnly}
                                   onChange={() => setGender(g)}
-                                  className={`text-indigo-600 focus:ring-indigo-500 ${isViewOnly ? "cursor-not-allowed" : ""}`} 
+                                  className={`text-indigo-600 focus:ring-indigo-500 ${isViewOnly ? "cursor-not-allowed" : ""}`}
                                 />
                                 {g}
                               </label>
@@ -581,15 +641,17 @@ function UserProfilePageContent() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Ngày sinh</label>
-                          <input 
-                            type="date" 
+                          <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                            Ngày sinh
+                          </label>
+                          <input
+                            type="date"
                             disabled={isViewOnly}
                             value={dateOfBirth}
                             onChange={(e) => setDateOfBirth(e.target.value)}
                             className={`w-full px-4 py-3 rounded-xl border font-medium transition-all ${
-                              isViewOnly 
-                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed" 
+                              isViewOnly
+                                ? "bg-gray-50 dark:bg-gray-950/60 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-800 cursor-not-allowed"
                                 : "bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-600 focus:outline-none"
                             }`}
                           />
@@ -603,7 +665,9 @@ function UserProfilePageContent() {
                             disabled={profileLoading}
                             className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl transition-all shadow-md shadow-indigo-600/15"
                           >
-                            {profileLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                            {profileLoading && (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            )}
                             Lưu thông tin cá nhân
                           </button>
                         </div>
@@ -635,30 +699,38 @@ function UserProfilePageContent() {
                   ) : addresses.length === 0 ? (
                     <div className="text-center py-16 text-gray-400 dark:text-gray-500">
                       <MapPin className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                      <p className="font-semibold text-sm">Chưa lưu địa chỉ giao hàng nào</p>
-                      <p className="text-xs text-gray-400 mt-1">Vui lòng thêm địa chỉ để thuận tiện hơn khi mua sắm.</p>
+                      <p className="font-semibold text-sm">
+                        Chưa lưu địa chỉ giao hàng nào
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Vui lòng thêm địa chỉ để thuận tiện hơn khi mua sắm.
+                      </p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {addresses.map((address) => (
-                        <div 
-                          key={address.id} 
+                        <div
+                          key={address.id}
                           className={`relative rounded-2xl border p-5 flex flex-col justify-between transition-all ${
-                            address.isDefault 
-                              ? "border-indigo-600 bg-indigo-50/15 dark:bg-indigo-950/10" 
+                            address.isDefault
+                              ? "border-indigo-600 bg-indigo-50/15 dark:bg-indigo-950/10"
                               : "border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700"
                           }`}
                         >
                           <div>
                             <div className="flex items-center justify-between mb-3">
-                              <span className="font-bold text-gray-900 dark:text-white text-base">{address.receiverName}</span>
+                              <span className="font-bold text-gray-900 dark:text-white text-base">
+                                {address.receiverName}
+                              </span>
                               {address.isDefault && (
                                 <span className="flex items-center gap-1 px-2.5 py-0.5 bg-indigo-600 text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
                                   <Check className="w-3 h-3" /> Mặc định
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{address.receiverPhone}</p>
+                            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                              {address.receiverPhone}
+                            </p>
                             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4">
                               {address.addressDetails}, {address.city}
                             </p>
@@ -700,11 +772,16 @@ function UserProfilePageContent() {
                     Đổi mật khẩu bảo mật
                   </h3>
 
-                  <form onSubmit={handleChangePassword} className="space-y-6 max-w-md">
+                  <form
+                    onSubmit={handleChangePassword}
+                    className="space-y-6 max-w-md"
+                  >
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Mật khẩu hiện tại</label>
-                      <input 
-                        type="password" 
+                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                        Mật khẩu hiện tại
+                      </label>
+                      <input
+                        type="password"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
                         placeholder="Nhập mật khẩu hiện tại"
@@ -712,9 +789,11 @@ function UserProfilePageContent() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Mật khẩu mới</label>
-                      <input 
-                        type="password" 
+                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                        Mật khẩu mới
+                      </label>
+                      <input
+                        type="password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Mật khẩu tối thiểu 6 ký tự"
@@ -722,9 +801,11 @@ function UserProfilePageContent() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">Xác nhận mật khẩu mới</label>
-                      <input 
-                        type="password" 
+                      <label className="block text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider mb-2">
+                        Xác nhận mật khẩu mới
+                      </label>
+                      <input
+                        type="password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Nhập lại mật khẩu mới"
@@ -738,7 +819,9 @@ function UserProfilePageContent() {
                         disabled={profileLoading}
                         className="flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white font-bold rounded-xl transition-all shadow-md shadow-indigo-600/15"
                       >
-                        {profileLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                        {profileLoading && (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        )}
                         Cập nhật mật khẩu
                       </button>
                     </div>
@@ -755,7 +838,8 @@ function UserProfilePageContent() {
                       Sản phẩm của tôi
                     </h3>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Quản lý và lọc nhanh danh sách các mặt hàng xe mô hình bạn đang kinh doanh.
+                      Quản lý và lọc nhanh danh sách các mặt hàng xe mô hình bạn
+                      đang kinh doanh.
                     </p>
                   </div>
 
@@ -771,7 +855,7 @@ function UserProfilePageContent() {
                     </div>
                     <div className="bg-gray-50/50 dark:bg-gray-800/40 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/75">
                       <span className="block text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                        {sellerProducts.filter(p => !p.isAuction).length}
+                        {sellerProducts.filter((p) => !p.isAuction).length}
                       </span>
                       <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
                         Đang bán (Mua ngay)
@@ -779,7 +863,7 @@ function UserProfilePageContent() {
                     </div>
                     <div className="bg-gray-50/50 dark:bg-gray-800/40 rounded-2xl p-4 border border-gray-100 dark:border-gray-800/75">
                       <span className="block text-2xl font-black text-amber-600 dark:text-amber-400">
-                        {sellerProducts.filter(p => p.isAuction).length}
+                        {sellerProducts.filter((p) => p.isAuction).length}
                       </span>
                       <span className="text-[10px] uppercase font-bold text-gray-400 dark:text-gray-500 tracking-wider">
                         Đang Đấu giá
@@ -796,8 +880,8 @@ function UserProfilePageContent() {
                           Tìm kiếm sản phẩm
                         </label>
                         <div className="relative">
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             value={productSearch}
                             onChange={(e) => setProductSearch(e.target.value)}
                             placeholder="Nhập tên sản phẩm, mã xe..."
@@ -812,15 +896,19 @@ function UserProfilePageContent() {
                         <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
                           Tỉ lệ (Scale)
                         </label>
-                        <select 
+                        <select
                           value={scaleFilter}
                           onChange={(e) => setScaleFilter(e.target.value)}
                           className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
                         >
                           <option value="all">Tất cả tỉ lệ</option>
-                          {availableScales.filter(s => s !== "all").map(scale => (
-                            <option key={scale} value={scale}>{scale}</option>
-                          ))}
+                          {availableScales
+                            .filter((s) => s !== "all")
+                            .map((scale) => (
+                              <option key={scale} value={scale}>
+                                {scale}
+                              </option>
+                            ))}
                         </select>
                       </div>
 
@@ -829,15 +917,19 @@ function UserProfilePageContent() {
                         <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
                           Hãng xe (Marque)
                         </label>
-                        <select 
+                        <select
                           value={marqueFilter}
                           onChange={(e) => setMarqueFilter(e.target.value)}
                           className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
                         >
                           <option value="all">Tất cả hãng xe</option>
-                          {availableMarques.filter(m => m !== "all").map(marque => (
-                            <option key={marque} value={marque}>{marque}</option>
-                          ))}
+                          {availableMarques
+                            .filter((m) => m !== "all")
+                            .map((marque) => (
+                              <option key={marque} value={marque}>
+                                {marque}
+                              </option>
+                            ))}
                         </select>
                       </div>
 
@@ -846,7 +938,7 @@ function UserProfilePageContent() {
                         <label className="block text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">
                           Cách bán
                         </label>
-                        <select 
+                        <select
                           value={typeFilter}
                           onChange={(e) => setTypeFilter(e.target.value)}
                           className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-sm font-medium"
@@ -860,7 +952,11 @@ function UserProfilePageContent() {
 
                     <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800/60">
                       <span className="text-xs text-gray-400 dark:text-gray-500 font-semibold">
-                        Hiển thị <strong className="text-gray-700 dark:text-gray-300">{filteredProducts.length}</strong> / {sellerProducts.length} sản phẩm
+                        Hiển thị{" "}
+                        <strong className="text-gray-700 dark:text-gray-300">
+                          {filteredProducts.length}
+                        </strong>{" "}
+                        / {sellerProducts.length} sản phẩm
                       </span>
 
                       {/* Sort Dropdown */}
@@ -868,7 +964,7 @@ function UserProfilePageContent() {
                         <label className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider flex items-center gap-1">
                           <ArrowUpDown className="w-3 h-3" /> Sắp xếp
                         </label>
-                        <select 
+                        <select
                           value={sortBy}
                           onChange={(e) => setSortBy(e.target.value)}
                           className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 focus:ring-2 focus:ring-indigo-500/25 focus:outline-none text-xs font-semibold"
@@ -890,22 +986,28 @@ function UserProfilePageContent() {
                   ) : filteredProducts.length === 0 ? (
                     <div className="text-center py-16 text-gray-400 dark:text-gray-500">
                       <SlidersHorizontal className="w-12 h-12 mx-auto mb-3 opacity-40" />
-                      <p className="font-semibold text-sm">Không tìm thấy sản phẩm phù hợp</p>
-                      <p className="text-xs text-gray-400 mt-1">Vui lòng thay đổi từ khóa hoặc bộ lọc của bạn.</p>
+                      <p className="font-semibold text-sm">
+                        Không tìm thấy sản phẩm phù hợp
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Vui lòng thay đổi từ khóa hoặc bộ lọc của bạn.
+                      </p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 cursor-pointer">
                       {filteredProducts.map((product) => (
-                        <div 
+                        
+                        <div
                           key={product.id}
+                          onClick={() => router.push(`/product-detail/${product.id}`)}
                           className="group relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800/80 hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-lg transition-all duration-300 flex flex-col h-full"
                         >
                           {/* PRODUCT IMAGE */}
                           <div className="h-44 bg-gray-50 dark:bg-gray-950/65 relative flex items-center justify-center overflow-hidden border-b border-gray-50 dark:border-gray-800/40">
                             {product.imageUrl ? (
-                              <img 
-                                src={product.imageUrl} 
-                                alt={product.name} 
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
                                 className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
@@ -925,7 +1027,7 @@ function UserProfilePageContent() {
                                   Mua ngay
                                 </span>
                               )}
-                              
+
                               {product.scale && (
                                 <span className="px-2 py-0.5 bg-indigo-500/10 dark:bg-indigo-950/45 text-indigo-600 dark:text-indigo-400 text-[9px] font-extrabold rounded-md border border-indigo-100/35 uppercase tracking-wider self-start">
                                   Tỉ lệ {product.scale}
@@ -949,7 +1051,7 @@ function UserProfilePageContent() {
                                   </span>
                                 )}
                               </div>
-                              
+
                               <h4 className="font-extrabold text-gray-900 dark:text-white text-sm line-clamp-2 leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                 {product.name}
                               </h4>
@@ -958,19 +1060,30 @@ function UserProfilePageContent() {
                             <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/60 flex items-center justify-between">
                               <div>
                                 <span className="block text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
-                                  {product.isAuction ? "Giá hiện tại" : "Đơn giá"}
+                                  {product.isAuction
+                                    ? "Giá hiện tại"
+                                    : "Đơn giá"}
                                 </span>
                                 <span className="text-sm font-black text-rose-600 dark:text-rose-500">
-                                  {product.price ? product.price.toLocaleString("vi-VN") : "0"} ₫
+                                  {product.price
+                                    ? product.price.toLocaleString("vi-VN")
+                                    : "0"}{" "}
+                                  ₫
                                 </span>
                               </div>
 
                               <div className="text-right">
                                 <span className="block text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
-                                  Kho: <strong className="text-gray-700 dark:text-gray-300">{product.stockQuantity}</strong>
+                                  Kho:{" "}
+                                  <strong className="text-gray-700 dark:text-gray-300">
+                                    {product.stockQuantity}
+                                  </strong>
                                 </span>
                                 <span className="block text-[9px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">
-                                  Đã bán: <strong className="text-gray-700 dark:text-gray-300">{product.soldQuantity}</strong>
+                                  Đã bán:{" "}
+                                  <strong className="text-gray-700 dark:text-gray-300">
+                                    {product.soldQuantity}
+                                  </strong>
                                 </span>
                               </div>
                             </div>
@@ -981,7 +1094,6 @@ function UserProfilePageContent() {
                   )}
                 </div>
               )}
-
             </main>
           </div>
         </div>
@@ -992,9 +1104,11 @@ function UserProfilePageContent() {
             <div className="bg-white dark:bg-gray-900 w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800 transition-all">
               <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/45 dark:bg-gray-800/15">
                 <h4 className="text-lg font-bold text-gray-900 dark:text-white">
-                  {editingAddress ? "Chỉnh sửa địa chỉ" : "Thêm địa chỉ giao hàng mới"}
+                  {editingAddress
+                    ? "Chỉnh sửa địa chỉ"
+                    : "Thêm địa chỉ giao hàng mới"}
                 </h4>
-                <button 
+                <button
                   onClick={() => setAddressModalOpen(false)}
                   className="text-gray-400 hover:text-gray-600"
                 >
@@ -1005,9 +1119,11 @@ function UserProfilePageContent() {
               <form onSubmit={handleSaveAddress} className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Họ & Tên người nhận</label>
-                    <input 
-                      type="text" 
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                      Họ & Tên người nhận
+                    </label>
+                    <input
+                      type="text"
                       value={receiverName}
                       onChange={(e) => setReceiverName(e.target.value)}
                       placeholder="Nhập tên người nhận"
@@ -1015,9 +1131,11 @@ function UserProfilePageContent() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Số điện thoại nhận</label>
-                    <input 
-                      type="text" 
+                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                      Số điện thoại nhận
+                    </label>
+                    <input
+                      type="text"
                       value={receiverPhone}
                       onChange={(e) => setReceiverPhone(e.target.value)}
                       placeholder="Nhập số điện thoại"
@@ -1027,9 +1145,11 @@ function UserProfilePageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tỉnh / Thành phố</label>
-                  <input 
-                    type="text" 
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    Tỉnh / Thành phố
+                  </label>
+                  <input
+                    type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Ví dụ: TP. Hồ Chí Minh"
@@ -1038,9 +1158,11 @@ function UserProfilePageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Địa chỉ cụ thể</label>
-                  <input 
-                    type="text" 
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                    Địa chỉ cụ thể
+                  </label>
+                  <input
+                    type="text"
                     value={addressDetails}
                     onChange={(e) => setAddressDetails(e.target.value)}
                     placeholder="Số nhà, tên đường, phường/xã..."
@@ -1049,15 +1171,18 @@ function UserProfilePageContent() {
                 </div>
 
                 <div className="flex items-center gap-2.5 pt-2">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     id="address-default"
                     checked={isDefault}
                     onChange={(e) => setIsDefault(e.target.checked)}
                     disabled={editingAddress?.isDefault} // Không cho phép bỏ tích nếu đây đang là mặc định duy nhất
                     className="h-4.5 w-4.5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
                   />
-                  <label htmlFor="address-default" className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                  <label
+                    htmlFor="address-default"
+                    className="text-sm font-semibold text-gray-700 dark:text-gray-300 cursor-pointer"
+                  >
                     Đặt địa chỉ này làm mặc định
                   </label>
                 </div>
@@ -1088,14 +1213,16 @@ function UserProfilePageContent() {
 
 export default function UserProfilePage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">Đang tải...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4">
+          <div className="text-center">
+            <Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-3" />
+            <p className="text-gray-500 text-sm">Đang tải...</p>
+          </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <UserProfilePageContent />
     </Suspense>
   );
