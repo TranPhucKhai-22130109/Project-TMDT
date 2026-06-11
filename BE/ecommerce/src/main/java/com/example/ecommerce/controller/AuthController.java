@@ -1,11 +1,15 @@
 package com.example.ecommerce.controller;
 
 
+import com.example.ecommerce.dto.request.auth.ForgotPasswordRequest;
 import com.example.ecommerce.dto.request.auth.GoogleAuthRequest;
 import com.example.ecommerce.dto.request.auth.LoginRequest;
+import com.example.ecommerce.dto.request.auth.ResetPasswordRequest;
 import com.example.ecommerce.dto.request.auth.SignUpRequest;
+import com.example.ecommerce.dto.request.auth.VerifyOtpRequest;
 import com.example.ecommerce.dto.response.ApiResponse;
 import com.example.ecommerce.dto.response.LoginResponse;
+import com.example.ecommerce.dto.response.VerifyOtpResponse;
 import com.example.ecommerce.exception.AppException;
 import com.example.ecommerce.exception.ErrorCode;
 import com.example.ecommerce.service.AuthService;
@@ -58,7 +62,70 @@ public class AuthController {
                 ApiResponse.<Void>builder()
                         .success(true)
                         .code("REGISTER_SUCCESS")
-                        .message("Register successfully")
+                        .message("Registration successful. Please check your email to verify your account.")
+                        .build()
+        );
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(
+            @RequestParam String token
+    ) {
+        authService.verifyEmail(token);
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .code("EMAIL_VERIFIED")
+                        .message("Email verified successfully. You can now log in.")
+                        .build()
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @RequestBody ForgotPasswordRequest request
+    ) {
+        authService.forgotPassword(request.getEmail());
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .code("OTP_SENT")
+                        .message("OTP has been sent to your email.")
+                        .build()
+        );
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<ApiResponse<VerifyOtpResponse>> verifyOtp(
+            @RequestBody VerifyOtpRequest request
+    ) {
+        String resetToken = authService.verifyOtp(request.getEmail(), request.getOtp());
+
+        return ResponseEntity.ok(
+                ApiResponse.<VerifyOtpResponse>builder()
+                        .success(true)
+                        .code("OTP_VERIFIED")
+                        .message("OTP verified. Use the reset token to set a new password.")
+                        .data(VerifyOtpResponse.builder()
+                                .resetToken(resetToken)
+                                .build())
+                        .build()
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @RequestBody ResetPasswordRequest request
+    ) {
+        authService.resetPassword(request.getResetToken(), request.getNewPassword());
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .success(true)
+                        .code("PASSWORD_RESET_SUCCESS")
+                        .message("Password has been reset successfully.")
                         .build()
         );
     }

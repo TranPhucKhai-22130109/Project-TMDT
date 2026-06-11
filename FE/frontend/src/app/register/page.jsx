@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Apple, ArrowRight, Chrome, Lock, Mail, User } from "lucide-react";
+import { Apple, ArrowRight, Chrome, Lock, Mail, User, CheckCircle } from "lucide-react";
 import { Button } from "@/components/Button";
 import { Input } from "@/components/Input";
 import { useAuth } from "@/context/AuthContext";
@@ -14,7 +14,7 @@ export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [successMsg, setSuccessMsg] = useState("");
+  const [isRegistered, setIsRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { signup, loginWithGoogle, isAuthenticated, syncGuestCartToDB } =
@@ -39,15 +39,11 @@ export default function Page() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccessMsg("");
     setLoading(true);
 
     try {
       await signup({ name, email, password });
-      setSuccessMsg("Đăng ký thành công! Đang chuyển hướng đến đăng nhập...");
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+      setIsRegistered(true);
     } catch (err) {
       setError(err.message || "Registration failed. Please try again.");
     } finally {
@@ -70,6 +66,23 @@ export default function Page() {
     }
   };
 
+  if (isRegistered) {
+    return (
+      <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-xl shadow-sm border border-gray-300 dark:border-gray-700 text-center">
+          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Kiểm tra email của bạn</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Chúng tôi đã gửi một đường dẫn xác nhận đến email <span className="font-semibold text-gray-900 dark:text-gray-200">{email}</span>. Vui lòng kiểm tra hộp thư (và mục thư rác) để kích hoạt tài khoản.
+          </p>
+          <NextLink href="/login" className="inline-block w-full py-3 bg-gray-900 dark:bg-gray-700 text-white font-semibold rounded-xl hover:bg-gray-800 dark:hover:bg-gray-600 transition-colors">
+            Về trang đăng nhập
+          </NextLink>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -87,15 +100,10 @@ export default function Page() {
           className="border border-gray-300 rounded-xl dark:border-gray-700 p-8 space-y-6 bg-white dark:bg-gray-800 shadow-sm"
           onSubmit={handleSubmit}
         >
-          {/* Error / Success messages */}
+          {/* Error messages */}
           {error && (
             <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
               {error}
-            </div>
-          )}
-          {successMsg && (
-            <div className="p-3 rounded-lg bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-600 dark:text-green-400 text-sm">
-              {successMsg}
             </div>
           )}
 

@@ -12,6 +12,7 @@ import { Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { addToCart } from "@/services/cartService";
 import { useCart } from "@/app/cart/CartContext";
+import NextLink from "next/link";
 
 export default function Page() {
   const [darkMode, setDarkMode] = useState(false);
@@ -136,13 +137,13 @@ export default function Page() {
                 {" "}
                 Password{" "}
               </label>
-              <a
-                href="#"
+              <NextLink
+                href="/forgot-password"
                 className="text-sm text-red-600 dark:text-red-500 hover:underline"
               >
                 {" "}
                 Forgot?{" "}
-              </a>
+              </NextLink>
             </div>
             <div className="relative">
               <Input

@@ -40,6 +40,12 @@ public enum ErrorCode {
     // ==== ORDER ====
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "Order not found"),
     PAYMENT_FAILED(HttpStatus.BAD_REQUEST, "Payment processing failed"),
+
+    // ==== EMAIL VERIFICATION / PASSWORD RESET ====
+    INVALID_VERIFY_TOKEN(HttpStatus.BAD_REQUEST, "Invalid or expired verification token"),
+    INVALID_OTP(HttpStatus.BAD_REQUEST, "Invalid or expired OTP"),
+    INVALID_RESET_TOKEN(HttpStatus.BAD_REQUEST, "Invalid or expired reset token"),
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send email"),
     ;
 
 
