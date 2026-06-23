@@ -55,4 +55,74 @@ public class TokenService {
         }
         return true;
     }
+
+    // ===== Email verification token =====
+    private final ConcurrentHashMap<String, String> emailVerifyTokens = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Instant> emailVerifyExpiry = new ConcurrentHashMap<>();
+
+    public void storeVerifyToken(String token, String userId, Instant expiresAt) {
+        emailVerifyTokens.put(token, userId);
+        emailVerifyExpiry.put(token, expiresAt);
+    }
+
+    public String getUserIdByVerifyToken(String token) {
+        Instant expiresAt = emailVerifyExpiry.get(token);
+        if (expiresAt == null || expiresAt.isBefore(Instant.now())) {
+            consumeVerifyToken(token);
+            return null;
+        }
+        return emailVerifyTokens.get(token);
+    }
+
+    public void consumeVerifyToken(String token) {
+        emailVerifyTokens.remove(token);
+        emailVerifyExpiry.remove(token);
+    }
+
+    // ===== OTP (forgot password) =====
+    private final ConcurrentHashMap<String, String> otpStore = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Instant> otpExpiry = new ConcurrentHashMap<>();
+
+    public void storeOtp(String email, String otp, Instant expiresAt) {
+        otpStore.put(email, otp);
+        otpExpiry.put(email, expiresAt);
+    }
+
+    public boolean validateAndConsumeOtp(String email, String otp) {
+        Instant expiresAt = otpExpiry.get(email);
+        if (expiresAt == null || expiresAt.isBefore(Instant.now())) {
+            otpStore.remove(email);
+            otpExpiry.remove(email);
+            return false;
+        }
+        String stored = otpStore.get(email);
+        if (stored != null && stored.equals(otp)) {
+            otpStore.remove(email);
+            otpExpiry.remove(email);
+            return true;
+        }
+        return false;
+    }
+
+    // ===== Reset password token =====
+    private final ConcurrentHashMap<String, String> resetTokens = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Instant> resetTokenExpiry = new ConcurrentHashMap<>();
+
+    public void storeResetToken(String token, String email, Instant expiresAt) {
+        resetTokens.put(token, email);
+        resetTokenExpiry.put(token, expiresAt);
+    }
+
+    public String validateAndConsumeResetToken(String token) {
+        Instant expiresAt = resetTokenExpiry.get(token);
+        if (expiresAt == null || expiresAt.isBefore(Instant.now())) {
+            resetTokens.remove(token);
+            resetTokenExpiry.remove(token);
+            return null;
+        }
+        String email = resetTokens.get(token);
+        resetTokens.remove(token);
+        resetTokenExpiry.remove(token);
+        return email;
+    }
 }

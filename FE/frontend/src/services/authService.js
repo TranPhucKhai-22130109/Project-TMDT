@@ -155,3 +155,77 @@ export async function logout() {
   // Luôn xóa userId khỏi localStorage dù API thành công hay thất bại
   localStorage.removeItem("localstorage-userId");
 }
+
+/**
+ * Verify Email
+ * GET /v1/auth/verify-email?token=...
+ */
+export async function verifyEmail(token) {
+  const res = await fetch(`${AUTH_BASE}/v1/auth/verify-email?token=${encodeURIComponent(token)}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Email verification failed");
+  }
+  return data;
+}
+
+/**
+ * Forgot Password - Send OTP
+ * POST /v1/auth/forgot-password
+ */
+export async function forgotPassword(email) {
+  const res = await fetch(`${AUTH_BASE}/v1/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Failed to send OTP");
+  }
+  return data;
+}
+
+/**
+ * Verify OTP
+ * POST /v1/auth/verify-otp
+ */
+export async function verifyOtp(email, otp) {
+  const res = await fetch(`${AUTH_BASE}/v1/auth/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email, otp }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Invalid OTP");
+  }
+  return data;
+}
+
+/**
+ * Reset Password
+ * POST /v1/auth/reset-password
+ */
+export async function resetPassword(resetToken, newPassword) {
+  const res = await fetch(`${AUTH_BASE}/v1/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ resetToken, newPassword }),
+  });
+
+  const data = await res.json();
+  if (!res.ok || !data.success) {
+    throw new Error(data.message || "Password reset failed");
+  }
+  return data;
+}

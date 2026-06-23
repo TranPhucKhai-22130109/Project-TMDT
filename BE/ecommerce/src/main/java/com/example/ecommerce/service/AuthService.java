@@ -9,6 +9,7 @@ import com.example.ecommerce.dto.response.LoginResponse;
 import com.example.ecommerce.entity.Role;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.entity.UserRole;
+import com.example.ecommerce.enums.AccountStatus;
 import com.example.ecommerce.enums.RoleName;
 import com.example.ecommerce.exception.AppException;
 import com.example.ecommerce.exception.ErrorCode;
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +34,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -49,6 +52,13 @@ public class AuthService {
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
     private final FirebaseAuth firebaseAuth;
+    private final EmailService emailService;
+
+    @Value("${app.email-verify-expire-seconds}")
+    private long emailVerifyExpireSeconds;
+
+    @Value("${app.otp-expire-seconds}")
+    private long otpExpireSeconds;
 
     public boolean isUsernameAvailable(String username) {
         return !userRepository.existsByUsername(username);
@@ -63,6 +73,7 @@ public class AuthService {
         user.setUsername(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setStatus(AccountStatus.INACTIVE);
         user.setAvatarUrl(
                 "https://api.dicebear.com/9.x/notionists/svg?seed="
                         + request.getName().replace(" ", "%20")
@@ -76,8 +87,64 @@ public class AuthService {
         UserRole userRole = new UserRole();
         userRole.setUser(savedUser);
         userRole.setRole(role);
-
         userRoleRepository.save(userRole);
+
+        // Generate verification token and send email
+        String verifyToken = UUID.randomUUID().toString();
+        Instant expiresAt = Instant.now().plusSeconds(emailVerifyExpireSeconds);
+        tokenService.storeVerifyToken(verifyToken, savedUser.getId(), expiresAt);
+        emailService.sendVerificationEmail(savedUser.getEmail(), verifyToken);
+    }
+
+    public void verifyEmail(String token) {
+        String userId = tokenService.getUserIdByVerifyToken(token);
+        if (userId == null) {
+            throw new AppException(ErrorCode.INVALID_VERIFY_TOKEN);
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setStatus(AccountStatus.ACTIVE);
+        userRepository.save(user);
+        tokenService.consumeVerifyToken(token);
+    }
+
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        String otp = generateOtp();
+        Instant expiresAt = Instant.now().plusSeconds(otpExpireSeconds);
+        tokenService.storeOtp(email, otp, expiresAt);
+        emailService.sendOtpEmail(email, otp);
+    }
+
+    public String verifyOtp(String email, String otp) {
+        boolean valid = tokenService.validateAndConsumeOtp(email, otp);
+        if (!valid) {
+            throw new AppException(ErrorCode.INVALID_OTP);
+        }
+        // Generate a one-time reset token
+        String resetToken = UUID.randomUUID().toString();
+        Instant expiresAt = Instant.now().plusSeconds(otpExpireSeconds); // same TTL as OTP
+        tokenService.storeResetToken(resetToken, email, expiresAt);
+        return resetToken;
+    }
+
+    public void resetPassword(String resetToken, String newPassword) {
+        String email = tokenService.validateAndConsumeResetToken(resetToken);
+        if (email == null) {
+            throw new AppException(ErrorCode.INVALID_RESET_TOKEN);
+        }
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    private String generateOtp() {
+        SecureRandom random = new SecureRandom();
+        int otp = 100000 + random.nextInt(900000); // 6-digit
+        return String.valueOf(otp);
     }
 
     // Login Google
