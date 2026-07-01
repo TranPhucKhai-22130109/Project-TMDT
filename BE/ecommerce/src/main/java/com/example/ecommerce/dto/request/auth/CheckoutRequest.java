@@ -32,6 +32,8 @@ public class CheckoutRequest {
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
 
+    private Boolean auctionCheckout;
+
     @NotEmpty(message = "Order must have at least one item")
     @Valid
     private List<OrderItemRequest> items;
