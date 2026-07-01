@@ -10,11 +10,14 @@ const notifications = [
   { id: 3, text: "User John Doe registered", time: "1h ago", unread: false },
 ];
 
-export default function Topbar({ title, onMenuClick }) {
+export default function Topbar({ title, onMenuClick, adminProfile }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const unreadCount = notifications.filter((n) => n.unread).length;
   const { logout } = useAuth();
+  const displayName = adminProfile?.fullName || adminProfile?.username || "Admin";
+  const avatarUrl = adminProfile?.avatarUrl;
+  const avatarLetter = displayName.charAt(0).toUpperCase();
 
   const handleSignOut = async () => {
     setShowUserMenu(false);
@@ -117,16 +120,24 @@ export default function Topbar({ title, onMenuClick }) {
             }}
             className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-gray-100 transition"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
-              A
-            </div>
-            <span className="hidden sm:block text-sm font-medium text-gray-700">Admin</span>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
+                {avatarLetter}
+              </div>
+            )}
+            <span className="hidden sm:block text-sm font-medium text-gray-700">{displayName}</span>
             <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block" />
           </button>
 
           {showUserMenu && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 z-50 py-1">
-              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+              <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                 My Profile
               </a>
               <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
@@ -146,4 +157,3 @@ export default function Topbar({ title, onMenuClick }) {
     </header>
   );
 }
-

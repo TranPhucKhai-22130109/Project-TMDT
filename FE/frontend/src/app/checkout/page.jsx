@@ -2,11 +2,12 @@
 
 import { checkout } from "@/services/order";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NextLink from "next/link";
 import { useCart } from "@/app/cart/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { getCartItems } from "@/services/cartService";
+import { getProductById } from "@/services/productService";
 import { getMyProfile } from "@/services/userService";
 import Navbar from "@/components/Navbar";
 import {
@@ -40,8 +41,13 @@ const SHIPPING_FEE        = 50_000;
 
 export default function CheckoutPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { reloadCartCount } = useCart();
     const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+    const auctionProductId = searchParams.get("auctionProductId");
+    const auctionPrice = Number(searchParams.get("price"));
+    const isAuctionCheckout = Boolean(auctionProductId);
 
     const [cartItems, setCartItems]     = useState([]);
     const [pageLoading, setPageLoading] = useState(true);
@@ -69,9 +75,26 @@ export default function CheckoutPage() {
         const fetchCheckoutData = async () => {
             try {
                 setPageLoading(true);
-                const data = await getCartItems();
-                const list = Array.isArray(data) ? data : data.content || [];
-                setCartItems(list);
+                if (isAuctionCheckout) {
+                    const product = await getProductById(auctionProductId);
+                    const displayPrice = auctionPrice || product.currentPrice || product.price || 0;
+                    setCartItems([
+                        {
+                            id: `auction-${product.id}`,
+                            quantity: 1,
+                            subtotal: displayPrice,
+                            product: {
+                                ...product,
+                                price: displayPrice,
+                                currentPrice: displayPrice,
+                            },
+                        },
+                    ]);
+                } else {
+                    const data = await getCartItems();
+                    const list = Array.isArray(data) ? data : data.content || [];
+                    setCartItems(list);
+                }
 
                 try {
                     const p = await getMyProfile();
@@ -98,7 +121,7 @@ export default function CheckoutPage() {
         };
 
         fetchCheckoutData();
-    }, [isAuthenticated, authLoading]);
+    }, [isAuthenticated, authLoading, isAuctionCheckout, auctionProductId, auctionPrice]);
 
     // ── Derived totals ─────────────────────────────────────────────
     const cartTotal   = cartItems.reduce((sum, item) => sum + getItemSubtotal(item), 0);
@@ -123,6 +146,7 @@ export default function CheckoutPage() {
                 city,
                 note,
                 paymentMethod,
+                auctionCheckout: isAuctionCheckout,
                 items: cartItems.map(item => ({
                     productId: item.product?.id || item.id,
                     quantity: item.quantity,

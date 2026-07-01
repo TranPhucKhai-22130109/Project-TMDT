@@ -90,14 +90,12 @@ public class OrderService {
         // ------------------------------------------------------------------
 
         Order savedOrder = orderRepository.save(order);
-        if (request.getPaymentMethod() == PaymentMethod.COD) {
-            cartItemRepository.deleteByUserId(userId);
-        }
-        // Xóa toàn bộ giỏ hàng của user sau khi checkout thành công
-        try {
-            cartItemRepository.deleteByUserId(userId);
-        } catch (Exception e) {
-            System.err.println("Lỗi khi xóa giỏ hàng sau checkout: " + e.getMessage());
+        if (!Boolean.TRUE.equals(request.getAuctionCheckout())) {
+            try {
+                cartItemRepository.deleteByUserId(userId);
+            } catch (Exception e) {
+                System.err.println("Lỗi khi xóa giỏ hàng sau checkout: " + e.getMessage());
+            }
         }
 
         return OrderResponse.from(savedOrder);

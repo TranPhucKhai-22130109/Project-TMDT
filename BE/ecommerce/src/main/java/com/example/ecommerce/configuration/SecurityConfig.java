@@ -115,7 +115,8 @@ public class SecurityConfig {
         // 🌟 SỬA QUAN TRỌNG: Chỉ định Spring Boot đọc quyền hạn từ trường nào trong chuỗi JWT của bạn.
         // Mặc định is "scope", ở đây ta ép đọc từ "roles" (hoặc "role" / "authorities" tùy theo cách bạn tạo JWT)
         // Bác hãy kiểm tra hàm tạo Token (JwtProvider/JwtService) xem đang put tên gì nhé, thường là "roles"
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        // grantedAuthoritiesConverter.setAuthoritiesClaimName("roles");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("scope");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);

@@ -21,8 +21,12 @@ const navItems = [
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({ isOpen, onClose, adminProfile }) {
   const pathname = usePathname();
+  const displayName = adminProfile?.fullName || adminProfile?.username || "Admin User";
+  const displayEmail = adminProfile?.email || adminProfile?.roles?.[0] || "Admin";
+  const avatarUrl = adminProfile?.avatarUrl;
+  const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
     <>
@@ -73,8 +77,9 @@ export default function Sidebar({ isOpen, onClose }) {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+              item.href === "/admin"
+                ? pathname === "/admin"
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
             return (
               <Link
@@ -113,14 +118,22 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Footer */}
         <div className="px-4 py-4 border-t border-white/10">
           <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/5">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
-              A
-            </div>
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={displayName}
+                className="w-8 h-8 rounded-full object-cover shrink-0"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                {avatarLetter}
+              </div>
+            )}
             <div className="overflow-hidden">
               <p className="text-white text-sm font-medium truncate">
-                Admin User
+                {displayName}
               </p>
-              <p className="text-white/40 text-xs truncate">admin@cozy.com</p>
+              <p className="text-white/40 text-xs truncate">{displayEmail}</p>
             </div>
           </div>
         </div>
